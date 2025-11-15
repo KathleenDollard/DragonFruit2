@@ -5,9 +5,9 @@ namespace SampleConsoleApp;
 
 public partial class MyArgs : IArgs<MyArgs>
 {
-    public static Command CreateCli()
+    public static System.CommandLine.Command CreateCli()
     {
-        var rootCommand = new Command("Test");
+        var rootCommand = new System.CommandLine.Command("Test");
         rootCommand.Add(new Option<string>("--name")
         {
             Description = "Your name",

@@ -3,19 +3,19 @@ using System.IO;
 
 namespace DragonFruit2;
 
-public static class CLiBuilder
+public static class Command
 {
  
     /// <summary>
     /// </summary>
-    /// <typeparam name="T">The type containing the CLI definition</typeparam>
+    /// <typeparam name="TArgs">The type containing the CLI definition</typeparam>
     /// <param name="args">Optionaly pass the commandline args</param>
     /// <returns></returns>
-    public static T? ParseArgs<T>(string[]? args = null)
-        where T : IArgs<T>
+    public static TArgs? ParseArgs<TArgs>(string[]? args = null)
+        where TArgs : IArgs<TArgs>
     {
         args ??= Environment.GetCommandLineArgs();
-        var command = T.CreateCli();
+        var command = TArgs.CreateCli();
         command.SetAction(parseResult =>
         {
             return 0;
@@ -27,7 +27,7 @@ public static class CLiBuilder
         {
             return default;
         }
-        T? argsObject = T.Create(parseResult);
+        TArgs? argsObject = TArgs.Create(parseResult);
         return argsObject;
 
     }

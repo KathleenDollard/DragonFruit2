@@ -4,9 +4,9 @@ namespace DragonFruit2;
 
 public static class CliExtensions
 {
-    extension(Command command)
+    extension(System.CommandLine.Command command)
     {
-        public Command AddRange(IEnumerable<Option> options)
+        public System.CommandLine.Command AddRange(IEnumerable<Option> options)
         {
             foreach (var option in options)
             {
@@ -14,7 +14,7 @@ public static class CliExtensions
             }
             return command;
         }
-        public Command AddRange(IEnumerable<Argument> arguments)
+        public System.CommandLine.Command AddRange(IEnumerable<Argument> arguments)
         {
             foreach (var argument in arguments)
             {  
@@ -22,7 +22,7 @@ public static class CliExtensions
             }
             return command;
         }
-        public Command AddRange(IEnumerable<Command> commands)
+        public System.CommandLine.Command AddRange(IEnumerable<System.CommandLine.Command> commands)
         {
             foreach (var childCommand in commands)
             {

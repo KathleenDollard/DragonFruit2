@@ -5,7 +5,7 @@ namespace DragonFruit2;
 
 public interface IArgs<T>
 {
-    public abstract static Command CreateCli();
+    public abstract static System.CommandLine.Command CreateCli();
     public void SetParsedValues(ParseResult result);
 
     public abstract static T Create(ParseResult parseResult); 

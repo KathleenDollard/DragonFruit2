@@ -1,7 +1,7 @@
 ﻿using DragonFruit2;
 using SampleConsoleApp;
 
-var myArgs = CLiBuilder.ParseArgs<MyArgs>(args);
+var myArgs = Command.ParseArgs<MyArgs>(args);
 
 if (myArgs != null)
 {

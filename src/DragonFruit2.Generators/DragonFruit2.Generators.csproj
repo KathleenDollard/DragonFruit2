@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>14.0</LangVersion>
+		<IsRoslynComponent>true</IsRoslynComponent>
+
+		<!--<AllowUnsafeBlocks>true</AllowUnsafeBlocks>-->
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<IsPackable>false</IsPackable>
+		<OutputItemType>Analyzer</OutputItemType>
+		<LangVersion>14.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="DragonFruit2.Generators.Test" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+	  <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\DragonFruit2.GeneratorSupport\DragonFruit2.GeneratorSupport.csproj" />
+	</ItemGroup>
+
+</Project>
+
+

@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "SampleConsoleApp": {
-      "commandName": "Project",
-      "commandLineArgs": "--greeting Hello  --name Kathleen --age 21"
-    }
-  }
-}

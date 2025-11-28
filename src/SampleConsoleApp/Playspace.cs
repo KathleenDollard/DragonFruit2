@@ -22,6 +22,6 @@ class Cat : IAnimal
 class AnimalSoundExplainer<T> where T : IAnimal
 {
 
-    internal static void Explain() =>
+    public static void Explain() =>
         Console.WriteLine("Every " + typeof(T).Name + " makes " + T.Sound);
 }

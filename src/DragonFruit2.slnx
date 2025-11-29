@@ -2,10 +2,9 @@
   <Folder Name="/Solution Items/">
     <File Path="Directory.Build.props" />
   </Folder>
+  <Project Path="DragonFruit2.Common/DragonFruit2.Common.csproj" Id="9177aa91-9658-4438-9331-dd6eb6fb676d" />
   <Project Path="DragonFruit2.Generators.Test/DragonFruit2.Generators.Test.csproj" Id="513239eb-873d-4d57-b95d-43eff3f81bbd" />
   <Project Path="DragonFruit2.Generators/DragonFruit2.Generators.csproj" />
-  <Project Path="DragonFruit2.GeneratorSupport/DragonFruit2.GeneratorSupport.csproj" Id="5d19b8a8-31fa-4c54-bbcb-09315d11cc99" />
   <Project Path="DragonFruit2.Polyfills/DragonFruit2.Polyfills.csproj" Id="9ca1ff61-3e17-40b6-9e71-a654d4d3a5c6" />
   <Project Path="DragonFruit2/DragonFruit2.csproj" />
-  <Project Path="SampleConsoleApp/SampleConsoleApp.csproj" />
 </Solution>

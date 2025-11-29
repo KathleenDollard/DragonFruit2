@@ -8,9 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\DragonFruit2\DragonFruit2.csproj" />
-		<ProjectReference Include="..\DragonFruit2.Generators\DragonFruit2.Generators.csproj"
-				  OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<PackageReference Include="DragonFruit2.Generators" Version="0.1.0-beta" />
 	</ItemGroup>
 
 </Project>

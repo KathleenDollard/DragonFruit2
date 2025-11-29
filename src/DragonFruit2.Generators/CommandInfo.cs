@@ -1,6 +1,3 @@
-using Microsoft.CodeAnalysis;
-using System.Runtime.CompilerServices;
-
 namespace DragonFruit2.GeneratorSupport;
 
 /// <summary>

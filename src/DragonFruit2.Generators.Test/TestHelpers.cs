@@ -42,6 +42,7 @@ public static class TestHelpers
                             .Cast<MetadataReference>()
                             .ToList();
         references.Add(MetadataReference.CreateFromFile(@"..\..\DragonFruit2\debug\DragonFruit2.dll"));
+        references.Add(MetadataReference.CreateFromFile(@"..\..\DragonFruit2.Common\debug\DragonFruit2.Common.dll"));
 
         CSharpCompilation compilation = CSharpCompilation.Create(
             assemblyName: "Tests",

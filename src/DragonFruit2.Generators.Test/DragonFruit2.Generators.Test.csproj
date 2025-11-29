@@ -15,17 +15,16 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="1.1.2" />
 		<PackageReference Include="xunit.v3" Version="2.9.3" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\DragonFruit2.Common\DragonFruit2.Common.csproj" />
+		<ProjectReference Include="..\DragonFruit2.Generators\DragonFruit2.Generators.csproj" />
+		<ProjectReference Include="..\DragonFruit2.Polyfills\DragonFruit2.Polyfills.csproj" PrivateAssets="All" IncludeAssets="runtime" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\DragonFruit2.Generators\DragonFruit2.Generators.csproj" />
-	</ItemGroup>
 
-
-</Project>	
+</Project>

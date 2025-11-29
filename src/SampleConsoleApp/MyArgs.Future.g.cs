@@ -4,7 +4,7 @@ using System.CommandLine;
 
 namespace SampleConsoleApp;
 
-public partial class MyArgs : IArgs<MyArgs>
+public partial class MyArgs_Example : IArgs<MyArgs>
 {
     public static System.CommandLine.Command CreateCli()
     {

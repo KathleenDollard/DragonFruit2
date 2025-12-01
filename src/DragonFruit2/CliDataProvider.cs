@@ -7,6 +7,7 @@ namespace DragonFruit2;
 public class CliDataProvider() : DataProvider
 {
     public ParseResult? ParseResult { get; set; }
+    public Dictionary<string, Symbol> LookupByName { get; set; } = [];
 
     public override bool TryGetValue<TValue>(string key, object[] alternateKeys, out DataValue<TValue> trialValue)
     {
@@ -52,5 +53,10 @@ public class CliDataProvider() : DataProvider
 
         //throw new NotImplementedException();
 
+    }
+
+    public void AddNameLookup(string name, Symbol symbol)
+    {
+        LookupByName[name] = symbol;
     }
 }

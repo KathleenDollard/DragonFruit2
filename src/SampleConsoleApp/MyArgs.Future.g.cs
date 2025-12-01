@@ -3,7 +3,6 @@ using DragonFruit2;
 using DragonFruit2.Common;
 using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 
 namespace SampleConsoleApp;
 
@@ -14,45 +13,47 @@ public partial class MyArgs : CliArgs, ICliArgs<MyArgs>
 {
     private static MyArgsBuilder builder;
 
-    private class MyArgsBuilder
-    {
-        internal Option<string> nameOption;
-        internal Option<Int32> ageOption;
-        internal Option<string> greetingOption;
-
-        public MyArgsBuilder()
-        {
-            nameOption = new Option<string>("--name")
-            {
-                Description = "Your name",
-                Required = true
-            };
-            ageOption = new Option<int>("--age")
-            {
-                Description = "Your Age"
-            };
-            greetingOption = new Option<string>("--greeting")
-            {
-                Description = "Greeting message"
-            };
-        }
-
-        public System.CommandLine.Command Build()
-        {
-            var rootCommand = new System.CommandLine.Command("Test");
-            rootCommand.Add(nameOption);
-            rootCommand.Add(ageOption);
-            rootCommand.Add(greetingOption);
-            rootCommand.Add(new System.CommandLine.Command("TestChild"));
-            return rootCommand;
-        }
-    }
-
-
     public static System.CommandLine.Command CreateCli()
     {
         builder ??= new MyArgsBuilder();
         return builder.Build();
+    }
+
+    private class MyArgsBuilder
+    {
+        public System.CommandLine.Command Build()
+        {
+            var dataProvider = DataProviders.FirstOrDefault(dp => dp is CliDataProvider) as CliDataProvider;
+
+            var rootCommand = new System.CommandLine.Command("Test")
+            {
+                Description = "This is a test command"
+            };
+            var nameOption = new Option<string>("--name")
+            {
+                Description = "Your name",
+                Required = true
+            };
+            dataProvider.AddNameLookup(nameof(Name), nameOption);
+            rootCommand.Add(nameOption);
+
+            var ageOption = new Option<System.Int32>("--age")
+            {
+                Description = "Your Age"
+            };
+            dataProvider.AddNameLookup(nameof(Age), ageOption);
+            rootCommand.Add(ageOption);
+
+            var greetingOption = new Option<System.Int32>("--greeting")
+            {
+                Description = "Greeting message"
+            };
+            dataProvider.AddNameLookup(nameof(Greeting), greetingOption);
+            rootCommand.Add(greetingOption);
+
+            rootCommand.Add(new System.CommandLine.Command("TestChild"));
+            return rootCommand;
+        }
     }
 
     // Only generate the following constructor if there are no other constructors defined (possibly via partial constructor)
@@ -62,6 +63,7 @@ public partial class MyArgs : CliArgs, ICliArgs<MyArgs>
 
     [SetsRequiredMembers()]
     private MyArgs(DataValue<string> nameDataValue, DataValue<Int32> ageDataValue, DataValue<string> greetingDataValue)
+        : this()
     {
         if (nameDataValue.IsSet)
             Name = nameDataValue.Value;
@@ -73,9 +75,9 @@ public partial class MyArgs : CliArgs, ICliArgs<MyArgs>
 
     public static MyArgs Create()
     {
-        var nameDataValue = GetDataValue<string>("Name", builder.nameOption);
-        var ageDataValue = GetDataValue<Int32>("Age", builder.ageOption);
-        var greetingDataValue = GetDataValue<string>("Greeting", builder.greetingOption);
+        var nameDataValue = GetDataValue<string>("Name");
+        var ageDataValue = GetDataValue<Int32>("Age");
+        var greetingDataValue = GetDataValue<string>("Greeting");
 
         var newArgs = new MyArgs(nameDataValue, ageDataValue, greetingDataValue);
 
@@ -85,6 +87,6 @@ public partial class MyArgs : CliArgs, ICliArgs<MyArgs>
     public static MyArgs Create(ParseResult parseResult)
     {
         SetCliDataProvider<MyArgs>(parseResult);
-        return Create(); 
+        return Create();
     }
 }

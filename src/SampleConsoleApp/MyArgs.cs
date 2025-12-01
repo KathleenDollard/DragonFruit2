@@ -1,5 +1,10 @@
-﻿namespace SampleConsoleApp;
+﻿using System.ComponentModel;
 
+namespace SampleConsoleApp;
+
+/// <summary>
+/// This is a test command
+/// </summary>
 public partial class MyArgs
 {
     /// <summary>

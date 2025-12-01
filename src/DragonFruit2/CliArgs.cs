@@ -5,7 +5,7 @@ namespace DragonFruit2;
 
 public abstract class CliArgs : Args
 {
-    public static void SetCliDataProvider<T>(ParseResult parseResult) where T : CliArgs
+    public static CliDataProvider SetCliDataProvider<T>(ParseResult parseResult) where T : CliArgs
     {
         var cliProvider = DataProviders.OfType<CliDataProvider>().FirstOrDefault();
         if (cliProvider is null)
@@ -14,6 +14,7 @@ public abstract class CliArgs : Args
             AddDataProvider( cliProvider, 0);
         }
         cliProvider.ParseResult = parseResult;
+        return cliProvider;
     }
 
 }

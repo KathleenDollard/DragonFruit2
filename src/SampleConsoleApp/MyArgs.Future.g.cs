@@ -11,13 +11,13 @@ namespace SampleConsoleApp;
 /// </summary>
 public partial class MyArgs : CliArgs, ICliArgs<MyArgs>
 {
-    private static MyArgsBuilder builder;
-
     public static System.CommandLine.Command CreateCli()
     {
         builder ??= new MyArgsBuilder();
         return builder.Build();
-    }
+    }   
+    
+    private static MyArgsBuilder builder;
 
     private class MyArgsBuilder
     {
@@ -65,12 +65,9 @@ public partial class MyArgs : CliArgs, ICliArgs<MyArgs>
     private MyArgs(DataValue<string> nameDataValue, DataValue<Int32> ageDataValue, DataValue<string> greetingDataValue)
         : this()
     {
-        if (nameDataValue.IsSet)
-            Name = nameDataValue.Value;
-        if (ageDataValue.IsSet)
-            Age = ageDataValue.Value;
-        if (greetingDataValue.IsSet)
-            Greeting = greetingDataValue.Value;
+        if (nameDataValue.IsSet) Name = nameDataValue.Value;
+        if (ageDataValue.IsSet) Age = ageDataValue.Value;
+        if (greetingDataValue.IsSet) Greeting = greetingDataValue.Value;
     }
 
     public static MyArgs Create()
@@ -80,7 +77,6 @@ public partial class MyArgs : CliArgs, ICliArgs<MyArgs>
         var greetingDataValue = GetDataValue<string>("Greeting");
 
         var newArgs = new MyArgs(nameDataValue, ageDataValue, greetingDataValue);
-
         return newArgs;
     }
 

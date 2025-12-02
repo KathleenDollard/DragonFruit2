@@ -1,4 +1,5 @@
-﻿using DragonFruit2.GeneratorSupport;
+﻿using DragonFruit2.Common;
+using DragonFruit2.GeneratorSupport;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Text;
@@ -141,30 +142,93 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
 
     internal static string GetSourceForCommandInfo(CommandInfo commandInfo)
     {
-        var description = commandInfo.Description is null
-                              ? "null"
-                              : $"\"{commandInfo.Description.Replace("\"", "\"\"")}\"";
-
         var sb = new StringBuilder();
         sb.Append(OutputFileOpening());
+        OpenNamespace(commandInfo, sb);
+        OpenArgsPartialClass(commandInfo, sb);
+
+        OutputCreateCliMethod(commandInfo, sb);
+        OutputBuilderNestedClass(commandInfo, sb);
         sb.AppendLine();
-        if (!string.IsNullOrEmpty(commandInfo.NamespaceName))
-        {
-            sb.AppendLine($"{indent}namespace {commandInfo.NamespaceName}");
-            OpenCurly(sb);
-        }
-        var classOrStruct = commandInfo.IsStruct ? "struct" : "class";
-        sb.AppendLine($"""
-                {indent}/// <summary>
-                {indent}/// Auto-generated partial {classOrStruct} for building CLI commands for <see cref="{commandInfo.Name}" />
-                {indent}/// and creating a new {commandInfo.Name} instance from a <see cref="System.CommandLine.ParseResult" />.
-                {indent}/// </summary>
-                {indent}public partial {classOrStruct} {commandInfo.Name} : CliArgs, ICliArgs<{commandInfo.Name}>
-                """);
+        OutputConstructors(commandInfo, sb);
+        OutputStaticCreateMethods(commandInfo, sb);
+
+        CloseCurly(sb);
+        CloseNamespace(commandInfo, sb);
+        return sb.ToString();
+    }
+
+    private static void OutputStaticCreateMethods(CommandInfo commandInfo, StringBuilder sb)
+    {
+        sb.AppendLine($"""{indent}public static {commandInfo.Name} Create()""");
         OpenCurly(sb);
-        sb.AppendLine($"""{indent}private static MyArgsBuilder builder;""");
+        foreach (var propInfo in commandInfo.PropInfos)
+        {
+            sb.AppendLine($"""{indent}var {propInfo.Name.ToCamelCase()}DataValue = GetDataValue<{propInfo.TypeName}>("{propInfo.Name}")""");
+        }
         sb.AppendLine();
-        sb.AppendLine($"""{indent}private class MyArgsBuilder""");
+        sb.Append($"""{indent}var newArgs = new {commandInfo.Name}(""");
+        foreach (var propInfo in commandInfo.PropInfos)
+        {
+            sb.Append($"""{propInfo.Name.ToCamelCase()}DataValue, """);
+        }
+        sb.AppendLine(")");
+        sb.AppendLine($"""{indent}return newArgs;""");
+        CloseCurly(sb);
+        sb.AppendLine();
+
+        sb.AppendLine($"""{indent}public static {commandInfo.Name} Create(ParseResult parseResult)""");
+        OpenCurly(sb);
+        sb.AppendLine($"""{indent}SetCliDataProvider<MyArgs>(parseResult);""");
+        sb.AppendLine($"""{indent}return Create();""");
+        CloseCurly(sb);
+
+    }
+
+    private static void OutputConstructors(CommandInfo commandInfo, StringBuilder sb)
+    {
+        // TODO: Only generate the following constructor if the user does not create it
+        sb.AppendLine($"""{indent}public {commandInfo.Name}()""");
+        OpenCurly(sb);
+        CloseCurly(sb);
+
+        sb.AppendLine();
+        sb.AppendLine($"""{indent}[SetsRequiredMembers()]""");
+        sb.Append($"""{indent}private {commandInfo.Name}(""");
+
+        foreach (var propInfo in commandInfo.PropInfos)
+        {
+            sb.Append($"""DataValue<{propInfo.TypeName}> {propInfo.Name.ToCamelCase()}DataValue, """);
+        }
+        sb.AppendLine(")");
+        sb.AppendLine($"""{indent}    : this()""");
+        OpenCurly(sb);
+        foreach (var propInfo in commandInfo.PropInfos)
+        {
+            sb.AppendLine($"""{indent}if ({propInfo.Name.ToCamelCase()}DataVaue.IsSet) {propInfo.Name}DataVaue = {propInfo.Name.ToCamelCase()}DataVaue.Value;""");
+        }
+        CloseCurly(sb);
+        sb.AppendLine();
+    }
+
+    private static void OutputCreateCliMethod(CommandInfo commandInfo, StringBuilder sb)
+    {
+        sb.AppendLine($"""{indent}public static System.CommandLine.Command CreateCli()""");
+        OpenCurly(sb);
+        sb.AppendLine($"""{indent}builder ??= new {commandInfo.Name}Builder();""");
+        sb.AppendLine($"""{indent}return builder.Build();""");
+        CloseCurly(sb);
+        sb.AppendLine();
+    }
+
+    private static void OutputBuilderNestedClass(CommandInfo commandInfo, StringBuilder sb)
+    {
+        var commandDescription = commandInfo.Description is null
+                                  ? "null"
+                                  : $"\"{commandInfo.Description.Replace("\"", "\"\"")}\"";
+        sb.AppendLine($"""{indent}private static {commandInfo.Name}Builder builder;""");
+        sb.AppendLine();
+        sb.AppendLine($"""{indent}private class {commandInfo.Name}Builder""");
         OpenCurly(sb);
         sb.AppendLine($"""{indent}public System.CommandLine.Command Build()""");
         OpenCurly(sb);
@@ -172,8 +236,8 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         sb.AppendLine();
         sb.AppendLine($"""{indent}var rootCommand = new System.CommandLine.Command("Test")""");
         OpenCurly(sb);
-        sb.AppendLine($"""{indent}Description = null""");
-        CloseCurly(sb, endStatement: true)  ;
+        sb.AppendLine($"""{indent}Description = {commandDescription},""");
+        CloseCurly(sb, endStatement: true);
 
         sb.AppendLine();
         foreach (var option in commandInfo.Options)
@@ -190,14 +254,37 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         }
         CloseCurly(sb);
         CloseCurly(sb);
+    }
+
+    private static void OpenArgsPartialClass(CommandInfo commandInfo, StringBuilder sb)
+    {
+        var classOrStruct = commandInfo.IsStruct ? "struct" : "class";
+        sb.AppendLine($"""
+                {indent}/// <summary>
+                {indent}/// Auto-generated partial {classOrStruct} for building CLI commands for <see cref="{commandInfo.Name}" />
+                {indent}/// and creating a new {commandInfo.Name} instance from a <see cref="System.CommandLine.ParseResult" />.
+                {indent}/// </summary>
+                {indent}public partial {classOrStruct} {commandInfo.Name} : CliArgs, ICliArgs<{commandInfo.Name}>
+                """);
+        OpenCurly(sb);
+    }
+
+    private static void OpenNamespace(CommandInfo commandInfo, StringBuilder sb)
+    {
         sb.AppendLine();
-        GetArgsCreation(sb);
-        CloseCurly(sb);
+        if (!string.IsNullOrEmpty(commandInfo.NamespaceName))
+        {
+            sb.AppendLine($"{indent}namespace {commandInfo.NamespaceName}");
+            OpenCurly(sb);
+        }
+    }
+
+    private static void CloseNamespace(CommandInfo commandInfo, StringBuilder sb)
+    {
         if (!string.IsNullOrEmpty(commandInfo.NamespaceName))
         {
             CloseCurly(sb);
         }
-        return sb.ToString();
     }
 
     private static void GetArgsCreation(StringBuilder sb)

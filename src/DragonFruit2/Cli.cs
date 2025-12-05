@@ -1,4 +1,6 @@
-﻿namespace DragonFruit2;
+﻿using DragonFruit2.Common;
+
+namespace DragonFruit2;
 
 public static class Cli
 {
@@ -14,10 +16,10 @@ public static class Cli
         args ??= Environment.GetCommandLineArgs();
 
         var runner = new Runner<TArgs>();
-        runner.AddDataProvider(new CliDataProvider<TArgs>(args));
+        runner.AddDataProvider(new CliDataProvider<TArgs>());
 
-
-        return argsObject;
+        throw new NotImplementedException();
+       // return argsObject;
 
     }
 }

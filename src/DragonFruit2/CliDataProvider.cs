@@ -8,10 +8,10 @@ namespace DragonFruit2;
 public class CliDataProvider<TArgs> : DataProvider
             where TArgs : IArgs<TArgs>
 {
-    public CliDataProvider(string[] inputArgs)
-    {
-        InputArgs = inputArgs ?? System.Environment.GetCommandLineArgs();
-    }
+    //public CliDataProvider(string[] inputArgs)
+    //{
+    //    InputArgs = inputArgs ?? System.Environment.GetCommandLineArgs();
+    //}
 
     public string[] InputArgs
     {
@@ -24,17 +24,14 @@ public class CliDataProvider<TArgs> : DataProvider
     }
     public Command? Command
     {
-        get
+        get;
+        set
         {
-            if (field is null)
+            field = value;
+            field?.SetAction(parseResult =>
             {
-                field = TArgs.Initialize<Command>();
-                field.SetAction(parseResult =>
-                {
-                    return 0;
-                });
-            }
-            return field;
+                return 0;
+            });
         }
     }
 

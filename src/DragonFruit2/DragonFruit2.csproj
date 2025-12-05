@@ -23,8 +23,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\DragonFruit2.Common.Net8\DragonFruit2.Common.Net8.csproj" />
-		<ProjectReference Include="..\DragonFruit2.Common\DragonFruit2.Common.csproj" />
 		<ProjectReference Include="..\DragonFruit2.Generators\DragonFruit2.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 

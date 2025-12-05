@@ -21,7 +21,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\DragonFruit2.Common\DragonFruit2.Common.csproj" />
 		<ProjectReference Include="..\DragonFruit2.Generators\DragonFruit2.Generators.csproj" />
 		<ProjectReference Include="..\DragonFruit2.Polyfills\DragonFruit2.Polyfills.csproj" PrivateAssets="All" IncludeAssets="runtime" />
 	</ItemGroup>

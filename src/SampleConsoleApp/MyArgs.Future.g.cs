@@ -11,23 +11,18 @@ namespace SampleConsoleApp;
 /// </summary>
 public partial class MyArgs : IArgs<MyArgs>
 {
-    private static MyArgsBuilder builder;
-
-
-    public static (Command, Dictionary<string, Symbol)>) Initialize<(Command)>()
+    public static void Initialize(Runner <MyArgs> runner)
     {
-        throw new NotImplementedException();
-    }
-    public static System.CommandLine.Command CreateCli(CliDataProvider<MyArgs> dataProvider)
-    {
-        builder ??= new MyArgsBuilder();
-        return builder.Build();
-    }
+        var cliDataProvider = runner.DataProviders.OfType<CliDataProvider<MyArgs>>().FirstOrDefault();
+        if (cliDataProvider != null)
+        {
+            cliDataProvider = new CliDataProvider<MyArgs>();
+            runner.DataProviders.Add(cliDataProvider);
+        }
+        cliDataProvider.Command = Build(cliDataProvider);
 
 
-    private class MyArgsBuilder
-    {
-        public System.CommandLine.Command Build()
+        System.CommandLine.Command Build(CliDataProvider<MyArgs> dataProvider)
         {
             var rootCommand = new System.CommandLine.Command("Test")
             {
@@ -82,11 +77,5 @@ public partial class MyArgs : IArgs<MyArgs>
 
         var newArgs = new MyArgs(nameDataValue, ageDataValue, greetingDataValue);
         return newArgs;
-    }
-
-    public static MyArgs Create(ParseResult parseResult)
-    {
-        SetParseResult(parseResult);
-        return Create();
     }
 }

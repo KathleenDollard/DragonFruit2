@@ -5,6 +5,10 @@ namespace DragonFruit2;
 public class Runner<TArgs>
     where TArgs : IArgs<TArgs>
 {
+    public Runner()
+    {
+        AddDataProvider(new CliDataProvider<TArgs>());
+    }
 
     public List<DataProvider> DataProviders { get; } = [];
 
@@ -32,8 +36,8 @@ public class Runner<TArgs>
         return DataValue<T>.CreateEmpty();
     }
 
-    public TArgs CreateArgs()
-    {
-        TArgs.Create(
-    }
+    //public TArgs CreateArgs()
+    //{
+    //    TArgs.Create();
+    //}
 }

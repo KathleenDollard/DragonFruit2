@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\DragonFruit2.Common\DragonFruit2.Common.csproj" />
-  </ItemGroup>
-
 </Project>

@@ -1,11 +1,9 @@
-﻿using System.CommandLine;
-using System.Runtime.InteropServices;
+﻿namespace DragonFruit2;
 
-namespace DragonFruit2;
-
-public interface IArgs<T>
+public interface IArgs<TArgs>
+    where TArgs :IArgs<TArgs>
 {
-    public abstract static System.CommandLine.Command CreateCli();
+    public abstract static void Initialize(Builder<TArgs> builder);
+    public abstract static TArgs Create(Builder<TArgs> builder);
 
-    public abstract static T Create(ParseResult parseResult); 
 }

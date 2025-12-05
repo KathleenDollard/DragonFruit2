@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+
+    <!-- Produce a single NuGet package containing runtime libs + analyzer -->
+    <IsPackable>true</IsPackable>
+
+    <!-- Package metadata -->
+    <PackageId>DragonFruit2</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>DragonFruit2</Authors>
+    <Description>DragonFruit2 runtime and source generator packaged together.</Description>
+    <RepositoryUrl>https://github.com/your/repo</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Reference the projects whose outputs we want included in the package -->
+    <ProjectReference Include="..\DragonFruit2.Common\DragonFruit2.Common.csproj" />
+    <ProjectReference Include="..\DragonFruit2.Polyfills\DragonFruit2.Polyfills.csproj" />
+    <ProjectReference Include="..\DragonFruit2.Generators\DragonFruit2.Generators.csproj" />
+  </ItemGroup>
+
+  <!-- Collect resolved copy-local DLLs and include them in lib\netstandard2.0 -->
+  <Target Name="CollectDependenciesForPack" AfterTargets="Build">
+    <ItemGroup>
+      <PackLib Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Extension)' == '.dll'">
+        <PackagePath>lib\netstandard2.0\</PackagePath>
+      </PackLib>
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- Add runtime libraries into the package lib folder -->
+      <None Include="@(PackLib)" Pack="true" PackagePath="%(PackLib.PackagePath)" />
+    </ItemGroup>
+
+    <!-- Locate the built generator assembly from the ProjectReference metadata (robust across environments) -->
+    <ItemGroup>
+      <!-- pick only the project reference that matches the generator project file name -->
+      <GeneratorProjectRef Include="@(ProjectReference)" Condition=" '%(ProjectReference.FileName)' == 'DragonFruit2.Generators' " />
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- use the TargetPath metadata produced during Build; ensure it exists before packing -->
+      <GeneratorAssembly Include="%(GeneratorProjectRef.TargetPath)" Condition="Exists('%(GeneratorProjectRef.TargetPath)')" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- Package the generator assembly under analyzers/dotnet/cs -->
+      <None Include="@(GeneratorAssembly)" Pack="true" PackagePath="analyzers/dotnet/cs" Condition="Exists('%(GeneratorAssembly.Identity)')" />
+    </ItemGroup>
+  </Target>
+
+</Project>

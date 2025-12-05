@@ -116,6 +116,46 @@ Some features will require a deeper understanding of the code generation process
 - Description from XML comments
 - Handle case where there is no namespace
 
+## Use of symbols in retrieving CLI values
+
+If we support alternate providers for testing, configuration based defaults and other scenarios, it seems odd to force CLI specific 
+name munging across the system. This would also result in changes in multiple places if an option was changed to an argument or similar.
+
+As a result, the generated code tracks symbols. But, the other data providers won't use that. So, there are alternate keys which 
+allow the main key to remain a string, but other keys to be added. This will be an implementation detail to most users.
+
+## Note on the project layout
+
+We're managing a generator and common files that need to be available in both `netstandard2.0` and `net7.0+` contexts. As a result there are a lot of projects at the moment.
+
+## The static interface methods
+
+To keep things simple for the common CLI case, we need a mechanism to call a static method based on a generic, especially for 
+the `Create` static method. This must be static because it is a factory method.
+
+We can create the method easily enough, but we need to _call_ it based solely on a generic argument. There are a few possible 
+approaches:
+
+- Use a static interface method, and a default interface implementation. This is appealing, but requires .NET 7. This is the approach
+in the prototype
+  - Upside: Simple, clean, efficient
+  - Downside: .NET 7 only
+- Use a static extension member against `IArgs` (without a static interface member) or similar 
+  - Downside: I'm not clear which frameworks this works on
+  - Downside: It will be messy because the method would have to accept `IArgs` as the member
+  - My intuition says there is joy here, I just haven't spent much time on it
+
+- Have a base class for `Args` that has a static method taking `IArgs` that throws, but avoids a 
+compile error before generation runs, and then the derived class has a static method on `MyArgs`.
+  - Downside: Does not work, because static methods can't be called via type arguments
+  - Downside: We are stealing the user's inheritance chain
+
+- Some sort of Builder class that the user specifies
+  - Downside: Much more complex for the user, therefore, not pursuing
+
+- Something I have not thought of
+- Use reflection to find the method and call it. OK, we're not doing this
+
 -- old notes
 
 There are several scenarios where you may wish to use the classes in this assembly in other ways.

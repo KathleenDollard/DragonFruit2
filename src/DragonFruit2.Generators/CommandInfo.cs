@@ -1,6 +1,3 @@
-using Microsoft.CodeAnalysis;
-using System.Runtime.CompilerServices;
-
 namespace DragonFruit2.GeneratorSupport;
 
 /// <summary>
@@ -13,12 +10,14 @@ public record class CommandInfo
     public required string Name { get; init; }
     public string? NamespaceName { get; init; }
 
-    public string? Description { get; init; }
+    public string? Description { get; init; } = null;
     public bool IsStruct { get; init; }
 
     public List<PropInfo> Arguments => field ??= [];
 
     public List<PropInfo> Options => field ??= [];
+
+    public IEnumerable<PropInfo> PropInfos => Options.Concat(Arguments);
 
     public List<CommandInfo> SubCommands => field ??= [];
 }

@@ -1,18 +1,11 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Collections.Generic;
-using System.Linq;
-using DragonFruit2.GeneratorSupport;
-using System.Text;
 
 namespace DragonFruit2.Generators
 {
     [Generator]
     public sealed partial class DragonFruit2Generator : IIncrementalGenerator
     {
-        private static DragonFruit2Builder builder = new DragonFruit2Builder();
-
-        private static int indentSize = 4;
+        private static readonly DragonFruit2Builder builder = new();
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {

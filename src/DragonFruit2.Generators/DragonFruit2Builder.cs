@@ -1,15 +1,21 @@
 ﻿using DragonFruit2.GeneratorSupport;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace DragonFruit2.Generators;
 
 public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
 {
-    private static int indentSize = 4;
+    private static readonly int indentSize = 4;
+    private static string indent = "";
+
+    private enum CliSymbolType
+    {
+        Option,
+        Argument,
+        SubCommand
+    }
 
     /// <summary>
     /// Determines whether the specified syntax node represents an invocation of the generic method 'ParseArgs' with
@@ -49,16 +55,15 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
 
     public static CommandInfo? GetRootCommandInfoFromInvocation(InvocationExpressionSyntax invocationSyntax, SemanticModel semanticModel)
     {
-        var rootArgTypeArgSymbol = GetArgTypeSymbol(invocationSyntax, semanticModel);
-        if (rootArgTypeArgSymbol is null)
+        var rootArgsTypeArgSymbol = GetArgsTypeSymbol(invocationSyntax, semanticModel);
+        if (rootArgsTypeArgSymbol is null)
             return null; // This occurs when the root arg type does not yet exist
-        var rootCommandInfo = CreateCommandInfo(rootArgTypeArgSymbol, semanticModel);
+        var rootCommandInfo = CreateCommandInfo(rootArgsTypeArgSymbol, semanticModel);
         return rootCommandInfo;
     }
 
     private static CommandInfo CreateCommandInfo(INamedTypeSymbol typeSymbol, SemanticModel semanticModel)
     {
-
         var commandInfo = CommandInfoHelpers.CreateCommandInfo(typeSymbol);
 
         var props = typeSymbol.GetMembers()
@@ -105,7 +110,7 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         return derivedTypes;
     }
 
-    private static INamedTypeSymbol? GetArgTypeSymbol(InvocationExpressionSyntax? invocation, SemanticModel semanticModel)
+    private static INamedTypeSymbol? GetArgsTypeSymbol(InvocationExpressionSyntax? invocation, SemanticModel semanticModel)
     {
         if (invocation is null) return null;
 
@@ -127,33 +132,87 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
 
     internal static string GetSourceForCommandInfo(CommandInfo commandInfo)
     {
-        var indent = "";
-        var description = commandInfo.Description is null
-                              ? "null"
-                              : $"\"{commandInfo.Description.Replace("\"", "\"\"")}\"";
-
         var sb = new StringBuilder();
-        sb.Append(OutputFileOpen(commandInfo, description));
+        sb.Append(OutputFileOpening());
+        OpenNamespace(commandInfo, sb);
+        OpenArgsPartialClass(commandInfo, sb);
+
+        OutputInitializeMethod(commandInfo, sb);
         sb.AppendLine();
-        if (!string.IsNullOrEmpty(commandInfo.NamespaceName))
+        OutputConstructors(commandInfo, sb);
+        OutputStaticCreateMethods(commandInfo, sb);
+
+        CloseCurly(sb);
+        CloseNamespace(commandInfo, sb);
+        return sb.ToString();
+    }
+
+    private static void OutputStaticCreateMethods(CommandInfo commandInfo, StringBuilder sb)
+    {
+        sb.AppendLine($"""{indent}public static {commandInfo.Name} Create(Builder<{commandInfo.Name}> builder)""");
+        OpenCurly(sb);
+        foreach (var propInfo in commandInfo.PropInfos)
         {
-            sb.AppendLine($"namespace {commandInfo.NamespaceName}");
-            sb.AppendLine("{");
-            indent += new string(' ', indentSize);
+            sb.AppendLine($"""{indent}var {propInfo.Name.ToCamelCase()}DataValue = GetDataValue<{propInfo.TypeName}>("{propInfo.Name}")""");
         }
-        var classOrStruct = commandInfo.IsStruct ? "struct" : "class";
-        sb.Append($$"""
-                {{indent}}public partial {{classOrStruct}} {{commandInfo.Name}} : IArgs<{{commandInfo.Name}}>
-                {{indent}}{
-                {{indent}}    public static System.CommandLine.Command CreateCli()
-                {{indent}}    {
-                {{indent}}        var rootCommand = new System.CommandLine.Command("Test")
-                {{indent}}            {
-                {{indent}}                Description = {{description}}
-                {{indent}}            };
-                """);
+        sb.AppendLine();
+        sb.Append($"""{indent}var newArgs = new {commandInfo.Name}(""");
+        foreach (var propInfo in commandInfo.PropInfos)
+        {
+            sb.Append($"""{propInfo.Name.ToCamelCase()}DataValue, """);
+        }
+        sb.AppendLine(")");
+        sb.AppendLine($"""{indent}return newArgs;""");
+        CloseCurly(sb);
 
+    }
 
+    private static void OutputConstructors(CommandInfo commandInfo, StringBuilder sb)
+    {
+        // TODO: Only generate the following constructor if the user does not create it
+        sb.AppendLine($"""{indent}public {commandInfo.Name}()""");
+        OpenCurly(sb);
+        CloseCurly(sb);
+
+        sb.AppendLine();
+        sb.AppendLine($"""{indent}[SetsRequiredMembers()]""");
+        sb.Append($"""{indent}private {commandInfo.Name}(""");
+
+        foreach (var propInfo in commandInfo.PropInfos)
+        {
+            sb.Append($"""DataValue<{propInfo.TypeName}> {propInfo.Name.ToCamelCase()}DataValue, """);
+        }
+        sb.AppendLine(")");
+        sb.AppendLine($"""{indent}    : this()""");
+        OpenCurly(sb);
+        foreach (var propInfo in commandInfo.PropInfos)
+        {
+            sb.AppendLine($"""{indent}if ({propInfo.Name.ToCamelCase()}DataVaue.IsSet) {propInfo.Name}DataVaue = {propInfo.Name.ToCamelCase()}DataVaue.Value;""");
+        }
+        CloseCurly(sb);
+        sb.AppendLine();
+    }
+
+    private static void OutputInitializeMethod(CommandInfo commandInfo, StringBuilder sb)
+    {
+        var commandDescription = commandInfo.Description is null
+                                  ? "null"
+                                  : $"\"{commandInfo.Description.Replace("\"", "\"\"")}\"";
+        sb.AppendLine($"""{indent}public static void Initialize(Builder<{commandInfo.Name}> builder)""");
+        OpenCurly(sb);
+        sb.AppendLine($"""{indent}var cliDataProvider = builder.DataProviders.OfType<CliDataProvider<{commandInfo.Name}>>().FirstOrDefault();""");
+        sb.AppendLine($"""{indent}if (cliDataProvider is null)""");
+        OpenCurly(sb);
+        sb.AppendLine($"""{indent}cliDataProvider = new CliDataProvider<{commandInfo.Name}>();""");
+        sb.AppendLine($"""{indent}builder.DataProviders.Add(cliDataProvider);""");
+        CloseCurly(sb);
+        sb.AppendLine();
+        sb.AppendLine($"""{indent}var rootCommand = new System.CommandLine.Command("{commandInfo.Name}")""");
+        OpenCurly(sb);
+        sb.AppendLine($"""{indent}Description = {commandDescription},""");
+        CloseCurly(sb, endStatement: true);
+
+        sb.AppendLine();
         foreach (var option in commandInfo.Options)
         {
             GetOptionDeclaration(sb, option);
@@ -166,62 +225,75 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         {
             GetSubCommandDeclaration(sb, subcommand);
         }
-        sb.AppendLine();
-        sb.Append($$"""
-                       {{indent}}        return rootCommand;
-                       {{indent}}    }
-                       """);
-        sb.AppendLine();
-        sb.AppendLine();
-        sb.Append($$"""
-                       {{indent}}    public static {{commandInfo.Name}} Create(ParseResult parseResult)
-                       {{indent}}    {
-                       {{indent}}        var newArgs = new {{commandInfo.Name}}()
-                       {{indent}}        {
-                       {{indent}}        };
-                       {{indent}}        return newArgs;
-                       {{indent}}    }
-                       {{indent}}}
+        sb.AppendLine($"""{indent}cliDataProvider.RootCommand = rootCommand;""");
 
-                       """);
-        if (!string.IsNullOrEmpty(commandInfo.NamespaceName))
-        {
-            indent = indent.Substring(0, indent.Length - indentSize);
-            sb.AppendLine($"{indent}}}");
-        }
-        return sb.ToString();
+        CloseCurly(sb);
     }
 
-    private static string OutputFileOpen(CommandInfo commandInfo, string description)
+    private static void OpenArgsPartialClass(CommandInfo commandInfo, StringBuilder sb)
     {
-        return $$"""
+        var classOrStruct = commandInfo.IsStruct ? "struct" : "class";
+        sb.AppendLine($"""
+                {indent}/// <summary>
+                {indent}/// Auto-generated partial {classOrStruct} for building CLI commands for <see cref="{commandInfo.Name}" />
+                {indent}/// and creating a new {commandInfo.Name} instance from a <see cref="System.CommandLine.ParseResult" />.
+                {indent}/// </summary>
+                {indent}public partial {classOrStruct} {commandInfo.Name} : IArgs<{commandInfo.Name}>
+                """);
+        OpenCurly(sb);
+    }
+
+    private static void OpenNamespace(CommandInfo commandInfo, StringBuilder sb)
+    {
+        sb.AppendLine();
+        if (!string.IsNullOrEmpty(commandInfo.NamespaceName))
+        {
+            sb.AppendLine($"{indent}namespace {commandInfo.NamespaceName}");
+            OpenCurly(sb);
+        }
+    }
+
+    private static void CloseNamespace(CommandInfo commandInfo, StringBuilder sb)
+    {
+        if (!string.IsNullOrEmpty(commandInfo.NamespaceName))
+        {
+            CloseCurly(sb);
+        }
+    }
+
+    private static string GetLocalSymbolName(string name)
+    {
+        return $"{char.ToLower(name[0])}{name.Substring(1)}";
+    }
+
+    private static void OpenCurly(StringBuilder sb)
+    {
+        sb.AppendLine($$"""{{indent}}{""");
+        indent += new string(' ', indentSize);
+    }
+
+    private static void CloseCurly(StringBuilder sb, bool closeParens = false, bool endStatement = false)
+    {
+        indent = indent.Substring(indentSize);
+        sb.AppendLine($$"""{{indent}}}{{(closeParens ? ")" : "")}}{{(endStatement ? ";" : "")}}""");
+    }
+
+    private static string OutputFileOpening()
+    {
+        return $"""
                        // <auto-generated />
                        using DragonFruit2;
                        using System.CommandLine;
+                       using System.Diagnostics.CodeAnalysis;
 
                        """;
     }
 
     internal static void GetSubCommandDeclaration(StringBuilder sb, CommandInfo commandInfo)
     {
-        sb.Append($$"""
-                                   commandInfo.Add(new System.CommandLine.Command("Test")              
-                                   {
-                                       Description = { { description } }
-                                   };
-                       """);
-        foreach (var option in commandInfo.Options)
-        {
-            GetOptionDeclaration(sb, option);
-        }
-        foreach (var argument in commandInfo.Arguments)
-        {
-            GetArgumentDeclaration(sb, argument);
-        }
-        foreach (var subcommand in commandInfo.SubCommands)
-        {
-            GetSubCommandDeclaration(sb, subcommand);
-        }
+        string symbolName = $"{GetLocalSymbolName(commandInfo.Name)}Command";
+        sb.AppendLine($"""{indent}{symbolName}Command = new System.CommandLine.Command("Test")""");
+        AddSymbolToRootCommand(sb, symbolName);
     }
 
     internal static void GetArgumentDeclaration(StringBuilder sb, PropInfo propInfo)
@@ -229,13 +301,16 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         var description = propInfo.Description is null
                               ? "null"
                               : $"\"{propInfo.Description.Replace("\"", "\"\"")}\"";
-        sb.Append($$"""
-                rootCommand.Add(new Argument<{{propInfo.TypeName}}>("{{propInfo.Name}}")
-                {
-                    Description = {{description}},
-                    Required = {{(propInfo.IsRequiredForCli ? "true" : "false")}}
-                });
+        string symbolName = $"{GetLocalSymbolName(propInfo.Name)}Argument";
+        sb.AppendLine($"""{indent}var {symbolName} = new Argument<{propInfo.TypeName}>("{propInfo.Name}")""");
+        OpenCurly(sb);
+        sb.AppendLine($"""
+                {indent}Description = {description},
+                {indent}Required = {(propInfo.IsRequiredForCli ? "true" : "false")}
                 """);
+        CloseCurly(sb, true, endStatement: true);
+        AddSymbolToLookup(sb, propInfo, symbolName);
+        AddSymbolToRootCommand(sb, symbolName);
     }
 
     internal static void GetOptionDeclaration(StringBuilder sb, PropInfo propInfo)
@@ -243,15 +318,27 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         var description = propInfo.Description is null
                               ? "null"
                               : $"\"{propInfo.Description.Replace("\"", "\"\"")}\"";
-        sb.Append($$"""
-                rootCommand.Add(new Option<{{propInfo.TypeName}}>("--{{propInfo.CliName}}")
-                {
-                    Description = {{description}},
-                    Required = {{(propInfo.IsRequiredForCli ? "true" : "false")}}
-                });
+        string symbolName = $"{GetLocalSymbolName(propInfo.Name)}Option";
+        sb.AppendLine($"""{indent}var {symbolName} = new Option<{propInfo.TypeName}>("--{propInfo.CliName}")""");
+        OpenCurly(sb);
+        sb.AppendLine($"""
+                {indent}Description = {description},
+                {indent}Required = {(propInfo.IsRequiredForCli ? "true" : "false")}
                 """);
+        CloseCurly(sb, endStatement: true);
+        AddSymbolToLookup(sb, propInfo, symbolName);
+        AddSymbolToRootCommand(sb, symbolName);
     }
 
+    private static void AddSymbolToLookup(StringBuilder sb, PropInfo propInfo, string symbolName)
+    {
+        sb.AppendLine($"""{indent}builder.AddNameLookup("{propInfo.Name}", {symbolName});""");
+    }
+
+    private static void AddSymbolToRootCommand(StringBuilder sb, string symbolName)
+    {
+        sb.AppendLine($"""{indent}rootCommand.Add({symbolName});""");
+    }
 
 
 }

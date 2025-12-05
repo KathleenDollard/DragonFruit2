@@ -130,8 +130,8 @@ public class CommandInfoBuildingTests
         var commandInfo = DragonFruit2Builder.GetRootCommandInfoFromInvocation(invocations.Single(), compilation.GetSemanticModel(programTree));
 
         Assert.NotNull(commandInfo);
-        Assert.Empty(commandInfo.Options);
         Assert.Single(commandInfo.Arguments);
+        Assert.Empty(commandInfo.Options);
         Assert.Equal(1, commandInfo.Arguments.Single().Position);
 
     }

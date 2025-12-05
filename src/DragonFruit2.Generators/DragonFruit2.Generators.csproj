@@ -2,17 +2,17 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<LangVersion>14.0</LangVersion>
-		<IsRoslynComponent>true</IsRoslynComponent>
 
-		<!--<AllowUnsafeBlocks>true</AllowUnsafeBlocks>-->
-		<GenerateDocumentationFile>false</GenerateDocumentationFile>
-		<ImplicitUsings>disable</ImplicitUsings>
-		<IsPackable>false</IsPackable>
-		<OutputItemType>Analyzer</OutputItemType>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>14.0</LangVersion>
 		<Nullable>enable</Nullable>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<OutputPath>../../artifacts/bin/DragonFruit2/release</OutputPath>
+
+		<!-- Roslyn analyzer metadata -->
+		<IsRoslynComponent>true</IsRoslynComponent>
+		<OutputItemType>Analyzer</OutputItemType>
+
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -20,13 +20,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
-	  <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\DragonFruit2.GeneratorSupport\DragonFruit2.GeneratorSupport.csproj" />
+		<ProjectReference Include="..\DragonFruit2.Polyfills\DragonFruit2.Polyfills.csproj" PrivateAssets="All" IncludeAssets="runtime" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<MySourceFiles Include="$(OutputPath)/DragonFruit.Generators.dll, $(OutputPath)/DragonFruit.Generators.pdb" />
+	</ItemGroup>
+
+	<Target Name="AfterBuild">
+		<Copy SourceFiles="@(MySourceFiles)" DestinationFolder="$(OutputPath)/../../DragonFruit/release" />
+	</Target>
 
 </Project>
 

@@ -153,15 +153,19 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         OpenCurly(sb);
         foreach (var propInfo in commandInfo.PropInfos)
         {
-            sb.AppendLine($"""{indent}var {propInfo.Name.ToCamelCase()}DataValue = GetDataValue<{propInfo.TypeName}>("{propInfo.Name}")""");
+            sb.AppendLine($"""{indent}var {propInfo.Name.ToCamelCase()}DataValue = builder.GetDataValue<{propInfo.TypeName}>("{propInfo.Name}");""");
         }
         sb.AppendLine();
         sb.Append($"""{indent}var newArgs = new {commandInfo.Name}(""");
+
+        var lastPropInfo = commandInfo.PropInfos.LastOrDefault();
         foreach (var propInfo in commandInfo.PropInfos)
         {
-            sb.Append($"""{propInfo.Name.ToCamelCase()}DataValue, """);
+            sb.Append($"""{propInfo.Name.ToCamelCase()}DataValue""");
+            if (propInfo != lastPropInfo)
+                sb.Append(", ");
         }
-        sb.AppendLine(")");
+        sb.AppendLine(");");
         sb.AppendLine($"""{indent}return newArgs;""");
         CloseCurly(sb);
 
@@ -178,16 +182,19 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         sb.AppendLine($"""{indent}[SetsRequiredMembers()]""");
         sb.Append($"""{indent}private {commandInfo.Name}(""");
 
+        var lastPropInfo = commandInfo.PropInfos.LastOrDefault();
         foreach (var propInfo in commandInfo.PropInfos)
         {
-            sb.Append($"""DataValue<{propInfo.TypeName}> {propInfo.Name.ToCamelCase()}DataValue, """);
+            sb.Append($"""DataValue<{propInfo.TypeName}> {propInfo.Name.ToCamelCase()}DataValue""");
+            if (propInfo != lastPropInfo) 
+                sb.Append(", ");
         }
         sb.AppendLine(")");
         sb.AppendLine($"""{indent}    : this()""");
         OpenCurly(sb);
         foreach (var propInfo in commandInfo.PropInfos)
         {
-            sb.AppendLine($"""{indent}if ({propInfo.Name.ToCamelCase()}DataVaue.IsSet) {propInfo.Name}DataVaue = {propInfo.Name.ToCamelCase()}DataVaue.Value;""");
+            sb.AppendLine($"""{indent}if ({propInfo.Name.ToCamelCase()}DataValue.IsSet) {propInfo.Name} = {propInfo.Name.ToCamelCase()}DataValue.Value;""");
         }
         CloseCurly(sb);
         sb.AppendLine();
@@ -332,13 +339,12 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
 
     private static void AddSymbolToLookup(StringBuilder sb, PropInfo propInfo, string symbolName)
     {
-        sb.AppendLine($"""{indent}builder.AddNameLookup("{propInfo.Name}", {symbolName});""");
+        sb.AppendLine($"""{indent}cliDataProvider.AddNameLookup("{propInfo.Name}", {symbolName});""");
     }
 
     private static void AddSymbolToRootCommand(StringBuilder sb, string symbolName)
     {
         sb.AppendLine($"""{indent}rootCommand.Add({symbolName});""");
     }
-
 
 }

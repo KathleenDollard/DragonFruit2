@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ExerciseDragonFruit2": {
+      "commandName": "Project",
+      "commandLineArgs": "--name KD --age 35 --greeting Howdy --over18-question \"Have a cider?\""
+    }
+  }
+}

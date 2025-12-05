@@ -7,10 +7,10 @@
 		<Nullable>enable</Nullable>
 		<IsPackable>true</IsPackable>
 
-		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<!--<IncludeBuildOutput>false</IncludeBuildOutput>-->
 
 		<!-- Optional package metadata (adjust as needed) -->
-		<PackageId>DragonFruit2.Generators</PackageId>
+		<PackageId>DragonFruit2</PackageId>
 		<Version>0.1.0-beta</Version>
 		<Authors>Kathleen Dollard</Authors>
 		<Description>Source generator and analyzers for DragonFruit2 including required runtime dependencies.</Description>

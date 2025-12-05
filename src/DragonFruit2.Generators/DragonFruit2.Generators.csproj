@@ -12,6 +12,8 @@
 		<!-- Roslyn analyzer metadata -->
 		<IsRoslynComponent>true</IsRoslynComponent>
 		<OutputItemType>Analyzer</OutputItemType>
+		
+		<Version>0.1.0-beta</Version>
 
 	</PropertyGroup>
 

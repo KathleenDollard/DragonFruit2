@@ -3,6 +3,9 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>14.0</LangVersion>
+
+		<IsPackable>false</IsPackable>
+
 	</PropertyGroup>
 
 	<ItemGroup>

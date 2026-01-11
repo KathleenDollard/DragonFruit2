@@ -35,12 +35,7 @@ internal static class OutputArgsDataBuilder
                                   : $"\"{commandInfo.Description.Replace("\"", "\"\"")}\"";
         sb.OpenMethod($"""public override void Initialize(Builder<{commandInfo.Name}> builder)""");
 
-        sb.AppendLine($"""var cliDataProvider = builder.DataProviders.OfType<CliDataProvider<{commandInfo.Name}>>().FirstOrDefault();""");
-
-        sb.OpenIf($"""cliDataProvider is null""");
-        sb.AppendLine($"""cliDataProvider = new CliDataProvider<{commandInfo.Name}>();""");
-        sb.AppendLine($"""builder.DataProviders.Add(cliDataProvider);""");
-        sb.CloseIf();
+        sb.AppendLine($"""var cliDataProvider = GetCliDataProvider(builder);""");
 
         sb.AppendLine($"""var rootCommand = new System.CommandLine.Command("{commandInfo.Name}")""");
         sb.OpenCurly();

@@ -56,9 +56,8 @@ internal class OutputPartialArgs
         foreach (var prop in commandInfo.Options.Concat(commandInfo.Arguments))
         {
             if (prop.Validators is not null && prop.Validators.Any())
-            { sb.AppendLine($"""private List<Validator<{prop.TypeName}>>?  {OutputHelpers.GetLocalSymbolName(prop.Name)}Validators;"""); }
+            { sb.AppendLine($"""private List<Validator<{prop.TypeName}>>? {OutputHelpers.GetLocalSymbolName(prop.Name)}Validators;"""); }
         }
-        sb.AppendLine();
     }
 
     private static void Constructors(StringBuilderWrapper sb, CommandInfo commandInfo)

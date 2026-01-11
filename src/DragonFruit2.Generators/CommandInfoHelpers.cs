@@ -137,7 +137,7 @@ public static class CommandInfoHelpers
         try
         {
             // These properties are commonly present; adjust names if your ValidatorInfo differs.
-            info.ConstructorArguments = ctorArgs;
+            info.ConstructorArguments = ctorArgs.Select(x=>x.Trim()).ToList();
             info.NamedArguments = namedArgs;
         }
         catch

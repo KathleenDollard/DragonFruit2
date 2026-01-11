@@ -112,11 +112,13 @@ public partial class MyArgs : Args<MyArgs>, IArgs<MyArgs>
         }
 
         protected override MyArgs CreateInstance(Builder<MyArgs> builder)
-            => new MyArgs(
-                    builder.GetDataValue<string>("Name"),
-                    builder.GetDataValue<Int32>("Age"),
-                    builder.GetDataValue<string>("Greeting")
-                );
+        {
+            var nameDataValue = builder.GetDataValue<string>("Name");
+            var ageDataValue = builder.GetDataValue<int>("Age");
+            var greetingDataValue = builder.GetDataValue<string>("Greeting");
+
+            var newArgs = new MyArgs(nameDataValue, ageDataValue, greetingDataValue);
+            return newArgs;
+        }
     }
 }
-

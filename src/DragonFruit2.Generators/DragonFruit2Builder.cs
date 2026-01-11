@@ -103,8 +103,8 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
                 if (SymbolEqualityComparer.Default.Equals(namedTypeSymbol.BaseType, typeSymbol))
                 {
                     // This namedTypeSymbol derives from typeSymbol
-                    derivedTypes.Add(namedTypeSymbol.BaseType);
-                    break;
+                    derivedTypes.Add(namedTypeSymbol);
+                    continue;
                 }
             }
         }

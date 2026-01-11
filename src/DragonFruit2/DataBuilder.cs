@@ -2,7 +2,7 @@
 
 namespace DragonFruit2;
 
-public abstract class DataBuilder<TArgs> where TArgs : Args<TArgs>, IArgs<TArgs>
+public abstract class ArgsBuilder<TArgs> where TArgs : Args<TArgs>, IArgs<TArgs>
 {
     protected CliDataProvider<TArgs> GetCliDataProvider(Builder<TArgs> builder)
     {
@@ -18,6 +18,15 @@ public abstract class DataBuilder<TArgs> where TArgs : Args<TArgs>, IArgs<TArgs>
 
     public DataValues<TArgs> Create(Builder<TArgs> builder)
     {
+        // This seems the place to determine which subcommand to call
+        // * Args should know if they have subcommands, probably root knowing all the subcommands from the root
+        // * Assuming the root ArgsBuilder has a symbol/command switch or a dictionary of Func<TArgs>
+        // * Once we know the actual args subcommand class, and can instantiate get its argsbuilder, we 
+        //   can work up the inheritance hiearchy for any prpoerties that are shared
+        //
+        // Another way to solve this is to have Actions on the SCL.Commands that supply the ArgsBuilder
+        // * That might let us avoid the IArgs interface and support C# 7.1
+        // * The CliDataProvider is already a flawed class because it holds data (not reentrant) so we just extend that
         var dataValues = new DataValues<TArgs>();
         dataValues.ValidationFailures.AddRange(CheckRequiredValues(builder));
         if (dataValues.IsValid)

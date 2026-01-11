@@ -37,7 +37,7 @@ public class Builder<TArgs>
 
     public DataValues<TArgs> ParseArgs(string[] args)
     {
-        var dataBuilder  = TArgs.GetDataBuilder(this);
+        var dataBuilder  = TArgs.GetArgsBuilder(this);
         dataBuilder.Initialize(this);
 
         var cliDataProvider = DataProviders.OfType<CliDataProvider<TArgs>>().FirstOrDefault()

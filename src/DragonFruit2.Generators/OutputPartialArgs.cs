@@ -19,9 +19,9 @@ internal class OutputPartialArgs
         //OutputStaticCreateMethods(commandInfo, sb); // moved to builder
         ValidateMethod(sb, commandInfo);
         InitializeValidatorsMethod(sb, commandInfo);
-        GetDataBuilder(sb, commandInfo);
+        GetArgsBuilder(sb, commandInfo);
 
-        OutputArgsDataBuilder.GetClass(sb, commandInfo);
+        OutputArgsBuilder.GetClass(sb, commandInfo);
 
         sb.CloseClass();
         sb.CloseNamespace(commandInfo.NamespaceName);
@@ -128,10 +128,10 @@ internal class OutputPartialArgs
         sb.CloseMethod();
     }
 
-    internal static void GetDataBuilder(StringBuilderWrapper sb, CommandInfo commandInfo)
+    internal static void GetArgsBuilder(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenMethod($"public static DataBuilder<{commandInfo.Name}> GetDataBuilder(Builder<{commandInfo.Name}> builder)");
-        sb.AppendLine($"return new {commandInfo.Name}.{commandInfo.Name}DataBuilder();");
+        sb.OpenMethod($"public static ArgsBuilder<{commandInfo.Name}> GetArgsBuilder(Builder<{commandInfo.Name}> builder)");
+        sb.AppendLine($"return new {commandInfo.Name}.{commandInfo.Name}ArgsBuilder();");
         sb.CloseMethod();
     }
 

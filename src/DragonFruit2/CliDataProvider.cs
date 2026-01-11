@@ -40,13 +40,6 @@ public class CliDataProvider<TArgs> : DataProvider
     {
         if (RootCommand is null) throw new ArgumentNullException(nameof(RootCommand));
         ParseResult ??= RootCommand.Parse(InputArgs);
-        //// TODO: The invocation should be replaced with direct calls to error reporting if possible
-        //var returnCode = parseResult.Invoke();
-        //if (returnCode != 0)
-        //{
-        //    trialValue = DataValue<TValue>.CreateEmpty();
-        //    return false;
-        //}
 
         var symbol = LookupByName[key];
         if (symbol is not null)

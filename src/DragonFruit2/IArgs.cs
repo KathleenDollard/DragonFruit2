@@ -3,6 +3,6 @@
 public interface IArgs<TArgs>
     where TArgs : Args<TArgs>, IArgs<TArgs>
 {
-    public static abstract DataBuilder<TArgs> GetDataBuilder(Builder<TArgs> builder);
+    public static abstract ArgsBuilder<TArgs> GetArgsBuilder(Builder<TArgs> builder);
 
 }

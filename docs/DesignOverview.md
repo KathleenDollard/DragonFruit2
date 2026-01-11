@@ -56,9 +56,9 @@ Generation uses the call to `TryParse` as an indicator to generate additional co
 
 `ParseArgs` is specific to System.CommandLine. Alternative generation can support other input mechanisms, although the basic design is for all the data to be collected and validated, making some possible entry mechanisms more difficult (WinForms or MAUI).
 
-All DragonFruit2 args classes implement a `Create` static factory method that is accessed either via a static interface method, or a direct call which uses a base class to avoid squiggles prior to first generation (the two syntaxes presented in [Syntax](#syntax)).
+All DragonFruit2 args classes implement a `Create` static factory method that is accessed either via a static interface method, or a 
 
-[[ Work on this design, as it currently requires a base class, block struct. Instead create a DataBuilder instance and move the Args.cs and CliArgs.cs code into a DataBuilder class]]
+[[ Work on this design, as it currently requires a base class, block struct. Instead create a ArgsBuilder.cs instance and move the Args.cs and CliArgs.cs code into a ArgsBuilder.cs class]]
 
 The `Create` method is fairly simple, it creates
 just creating a DataValue for each property using the static `GetDataValue` method of the `Args` class. This can be called directly if a derived class, 

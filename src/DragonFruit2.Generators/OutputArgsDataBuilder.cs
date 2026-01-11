@@ -3,7 +3,7 @@ using System.Text;
 
 namespace DragonFruit2.Generators;
 
-internal static class OutputArgsDataBuilder
+internal static class OutputArgsBuilder
 {
     internal static void GetClass(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
@@ -24,7 +24,7 @@ internal static class OutputArgsDataBuilder
         sb.AppendLines([
                 "/// <summary>",
                 "/// </summary>",
-                $"internal class {commandInfo.Name}DataBuilder : DataBuilder<{commandInfo.Name}>"]);
+                $"internal class {commandInfo.Name}ArgsBuilder : ArgsBuilder<{commandInfo.Name}>"]);
         sb.OpenCurly();
     }
 

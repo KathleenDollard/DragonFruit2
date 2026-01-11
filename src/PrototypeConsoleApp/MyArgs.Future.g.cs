@@ -61,12 +61,12 @@ public partial class MyArgs : Args<MyArgs>, IArgs<MyArgs>
         // Other properties do not have validation, so their validators remain null.
     }
 
-    public static DataBuilder<MyArgs> GetDataBuilder(Builder<MyArgs> builder)
+    public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder)
     {
         return new MyArgs.MyArgsDataBuilder();
     }
 
-    public class MyArgsDataBuilder : DataBuilder<MyArgs>
+    public class MyArgsDataBuilder : ArgsBuilder<MyArgs>
     {
         public override void Initialize(Builder<MyArgs> builder)
         {
@@ -120,5 +120,18 @@ public partial class MyArgs : Args<MyArgs>, IArgs<MyArgs>
             var newArgs = new MyArgs(nameDataValue, ageDataValue, greetingDataValue);
             return newArgs;
         }
+    }
+
+    public class MyArgsDataValues : DataValues<MyArgs>
+    {
+        public MyArgsDataValues(Builder<MyArgs> builder)
+        {
+            NameDataValue = builder.GetDataValue<string>("Name");
+            AgeDataValue = builder.GetDataValue<int>("Age");
+            GreetingDataValue = builder.GetDataValue<string>("Greeting");
+        }
+        public DataValue<string> NameDataValue { get; init; }
+        public DataValue<int> AgeDataValue { get; init; }
+        public DataValue<string> GreetingDataValue { get; init; }
     }
 }

@@ -27,7 +27,7 @@ public class GeneratorTheoryTests
         var actual = DragonFruit2Builder.GetSourceForCommandInfo(commandInfo);
 
         // TODO: Change TheoryData to support multiple commands
-        Assert.Equal(expected, actual.First().code);
+        Assert.Equal(expected, actual);
     }
 
     [Theory]

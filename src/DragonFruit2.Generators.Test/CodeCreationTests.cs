@@ -68,9 +68,9 @@ namespace DragonFruit2.Generators.Test
 
                 """";
 
-            var actual = DragonFruit2Builder.GetSourceForCommandInfo(commandInfo).First();
+            var actual = DragonFruit2Builder.GetSourceForCommandInfo(commandInfo);
 
-            Assert.Equal(expected, actual.code);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -92,9 +92,8 @@ namespace DragonFruit2.Generators.Test
                 """;
 
             var actual = DragonFruit2Builder.GetSourceForCommandInfo(commandInfo);
-            var code = actual.First().code;
-            var position = code.IndexOf(expectedMarker);
-            var testString = code[position..(position + expected.Length)]; // Trim to relevant part
+            var position = actual.IndexOf(expectedMarker);
+            var testString = ((string?)actual)[position..(position + expected.Length)]; // Trim to relevant part
 
             Assert.Equal(expected, testString);
         }

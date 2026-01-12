@@ -4,7 +4,7 @@ namespace DragonFruit2.Generators;
 
 internal class OutputPartialArgs
 {
-    internal static void GetSourcePartialArgs(CommandInfo commandInfo, List<(string hintName, string code)> outputStrings)
+    internal static string GetSourcePartialArgs(CommandInfo commandInfo)
     {
         var sb = new StringBuilderWrapper();
         FileOpening(sb);
@@ -24,11 +24,7 @@ internal class OutputPartialArgs
         sb.CloseClass();
         sb.CloseNamespace(commandInfo.NamespaceName);
 
-        outputStrings.Add((hintName: commandInfo.Name, code: sb.ToString()));
-        foreach (var subCommand in commandInfo.SubCommands)
-        {
-            GetSourcePartialArgs(subCommand, outputStrings);
-        }
+        return sb.ToString();
     }
 
     private static void FileOpening(StringBuilderWrapper sb)
@@ -45,12 +41,13 @@ internal class OutputPartialArgs
 
     internal static void OpenClass(CommandInfo commandInfo, StringBuilderWrapper sb)
     {
+        var baseType = commandInfo.BaseName ?? $"Args<{commandInfo.Name}>";
         sb.AppendLines([
                 "/// <summary>",
                 $"""/// Auto-generated partial class for building CLI commands for <see cref="{commandInfo.Name}" />""",
                 $"""/// and creating a new {commandInfo.Name} instance from a <see cref="System.CommandLine.ParseResult" />.""",
                 "/// </summary>",
-                $"public partial class {commandInfo.Name} : Args<{commandInfo.Name}>, IArgs<{commandInfo.Name}>"]);
+                $"public partial class {commandInfo.Name} : {baseType}, IArgs<{commandInfo.RootName}>"]);
         sb.OpenCurly();
     }
 
@@ -65,14 +62,24 @@ internal class OutputPartialArgs
 
     private static void Constructors(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
+        // TODO: Can we allow both base setting of properties and respect for a user-created parameterles ctor? Maybe not.
         // TODO: Only generate the following constructor if the user does not create it
-        sb.OpenMethod($"internal {commandInfo.Name}()");
-        sb.CloseMethod();
+        if (commandInfo.PropInfos.Any())
+        {
+            sb.OpenMethod($"public {commandInfo.Name}()");
+            sb.CloseMethod();
+        }
 
-        sb.AppendLine("[SetsRequiredMembers()]");
-        var parameters = commandInfo.PropInfos
-                         .Select(p => $"DataValue<{p.TypeName}> {p.Name.ToCamelCase()}DataValue");
-        sb.OpenMethod($"private {commandInfo.Name}({string.Join(", ", parameters)})", "this()");
+        sb.Append("[SetsRequiredMembers()]");
+        var parameters = string.Join(", ", commandInfo.SelfAndAncestorPropInfos
+                         .Select(CtorParameter));
+        var calledCtor = commandInfo.AncestorPropInfos.Any()
+            ? $"base({string.Join(", ", commandInfo.AncestorPropInfos
+                        .Select(p => $"{p.Name.ToCamelCase()}DataValue"))})"
+            : commandInfo.PropInfos.Any()
+                ? "this()"
+                : null;
+        sb.OpenMethod($"protected {commandInfo.Name}({string.Join(", ", parameters)})", calledCtor);
 
         foreach (var propInfo in commandInfo.PropInfos)
         {
@@ -80,7 +87,12 @@ internal class OutputPartialArgs
         }
 
         sb.CloseMethod();
+
+        static string CtorParameter(PropInfo p)
+            => $"DataValue<{p.TypeName}> {p.Name.ToCamelCase()}DataValue";
     }
+
+
 
     internal static void ValidateMethod(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
@@ -133,7 +145,7 @@ internal class OutputPartialArgs
 
     internal static void GetArgsBuilder(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenMethod($"public static ArgsBuilder<{commandInfo.Name}> GetArgsBuilder(Builder<{commandInfo.Name}> builder)");
+        sb.OpenMethod($"public static ArgsBuilder<{commandInfo.RootName}> GetArgsBuilder(Builder<{commandInfo.RootName}> builder)");
         sb.AppendLine($"return new {commandInfo.Name}.{commandInfo.Name}ArgsBuilder();");
         sb.CloseMethod();
     }

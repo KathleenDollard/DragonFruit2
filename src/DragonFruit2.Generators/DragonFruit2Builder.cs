@@ -1,6 +1,7 @@
 ﻿using DragonFruit2.GeneratorSupport;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace DragonFruit2.Generators;
@@ -43,14 +44,12 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
                 _ => null,
             };
 
-    public override IEnumerable<(string hintName, string code)> OutputSource(SourceProductionContext context, IEnumerable<CommandInfo> items)
+    public override void OutputSource(SourceProductionContext context, CommandInfo commandInfo)
     {
-        var sourceTexts = new List<(string hintName, string code)>();
-        foreach (var commandInfo in items)
-        {
-             GetSourceForCommandInfo(commandInfo, sourceTexts);
-        }
-        return sourceTexts;
+        //foreach (var commandInfo in items)
+        //{
+             context.AddSource(commandInfo.Name, GetSourceForCommandInfo(commandInfo));
+        //}
     }
 
 
@@ -59,13 +58,13 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         var rootArgsTypeArgSymbol = GetArgsTypeSymbol(invocationSyntax, semanticModel);
         if (rootArgsTypeArgSymbol is null)
             return null; // This occurs when the root arg type does not yet exist
-        var rootCommandInfo = CreateCommandInfo(rootArgsTypeArgSymbol, semanticModel);
+        var rootCommandInfo = CreateCommandInfo(rootArgsTypeArgSymbol, rootArgsTypeArgSymbol.Name, semanticModel);
         return rootCommandInfo;
     }
 
-    private static CommandInfo CreateCommandInfo(INamedTypeSymbol typeSymbol, SemanticModel semanticModel)
+    private static CommandInfo CreateCommandInfo(INamedTypeSymbol typeSymbol, string? rootName, SemanticModel semanticModel)
     {
-        var commandInfo = CommandInfoHelpers.CreateCommandInfo(typeSymbol);
+        var commandInfo = CommandInfoHelpers.CreateCommandInfo(typeSymbol, rootName);
 
         // future: Check perf here (semanticModel is captured, etc)
         var props = typeSymbol.GetMembers()
@@ -85,14 +84,14 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         var derivedTypes = GetChildTypes(typeSymbol);
         foreach (var derivedType in derivedTypes)
         {
-            var childCommandInfo = CreateCommandInfo(derivedType, semanticModel);
+            var childCommandInfo = CreateCommandInfo(derivedType, rootName, semanticModel);
             commandInfo.SubCommands.Add(childCommandInfo);
         }
 
         return commandInfo;
     }
 
-    private static IEnumerable<INamedTypeSymbol> GetChildTypes(INamedTypeSymbol typeSymbol)
+    internal static IEnumerable<INamedTypeSymbol> GetChildTypes(INamedTypeSymbol typeSymbol)
     {
         var derivedTypes = new List<INamedTypeSymbol>();
         var nspace = typeSymbol.ContainingNamespace;
@@ -132,8 +131,36 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         return semanticModel.GetSymbolInfo(typeArgSyntax).Symbol as INamedTypeSymbol;
     }
 
-    internal static void GetSourceForCommandInfo(CommandInfo commandInfo,List<(string hintName, string code)> outputStrings)
+    internal static string GetSourceForCommandInfo(CommandInfo commandInfo)
     {
-        OutputPartialArgs.GetSourcePartialArgs(commandInfo, outputStrings);
+        return OutputPartialArgs.GetSourcePartialArgs(commandInfo);
+    }
+
+    internal IEnumerable<CommandInfo> GetSelfAndDescendants(CommandInfo commandInfo)
+    {
+        List<CommandInfo> ret = [];
+        ret.Add(commandInfo);
+        foreach (var sub in commandInfo.SubCommands)
+        {
+            ret.AddRange(GetSelfAndDescendants(sub));
+        }
+        return ret;
+    }
+
+    internal ImmutableArray<CommandInfo> BindParents(ImmutableArray<CommandInfo> commandInfos)
+    {
+        foreach(var commandInfo in commandInfos)
+        {
+            BindParentsRecursive(commandInfo);
+        }
+        return commandInfos;
+        static void BindParentsRecursive(CommandInfo commandInfo)
+        {
+            foreach (var sub in commandInfo.SubCommands)
+            {
+                sub.ParentCommandInfo = commandInfo;
+                BindParentsRecursive(sub);
+            }
+        }
     }
 }

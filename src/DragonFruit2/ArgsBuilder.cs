@@ -2,8 +2,13 @@
 
 namespace DragonFruit2;
 
-public abstract class ArgsBuilder<TArgs> where TArgs : Args<TArgs>, IArgs<TArgs>
+public abstract class ArgsBuilder<TArgs> 
+    where TArgs : Args<TArgs>, IArgs<TArgs>
 {
+    public static ArgsBuilder<TArgs>? ActiveArgsBuilder { get; set; }
+
+    internal ArgsBuilder<TArgs>? GetActiveArgsBuilder => ActiveArgsBuilder;
+
     protected CliDataProvider<TArgs> GetCliDataProvider(Builder<TArgs> builder)
     {
         var cliDataProvider = builder.DataProviders.OfType<CliDataProvider<TArgs>>().FirstOrDefault();
@@ -14,7 +19,7 @@ public abstract class ArgsBuilder<TArgs> where TArgs : Args<TArgs>, IArgs<TArgs>
         }
         return cliDataProvider;
     }
-    public abstract void Initialize(Builder<TArgs> builder);
+    public abstract void Initialize(Builder<TArgs> builder, bool isRoot = false);
 
     public DataValues<TArgs> Create(Builder<TArgs> builder)
     {

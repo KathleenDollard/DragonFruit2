@@ -68,9 +68,7 @@ public partial class MyArgs : Args<MyArgs>, IArgs<MyArgs>
 
     public class MyArgsBuilder : ArgsBuilder<MyArgs>
     {
-        public ArgsBuilder<MyArgs>? ActiveArgsBuilder { get; set; }
-
-        public override void Initialize(Builder<MyArgs> builder)
+        public override void Initialize(Builder<MyArgs> builder, bool isRoot = false)
         {
             var cliDataProvider = GetCliDataProvider(builder);
 

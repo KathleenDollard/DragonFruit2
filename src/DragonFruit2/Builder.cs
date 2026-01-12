@@ -38,11 +38,12 @@ public class Builder<TArgs>
     public DataValues<TArgs> ParseArgs(string[] args)
     {
         var dataBuilder  = TArgs.GetArgsBuilder(this);
-        dataBuilder.Initialize(this);
+        dataBuilder.Initialize(this, isRoot: true);
 
         var cliDataProvider = DataProviders.OfType<CliDataProvider<TArgs>>().FirstOrDefault()
             ?? throw new InvalidOperationException("Internal error: CliDataProvider not found");
         cliDataProvider.InputArgs = args;
+        var activeArgsBuilder = dataBuilder.GetActiveArgsBuilder;
         var argsDataValues = dataBuilder.Create(this);
         return argsDataValues;
     }

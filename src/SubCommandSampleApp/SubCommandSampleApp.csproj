@@ -8,10 +8,11 @@
 
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
-
+	
 	<!--<ItemGroup>
-	  <PackageReference Include="DragonFruit2" Version="0.1.0-beta-001" />
+		<PackageReference Include="DragonFruit2" Version="0.1.0-beta-001" />
 	</ItemGroup>-->
+
 
 	<ItemGroup>
 		<ProjectReference Include="..\DragonFruit2\DragonFruit2.csproj" />

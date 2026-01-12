@@ -1,6 +1,7 @@
 ﻿{
   Name: MyArgs,
   NamespaceName: MyNamespace,
+  RootName: MyArgs,
   IsStruct: false,
   PropInfos: []
 }

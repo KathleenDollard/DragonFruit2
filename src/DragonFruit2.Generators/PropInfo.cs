@@ -13,7 +13,8 @@ public record class PropInfo
     {
         get => cliName switch
         {
-            null => Name.ToKebabCase(),
+            null when IsArgument=> Name.ToUpper(),
+            null => $"--{Name.ToKebabCase()}",
             _ => cliName
         };
         init => cliName = value;

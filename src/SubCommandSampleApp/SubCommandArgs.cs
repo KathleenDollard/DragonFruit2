@@ -27,3 +27,5 @@ public partial class EveningArgs : SubCommandArgs
     [GreaterThan(0)]
     public int Age { get; init; } = 1;
 }
+
+public partial class Bar : EveningArgs { }

@@ -6,15 +6,20 @@ namespace DragonFruit2.Generators;
 
 public static class CommandInfoHelpers
 {
-    public static CommandInfo CreateCommandInfo(INamedTypeSymbol typeSymbol)
-        => new()
+    public static CommandInfo CreateCommandInfo(INamedTypeSymbol typeSymbol, string rootName)
+    {
+        string? baseTypeName = typeSymbol.Name == rootName ? null : typeSymbol.BaseType?.Name;
+        return new()
         {
 
             // TODO: Add description from attribute if present or XML docs
             Name = typeSymbol.Name,
             NamespaceName = typeSymbol.GetNamespace(),
+            BaseName = baseTypeName,
+            RootName = rootName,
             IsStruct = typeSymbol.IsValueType,
         };
+    }
 
     /// <summary>
     /// Build model of properties using semantic and syntactic information available at compile time

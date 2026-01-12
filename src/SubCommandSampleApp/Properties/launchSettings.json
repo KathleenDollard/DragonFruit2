@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SubCommandSampleApp": {
+      "commandName": "Project",
+      "commandLineArgs": "evening-args --name Kathleen --greeting Howdy"
+    }
+  }
+}

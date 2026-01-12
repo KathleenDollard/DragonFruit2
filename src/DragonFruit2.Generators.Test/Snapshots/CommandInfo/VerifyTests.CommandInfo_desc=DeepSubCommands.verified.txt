@@ -1,6 +1,7 @@
 ﻿{
   Name: MyArgs,
   NamespaceName: MyNamespace,
+  RootName: MyArgs,
   IsStruct: false,
   Options: [
     {
@@ -32,12 +33,16 @@
     {
       Name: MorningGreetingArgs,
       NamespaceName: MyNamespace,
+      BaseName: MyArgs,
+      RootName: MyArgs,
       IsStruct: false,
       PropInfos: []
     },
     {
       Name: EveningGreetingArgs,
       NamespaceName: MyNamespace,
+      BaseName: MyArgs,
+      RootName: MyArgs,
       IsStruct: false,
       Options: [
         {
@@ -73,6 +78,8 @@
         {
           Name: Bar,
           NamespaceName: MyNamespace,
+          BaseName: EveningGreetingArgs,
+          RootName: MyArgs,
           IsStruct: false,
           PropInfos: []
         }

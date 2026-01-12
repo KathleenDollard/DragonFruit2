@@ -24,9 +24,9 @@ internal static class OutputArgsBuilder
         sb.AppendLines([
                 "/// <summary>",
                 "/// </summary>",
-                $"internal class {commandInfo.Name}ArgsBuilder : ArgsBuilder<{commandInfo.Name}>"]);
+                $"internal class {commandInfo.Name}ArgsBuilder : ArgsBuilder<{commandInfo.RootName}>"]);
         sb.OpenCurly();
-        sb.AppendLine($$"""public ArgsBuilder<{{commandInfo.Name}}>? ActiveArgsBuilder { get; set; }""");
+        //sb.AppendLine($$"""public ArgsBuilder<{{commandInfo.RootName}}>? ActiveArgsBuilder { get; set; }""");
     }
 
     private static void Initialize(StringBuilderWrapper sb, CommandInfo commandInfo)
@@ -34,11 +34,11 @@ internal static class OutputArgsBuilder
         var commandDescription = commandInfo.Description is null
                                   ? "null"
                                   : $"\"{commandInfo.Description.Replace("\"", "\"\"")}\"";
-        sb.OpenMethod($"""public override void Initialize(Builder<{commandInfo.Name}> builder)""");
+        sb.OpenMethod($"""public override void Initialize(Builder<{commandInfo.RootName}> builder, bool isRoot=false)""");
 
         sb.AppendLine($"""var cliDataProvider = GetCliDataProvider(builder);""");
 
-        sb.AppendLine($"""var rootCommand = new System.CommandLine.Command("{commandInfo.Name}")""");
+        sb.AppendLine($"""var cmd = new System.CommandLine.Command("{commandInfo.Name}")""");
         sb.OpenCurly();
         sb.AppendLine($"""Description = {commandDescription},""");
         sb.CloseCurly(endStatement: true);
@@ -57,8 +57,10 @@ internal static class OutputArgsBuilder
             GetSubCommandDeclaration(sb, subcommand);
         }
 
-        sb.AppendLine("rootCommand.SetAction(p => { ActiveArgsBuilder = this; return 0; });");
-        sb.AppendLine($"""cliDataProvider.RootCommand = rootCommand;""");
+        sb.AppendLine("cmd.SetAction(p => { ActiveArgsBuilder = this; return 0; });");
+        sb.OpenIf("isRoot");
+        sb.AppendLine($"""cliDataProvider.RootCommand = cmd;""");
+        sb.CloseIf();
 
         sb.CloseMethod();
     }
@@ -69,15 +71,16 @@ internal static class OutputArgsBuilder
                               ? "null"
                               : $"\"{propInfo.Description.Replace("\"", "\"\"")}\"";
         string symbolName = $"{OutputHelpers.GetLocalSymbolName(propInfo.Name)}Option";
-        sb.AppendLine($"""var {symbolName} = new Option<{propInfo.TypeName}>("--{propInfo.CliName}")""");
+        sb.AppendLine($"""var {symbolName} = new Option<{propInfo.TypeName}>("{propInfo.CliName}")""");
         sb.OpenCurly();
         sb.AppendLines([
                 $"Description = {description},",
-                $"""Required = {(propInfo.IsRequiredForCli ? "true" : "false")}"""]);
+                $"""Required = {(propInfo.IsRequiredForCli ? "true" : "false")},""",
+                "Recursive=true"]);
         sb.CloseCurly(endStatement: true);
 
         AddSymbolToLookup(sb, propInfo, symbolName);
-        AddSymbolToRootCommand(sb, symbolName);
+        sb.AppendLine($"""cmd.Add({symbolName});""");
     }
 
     internal static void GetArgumentDeclaration(StringBuilderWrapper sb, PropInfo propInfo)
@@ -86,7 +89,7 @@ internal static class OutputArgsBuilder
                               ? "null"
                               : $"\"{propInfo.Description.Replace("\"", "\"\"")}\"";
         string symbolName = $"{OutputHelpers.GetLocalSymbolName(propInfo.Name)}Argument";
-        sb.AppendLine($"""var {symbolName} = new Argument<{propInfo.TypeName}>("{propInfo.Name}")""");
+        sb.AppendLine($"""var {symbolName} = new Argument<{propInfo.TypeName}>("{propInfo.CliName}")""");
         sb.OpenCurly();
         sb.AppendLine($"""
                 Description = {description},
@@ -94,14 +97,16 @@ internal static class OutputArgsBuilder
                 """);
         sb.CloseCurly(true, endStatement: true);
         AddSymbolToLookup(sb, propInfo, symbolName);
-        AddSymbolToRootCommand(sb, symbolName);
+        sb.AppendLine($"""cmd.Add({symbolName});""");
     }
 
     internal static void GetSubCommandDeclaration(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        string symbolName = $"{OutputHelpers.GetLocalSymbolName(commandInfo.Name)}";
-        sb.AppendLine($"""{symbolName}Command = new System.CommandLine.Command("{(commandInfo.Name ?? "Root")}");""");
-        AddSymbolToRootCommand(sb, symbolName);
+        string symbolName = $"{OutputHelpers.GetLocalSymbolName(commandInfo.Name)}Command";
+        sb.AppendLine($"""var {symbolName} = new System.CommandLine.Command("{commandInfo.CliName ?? "Root"}");""");
+        sb.AppendLine($"{commandInfo.Name}.GetArgsBuilder(builder).Initialize(builder);");
+
+        sb.AppendLine($"""cmd.Add({symbolName});""");
     }
 
     private static void AddSymbolToLookup(StringBuilderWrapper sb, PropInfo propInfo, string symbolName)
@@ -109,20 +114,15 @@ internal static class OutputArgsBuilder
         sb.AppendLine($"""cliDataProvider.AddNameLookup("{propInfo.Name}", {symbolName});""");
     }
 
-    private static void AddSymbolToRootCommand(StringBuilderWrapper sb, string symbolName)
-    {
-        sb.AppendLine($"""rootCommand.Add({symbolName});""");
-    }
-
     private static void CreateInstance(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenMethod($"""protected override {commandInfo.Name} CreateInstance(Builder<{commandInfo.Name}> builder)""");
+        sb.OpenMethod($"""protected override {commandInfo.RootName} CreateInstance(Builder<{commandInfo.RootName}> builder)""");
 
-        foreach (var propInfo in commandInfo.PropInfos)
+        foreach (var propInfo in commandInfo.SelfAndAncestorPropInfos)
         {
             sb.AppendLine($"""var {propInfo.Name.ToCamelCase()}DataValue = builder.GetDataValue<{propInfo.TypeName}>("{propInfo.Name}");""");
         }
-        var ctorArguments = commandInfo.PropInfos.Select(p => $"{p.Name.ToCamelCase()}DataValue");
+        var ctorArguments = commandInfo.SelfAndAncestorPropInfos.Select(p => $"{p.Name.ToCamelCase()}DataValue");
         sb.AppendLine();
         sb.Append($"""var newArgs = new {commandInfo.Name}({string.Join(", ", ctorArguments)});""");
         sb.AppendLine();
@@ -133,7 +133,7 @@ internal static class OutputArgsBuilder
 
     private static void CheckRequiredValues(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenMethod($"""protected override IEnumerable<ValidationFailure> CheckRequiredValues(Builder<{commandInfo.Name}> builder)""");
+        sb.OpenMethod($"""protected override IEnumerable<ValidationFailure> CheckRequiredValues(Builder<{commandInfo.RootName}> builder)""");
 
         var requiredValues = commandInfo.PropInfos.Where(p => p.IsRequiredForCli).ToList();
         sb.AppendLine($"var validationFailures = new List<ValidationFailure?>();");

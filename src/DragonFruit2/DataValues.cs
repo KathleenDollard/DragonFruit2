@@ -3,7 +3,7 @@
 namespace DragonFruit2;
 
 public class DataValues<TArgs>
-    where TArgs : Args<TArgs>
+    where TArgs : IArgs<TArgs>
 {
     public List<ValidationFailure> ValidationFailures = [];
     public bool IsValid => !ValidationFailures.Any();

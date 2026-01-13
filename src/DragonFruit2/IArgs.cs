@@ -1,8 +1,9 @@
-﻿//namespace DragonFruit2;
+﻿using DragonFruit2.Validators;
 
-//public interface IArgs<TArgs>
-//    where TArgs : Args<TArgs>, IArgs<TArgs>
-//{
-//    public static abstract ArgsBuilder<TArgs> GetArgsBuilder(Builder<TArgs> builder);
+namespace DragonFruit2;
 
-//}
+public interface IArgs<TArgs>
+    where TArgs : IArgs<TArgs>
+{
+   IEnumerable<ValidationFailure> Validate();
+}

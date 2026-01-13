@@ -20,14 +20,6 @@ public class OutputCli
         return sb.ToString();
     }
 
-    private static void ParseArgsMethod(CommandInfo commandInfo, StringBuilderWrapper sb)
-    {
-        sb.OpenMethod($"public static DataValues<{commandInfo.Name}> ParseArgs<TRootArgs>(string[]? args = null)",
-            constraints: "TRootArgs : Args<TRootArgs>");
-        sb.AppendLine($"return DragonFruit2.Cli.ParseArgs<{commandInfo.Name}>(new {commandInfo.Name}.{commandInfo.Name}ArgsBuilder(), args);");
-        sb.CloseMethod();
-    }
-
     private static void FileOpening(StringBuilderWrapper sb, string? cliNamespace, string? argsNamespace)
     {
         sb.AppendLines([
@@ -51,5 +43,11 @@ public class OutputCli
         sb.OpenCurly();
     }
 
-
+    private static void ParseArgsMethod(CommandInfo commandInfo, StringBuilderWrapper sb)
+    {
+        sb.OpenMethod($"public static DataValues<{commandInfo.Name}> ParseArgs<TRootArgs>(string[]? args = null)",
+            constraints: "TRootArgs : IArgs<TRootArgs>");
+        sb.AppendLine($"return DragonFruit2.Cli.ParseArgs<{commandInfo.Name}>(new {commandInfo.Name}.{commandInfo.Name}ArgsBuilder(), args);");
+        sb.CloseMethod();
+    }
 }

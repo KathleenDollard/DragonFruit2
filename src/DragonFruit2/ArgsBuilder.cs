@@ -26,7 +26,7 @@ public abstract class ArgsBuilder
 /// <typeparam name="TRootArgs"></typeparam>
 /// <typeparam name="TRootArgs"></typeparam>
 public abstract class ArgsBuilder<TRootArgs> : ArgsBuilder
-   where TRootArgs : Args<TRootArgs>
+   where TRootArgs : IArgs<TRootArgs>
 {
     protected static CliDataProvider<TRootArgs> GetCliDataProvider(Builder<TRootArgs> builder)
     {

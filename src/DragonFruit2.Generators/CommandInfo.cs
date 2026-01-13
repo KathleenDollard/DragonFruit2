@@ -12,6 +12,7 @@ public record class CommandInfo
     public required string Name { get; init; }
     public string? NamespaceName { get; init; }
     public string? CliNamespaceName { get; init; }
+    public required string ArgsAccessibility {  get; init; }
     public string? BaseName { get; init; }
     public string? RootName { get; init; }
     public string? CliName

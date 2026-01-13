@@ -250,6 +250,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
             {
                 Name = "MyArgs",
                 NamespaceName = "MyNamespace",
+                ArgsAccessibility = "public"
             };
             subCommandsCommandInfo.Options.Add(new PropInfo()
             {
@@ -262,11 +263,13 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
                         {
                             Name = "MorningGreetingArgs",
                             NamespaceName = "MyNamespace",
+                            ArgsAccessibility = "public"
                         });
             var subCommandsEveningCommandInfo = new CommandInfo()
             {
                 Name = "EveningGreetingArgs",
                 NamespaceName = "MyNamespace",
+                ArgsAccessibility = "public"
             };
             subCommandsEveningCommandInfo.Options.Add(new PropInfo()
             {
@@ -285,6 +288,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
             {
                 Name = "MyArgs",
                 NamespaceName = "MyNamespace",
+                ArgsAccessibility = "public"
             };
             deepSubCommandInfo.Options.Add(new PropInfo()
             {
@@ -297,11 +301,13 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
                         {
                             Name = "MorningGreetingArgs",
                             NamespaceName = "MyNamespace",
+                            ArgsAccessibility = "public"
                         });
             var deepSubCommandsEveningCommandInfo = new CommandInfo()
             {
                 Name = "EveningGreetingArgs",
                 NamespaceName = "MyNamespace",
+                ArgsAccessibility = "public"
             };
             deepSubCommandsEveningCommandInfo.Options.Add(new PropInfo()
             {
@@ -313,6 +319,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
             {
                 Name = "Bar",
                 NamespaceName = "MyNamespace",
+                ArgsAccessibility = "public"
             };
             deepSubCommandsEveningCommandInfo.SubCommands.Add(deeperSubCommandsEveningCommandInfo);
             deepSubCommandInfo.SubCommands.Add(deepSubCommandsEveningCommandInfo);

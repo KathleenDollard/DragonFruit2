@@ -3,7 +3,7 @@
 namespace DragonFruit2;
 
 public class CliDataProvider<TRootArgs> : DataProvider
-            where TRootArgs : Args<TRootArgs>
+            where TRootArgs : IArgs<TRootArgs>
 {
 
     public string[] InputArgs

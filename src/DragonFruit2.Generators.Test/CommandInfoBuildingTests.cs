@@ -85,6 +85,43 @@ public class CommandInfoBuildingTests
         Assert.NotNull(commandInfo);
         Assert.Equal("MyNamespace", commandInfo?.NamespaceName);
     }
+
+    [Fact]
+    public async Task CommandInfoIncludesArgsClassAccessibility()
+    {
+        var sourceText = """
+            public partial class MyArgs
+            { }
+            """;
+        var compilation = TestHelpers.GetCompilation(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var programTree = compilation.SyntaxTrees.Last();
+        var invocations = TestHelpers.GetParseArgsInvocations(programTree);
+        Assert.Single(invocations);
+
+        var commandInfo = DragonFruit2Builder.GetRootCommandInfoFromInvocation(invocations.Single(), compilation.GetSemanticModel(programTree));
+        
+        Assert.NotNull(commandInfo);
+        Assert.Equal("public", commandInfo?.ArgsAccessibility);
+    }
+
+
+    [Fact]
+    public async Task CommandInfoIncludesArgsClassTwoWordAccessibility()
+    {
+        var sourceText = """
+            protected internal partial class MyArgs
+            { }
+            """;
+        var compilation = TestHelpers.GetCompilation(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var programTree = compilation.SyntaxTrees.Last();
+        var invocations = TestHelpers.GetParseArgsInvocations(programTree);
+        Assert.Single(invocations);
+
+        var commandInfo = DragonFruit2Builder.GetRootCommandInfoFromInvocation(invocations.Single(), compilation.GetSemanticModel(programTree));
+
+        Assert.NotNull(commandInfo);
+        Assert.Equal("public", commandInfo?.ArgsAccessibility);
+    }
     #endregion
 
     #region PropInfo Creation Tests

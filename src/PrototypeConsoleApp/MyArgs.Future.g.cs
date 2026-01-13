@@ -11,7 +11,7 @@ namespace SampleConsoleApp;
 /// <summary>
 /// 
 /// </summary>
-public partial class MyArgs : Args<MyArgs>
+public partial class MyArgs : IArgs<MyArgs>
 {
     private List<Validator<int>>? ageValidators;
 
@@ -30,7 +30,7 @@ public partial class MyArgs : Args<MyArgs>
     }
 
 
-    public override IEnumerable<ValidationFailure> Validate()
+    public IEnumerable<ValidationFailure> Validate()
     {
         var failures = new List<ValidationFailure>();
         InitializeValidators();

@@ -41,13 +41,13 @@ internal class OutputPartialArgs
 
     internal static void OpenClass(CommandInfo commandInfo, StringBuilderWrapper sb)
     {
-        var baseType = commandInfo.BaseName ?? $"Args<{commandInfo.Name}>";
+        var baseType = commandInfo.BaseName ?? $"IArgs<{commandInfo.Name}>";
         sb.AppendLines([
                 "/// <summary>",
                 $"""/// Auto-generated partial class for building CLI commands for <see cref="{commandInfo.Name}" />""",
                 $"""/// and creating a new {commandInfo.Name} instance from a <see cref="System.CommandLine.ParseResult" />.""",
                 "/// </summary>",
-                $"public partial class {commandInfo.Name} : {baseType}"]);
+                $"{commandInfo.ArgsAccessibility} partial class {commandInfo.Name} : {baseType}"]);
         sb.OpenCurly();
     }
 
@@ -94,7 +94,7 @@ internal class OutputPartialArgs
 
     internal static void ValidateMethod(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenMethod("public override IEnumerable<ValidationFailure> Validate()");
+        sb.OpenMethod("public IEnumerable<ValidationFailure> Validate()");
         sb.AppendLine("var failures = new List<ValidationFailure>();");
         sb.AppendLine("InitializeValidators();");
         sb.AppendLine();

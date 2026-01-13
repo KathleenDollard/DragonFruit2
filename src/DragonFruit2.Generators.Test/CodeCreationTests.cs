@@ -14,6 +14,7 @@ namespace DragonFruit2.Generators.Test
             {
                 Name = "MyCommand",
                 NamespaceName = "MyNamespace",
+                ArgsAccessibility = "public"
             };
 
             var expected = """"
@@ -80,7 +81,8 @@ namespace DragonFruit2.Generators.Test
             {
                 Name = "MyCommand",
                 NamespaceName = "MyNamespace",
-                Description = "This is my command"
+                Description = "This is my command",
+                ArgsAccessibility = "public"
             };
 
             var expectedMarker = "var rootCommand = new System.CommandLine.Command(\"MyCommand\")";

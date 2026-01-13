@@ -1,7 +1,7 @@
 ﻿namespace DragonFruit2;
 
 public class Builder<TRootArgs>
-    where TRootArgs : Args<TRootArgs>
+    where TRootArgs : IArgs<TRootArgs>
 {
     public Builder()
     {

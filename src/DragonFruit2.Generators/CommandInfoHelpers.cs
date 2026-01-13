@@ -1,5 +1,6 @@
 ﻿using DragonFruit2.GeneratorSupport;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace DragonFruit2.Generators;
@@ -11,6 +12,8 @@ public static class CommandInfoHelpers
                                                 string? cliNamespaceName)
     {
         string? baseTypeName = typeSymbol.Name == rootName ? null : typeSymbol.BaseType?.Name;
+        var format = new SymbolDisplayFormat( );
+
         return new()
         {
 
@@ -18,6 +21,7 @@ public static class CommandInfoHelpers
             Name = typeSymbol.Name,
             NamespaceName = typeSymbol.GetNamespace(),
             CliNamespaceName= cliNamespaceName,
+            ArgsAccessibility = typeSymbol.DeclaredAccessibility.ToCSharpString(),
             BaseName = baseTypeName,
             RootName = rootName,
             IsStruct = typeSymbol.IsValueType,

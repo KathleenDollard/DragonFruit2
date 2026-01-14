@@ -23,5 +23,7 @@
   <Project Path="DragonFruit2/DragonFruit2.csproj" />
   <Project Path="PrototypeConsoleApp/PrototypeConsoleApp.csproj" />
   <Project Path="SampleConsoleApp/SampleConsoleApp.csproj" />
-  <Project Path="SubCommandSampleApp/SubCommandSampleApp.csproj" Id="824e9dcd-a0f0-4178-83b9-6db05ccad94d" />
+  <Project Path="SubCommandSampleApp/SubCommandSampleApp.csproj" Id="824e9dcd-a0f0-4178-83b9-6db05ccad94d">
+    <Build Solution="Debug|*" Project="false" />
+  </Project>
 </Solution>

@@ -11,15 +11,6 @@ public abstract class ArgsBuilder
 
 }
 
-///// <summary>
-///// This type provides a common type to store ArgBuilders in the cache
-///// </summary>
-//public abstract class ArgsBuilder<TRootArgs> : ArgsBuilder
-//    where TRootArgs : Args<TRootArgs>
-//{
-
-//}
-
 /// <summary>
 /// 
 /// </summary>
@@ -28,19 +19,19 @@ public abstract class ArgsBuilder
 public abstract class ArgsBuilder<TRootArgs> : ArgsBuilder
    where TRootArgs : class, IArgs<TRootArgs>
 {
-    protected static CliDataProvider<TRootArgs> GetCliDataProvider(Builder<TRootArgs> builder)
-    {
-        var cliDataProvider = builder.DataProviders.OfType<CliDataProvider<TRootArgs>>().FirstOrDefault();
-        if (cliDataProvider is null)
-        {
-            cliDataProvider = new CliDataProvider<TRootArgs>();
-            builder.DataProviders.Add(cliDataProvider);
-        }
-        return cliDataProvider;
-    }
+    //protected static CliDataProvider<TRootArgs> GetCliDataProvider(Builder<TRootArgs> builder)
+    //{
+    //    var cliDataProvider = builder.DataProviders.OfType<CliDataProvider<TRootArgs>>().FirstOrDefault();
+    //    if (cliDataProvider is null)
+    //    {
+    //        cliDataProvider = new CliDataProvider<TRootArgs>(builder);
+    //        builder.DataProviders.Add(cliDataProvider);
+    //    }
+    //    return cliDataProvider;
+    //}
 
-    public abstract Command InitializeCli(Builder<TRootArgs> builder);
-
+    public abstract void Initialize(Builder<TRootArgs> builder);
+    public abstract Command InitializeCli(Builder<TRootArgs> builder, CliDataProvider<TRootArgs>? cliDataProvider);
     protected abstract TRootArgs CreateInstance(Builder<TRootArgs> builder);
 
     protected abstract IEnumerable<ValidationFailure> CheckRequiredValues(Builder<TRootArgs> builder);

@@ -46,7 +46,14 @@ In addition to creating the args class (`MyArgs` in this section), the developer
 
 Generation uses the call to `ParseArgs` as an indicator to generate additional code in an `MyArgs` partial class. This adds the `IArgs` interface and implements it's two methods. `Initialize(Builder builder)` and `Create()`. At runtime, this method creates a fully hydrated and validated instance of hte `MyArgs` class.
 
+## Extensibility points
 
+- DataProvider pipeline (in place)
+- ArgsBuilder Initialize (needs design to isolate -nitialization)
+- InitializationStart/Finish optional methods (needs design)
+- ConstructorStart/Finish optional methods (needs design)
+- Dependent defaults (needs design)
+- Dependent validation
 
 
 

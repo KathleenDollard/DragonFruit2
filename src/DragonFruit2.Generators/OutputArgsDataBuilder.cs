@@ -39,12 +39,19 @@ internal static class OutputArgsBuilder
 
     private static void Initialize(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
+        sb.OpenMethod($"""public override void Initialize(Builder<{commandInfo.RootName}> builder)""");
+        sb.AppendLine($"InitializeCli(builder, builder.DataProviders.OfType<CliDataProvider<{commandInfo.RootName}>>().FirstOrDefault());");
+        sb.CloseMethod();
+
+        InitializeCli(sb, commandInfo);
+    }
+
+    private static void InitializeCli(StringBuilderWrapper sb, CommandInfo commandInfo)
+    {
         var commandDescription = commandInfo.Description is null
                                   ? "null"
                                   : $"\"{commandInfo.Description.Replace("\"", "\"\"")}\"";
-        sb.OpenMethod($"""public override Command Initialize(Builder<{commandInfo.RootName}> builder)""");
-
-        sb.AppendLine($"""var cliDataProvider = GetCliDataProvider(builder);""");
+        sb.OpenMethod($"""public override Command InitializeCli(Builder<{commandInfo.RootName}> builder, CliDataProvider<{commandInfo.RootName}>? cliDataProvider)""");
 
         sb.AppendLine($"""var cmd = new System.CommandLine.{(commandInfo.BaseName is null ? "Root" : "")}Command("{commandInfo.CliName}")""");
         sb.OpenCurly();
@@ -67,8 +74,12 @@ internal static class OutputArgsBuilder
 
         sb.AppendLine($$"""cmd.SetAction(p => { ArgsBuilderCache<{{commandInfo.RootName}}>.ActiveArgsBuilder = this; return {{commandInfo.Name.Length + commandInfo.BaseName?.Length}}; });""");
 
-        sb.AppendLine("return cmd;");
+        if (commandInfo.Name == commandInfo.RootName)
+        {
+            sb.AppendLine("cliDataProvider.RootCommand = cmd;");
+        }
 
+        sb.AppendLine("return cmd;");
 
         sb.CloseMethod();
     }
@@ -113,7 +124,7 @@ internal static class OutputArgsBuilder
     internal static void GetSubCommandDeclaration(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
         string symbolName = $"{OutputHelpers.GetLocalSymbolName(commandInfo.Name)}Command";
-        sb.AppendLine($"""var {symbolName} = {commandInfo.Name}.GetArgsBuilder(builder).Initialize(builder);""");
+        sb.AppendLine($"""var {symbolName} = {commandInfo.Name}.GetArgsBuilder(builder).InitializeCli(builder, cliDataProvider);""");
         sb.AppendLine($"""cmd.Add({symbolName});""");
         sb.AppendLine();
     }

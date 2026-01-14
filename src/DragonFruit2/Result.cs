@@ -8,7 +8,7 @@ public class Result<TArgs>
 {
     private readonly List<ValidationFailure> validationFailures = new();
 
-    public Result(IEnumerable<ValidationFailure> failures, TArgs? args)
+    public Result(IEnumerable<ValidationFailure>? failures, TArgs? args)
     {
         validationFailures.AddRange(failures);
         Args = args;

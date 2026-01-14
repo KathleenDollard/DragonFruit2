@@ -5,15 +5,20 @@ namespace DragonFruit2;
 public class Builder<TRootArgs>
     where TRootArgs : class, IArgs<TRootArgs>
 {
-    public Builder()
+    public Builder(string[] commandLineArguments, DragonFruit2Configuration? configuration = null)
     {
-        AddDataProvider(new CliDataProvider<TRootArgs>());
+        CommandLineArguments = commandLineArguments;
+        AddDataProvider(new CliDataProvider<TRootArgs>(this));
+        Configuration = configuration;
     }
 
+    public string[] CommandLineArguments { get; }
     public List<DataProvider> DataProviders { get; } = [];
+    public DragonFruit2Configuration? Configuration { get; }
 
     public void AddDataProvider(DataProvider provider, int position = int.MaxValue)
     {
+        // TODO: Should we protect against multiple entries of the same provider? The same provider type? (might be scenarios for that) Have an "allow multiples" trait on the provider? (How would we do that in Framework?) Have each provider build a key that could differentiate?
         if (position < int.MaxValue)
         {
             DataProviders.Insert(position, provider);
@@ -36,18 +41,14 @@ public class Builder<TRootArgs>
         return DataValue<T>.CreateEmpty();
     }
 
-
-    public Result<TRootArgs> ParseArgs(ArgsBuilder<TRootArgs> argsBuilder, string[] args)
+    public Result<TRootArgs> ParseArgs(ArgsBuilder<TRootArgs> argsBuilder)
     {
-        //var argsBuilder = ArgsBuilderCache<TRootArgs>.GetArgsBuilder<TRootArgs>();
-        // The entire CLI tree is built from the TRootArgs
-        var rootCommand = argsBuilder.InitializeCli(this);
+        argsBuilder.Initialize(this);
 
-        var cliDataProvider = DataProviders.OfType<CliDataProvider<TRootArgs>>().FirstOrDefault()
+        var cliDataProvider = DataProviders.OfType<IActiveArgsBuilderProvider<TRootArgs>>().FirstOrDefault()
             ?? throw new InvalidOperationException("Internal error: CliDataProvider not found");
-        cliDataProvider.RootCommand = rootCommand;
         // Once you set the InputArgs, the provider can start parsing
-        var (failures, activeArgsBuilder) = cliDataProvider.GetActiveArgsBuilder(args);
+        var (failures, activeArgsBuilder) = cliDataProvider.GetActiveArgsBuilder();
 
         return activeArgsBuilder is null
                     ? new Result<TRootArgs>(failures, null)

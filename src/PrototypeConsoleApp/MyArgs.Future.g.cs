@@ -81,9 +81,15 @@ public partial class MyArgs : IArgs<MyArgs>
             ArgsBuilderCache<MyArgs>.AddArgsBuilder<MyArgs>(new MyArgsBuilder());
         }
 
-        public override Command InitializeCli(Builder<MyArgs> builder)
+        public override void Initialize(Builder<MyArgs> builder)
         {
-            var cliDataProvider = GetCliDataProvider(builder);
+            // Generate for each data provider
+            InitializeCli(builder, builder.DataProviders.OfType<CliDataProvider<MyArgs>>().FirstOrDefault());
+        }
+
+        public override Command InitializeCli(Builder<MyArgs> builder, CliDataProvider<MyArgs>? cliDataProvider)
+        {
+            if (cliDataProvider is null) throw new ArgumentNullException(nameof(cliDataProvider));
 
             var rootCommand = new System.CommandLine.Command("Test")
             {
@@ -112,6 +118,8 @@ public partial class MyArgs : IArgs<MyArgs>
             rootCommand.Add(greetingOption);
 
             rootCommand.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return 0; });
+
+            cliDataProvider.RootCommand = rootCommand;
 
             return rootCommand;
         }

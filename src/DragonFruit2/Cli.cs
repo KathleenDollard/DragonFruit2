@@ -38,6 +38,6 @@ public static class Cli
         // The first item is the exe/dll name
         args ??= Environment.GetCommandLineArgs().Skip(1).ToArray();
 
-        return new Builder<TRootArgs>().ParseArgs(rootArgsBuilder, args);
+        return new Builder<TRootArgs>(args).ParseArgs(rootArgsBuilder);
     }
 }

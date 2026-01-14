@@ -4,30 +4,26 @@ using System.CommandLine.Parsing;
 
 namespace DragonFruit2;
 
-public class CliDataProvider<TRootArgs> : DataProvider
+public class CliDataProvider<TRootArgs> : DataProvider, IActiveArgsBuilderProvider<TRootArgs>
             where TRootArgs : class, IArgs<TRootArgs>
 {
-
-    public string[] InputArgs
+    public CliDataProvider(Builder<TRootArgs> builder)
     {
-        get;
-        private set;
-
+        InputArgs = builder.CommandLineArguments;
     }
 
-    internal (IEnumerable<ValidationFailure>? failures, ArgsBuilder<TRootArgs>? builder) GetActiveArgsBuilder(string[] args)
-    {
-        {
-            InputArgs = args;
-            ParseResult = RootCommand?.Parse(InputArgs);
-            ArgsBuilderCache<TRootArgs>.ActiveArgsBuilder = null;
-            var _ = ParseResult?.Invoke();
-            var failures = ParseResult is not null && ParseResult.Errors.Any()
-                            ? TransformErrors(ParseResult.Errors)
-                            : Enumerable.Empty<ValidationFailure>();
+    public string[]? InputArgs { get; }
 
-            return (failures, ArgsBuilderCache<TRootArgs>.GetActiveArgsBuilder());
-        }
+    public (IEnumerable<ValidationFailure>? failures, ArgsBuilder<TRootArgs>? builder) GetActiveArgsBuilder()
+    {
+        ParseResult = RootCommand?.Parse(InputArgs);
+        ArgsBuilderCache<TRootArgs>.ActiveArgsBuilder = null;
+        var _ = ParseResult?.Invoke();
+        var failures = ParseResult is not null && ParseResult.Errors.Any()
+                        ? TransformErrors(ParseResult.Errors)
+                        : Enumerable.Empty<ValidationFailure>();
+
+        return (failures, ArgsBuilderCache<TRootArgs>.GetActiveArgsBuilder());
     }
 
     private IEnumerable<ValidationFailure>? TransformErrors(IReadOnlyList<ParseError> errors)

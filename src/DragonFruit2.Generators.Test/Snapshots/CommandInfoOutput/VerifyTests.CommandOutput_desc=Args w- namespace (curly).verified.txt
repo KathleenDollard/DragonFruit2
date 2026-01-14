@@ -43,9 +43,13 @@ namespace MyNamespace
         internal class MyArgsArgsBuilder : ArgsBuilder<>
         {
 
-            public override Command Initialize(Builder<> builder)
+            public override void Initialize(Builder<> builder)
             {
-                var cliDataProvider = GetCliDataProvider(builder);
+                InitializeCli(builder, builder.DataProviders.OfType<CliDataProvider<>>().FirstOrDefault());
+            }
+
+            public override Command InitializeCli(Builder<> builder, CliDataProvider<>? cliDataProvider)
+            {
                 var cmd = new System.CommandLine.RootCommand("my")
                 {
                     Description = null,

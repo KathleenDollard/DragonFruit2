@@ -18,27 +18,31 @@ public static class Cli
         where TRootArgs : class, IArgs<TRootArgs>
     {
         throw new InvalidOperationException("This method is a stub for source generation. You either called `DragonFruit2.Cli.TryParse` instead of an import for DragonFruit2 and `Cli.TryParse' or there is a problem with source generation.");
-        //args ??= Environment.GetCommandLineArgs();
-
-        //var argsDataValues = new Builder<TRootArgs>().ParseArgs(args);
-
-
-        //return argsDataValues;
-
     }
 
     /// <summary>
+    /// Attempts to parses CLI arguments and fill the specified args type.
     /// </summary>
+    /// <remarks>
+    /// The args class specified as the type argument must be public.
+    /// <br/>
+    /// You may need to build after editing this line.
+    /// </remarks>
     /// <typeparam name="TRootArgs">The type containing the CLI definition</typeparam>
+    /// <param name="result">An out parameter that contains an instance of the requested class and supporting data, such as a suggested CLI return value.</param>
     /// <param name="args">Optionaly pass the commandline args</param>
     /// <returns></returns>
-    public static Result<TRootArgs> ParseArgs<TRootArgs, TRootArgsBuilder> ( string[]? args = null)
-        where TRootArgs : class, IArgs<TRootArgs>
-        where TRootArgsBuilder : ArgsBuilder<TRootArgs>, new()
+    /// <exception cref="InvalidOperationException"></exception>
+    public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)
+            where TRootArgs : class, IArgs<TRootArgs>
     {
-        // The first item is the exe/dll name
-        args ??= Environment.GetCommandLineArgs().Skip(1).ToArray();
-
-        return new Builder<TRootArgs, TRootArgsBuilder>(args).ParseArgs(args);
+        throw new InvalidOperationException("This method is a stub for source generation. You either called `DragonFruit2.Cli.TryParse` instead of an import for DragonFruit2 and `Cli.TryParse' or there is a problem with source generation.");
     }
+
+    public static bool TryExecute<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)
+        where TRootArgs : class, IArgs<TRootArgs>
+    {
+        throw new InvalidOperationException("This method is a stub for source generation. You either called `DragonFruit2.Cli.TryParse` instead of an import for DragonFruit2 and `Cli.TryParse' or there is a problem with source generation.");
+    }
+
 }

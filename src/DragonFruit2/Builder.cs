@@ -9,7 +9,7 @@ public abstract class Builder<TRootArgs>
 
     protected Builder(string[] commandLineArguments, DragonFruit2Configuration? configuration = null)
     {
-        CommandLineArguments = commandLineArguments;
+        CommandLineArguments = commandLineArguments ?? Environment.GetCommandLineArgs().Skip(1).ToArray();
         AddDataProvider(new CliDataProvider<TRootArgs>(this));
         AddDataProvider(new DefaultDataProvider<TRootArgs>(this));
         Configuration = configuration;
@@ -63,7 +63,7 @@ public abstract class Builder<TRootArgs>
     }
 }
 
-internal class Builder<TRootArgs, TRootArgsBuilder> : Builder<TRootArgs>
+public class Builder<TRootArgs, TRootArgsBuilder> : Builder<TRootArgs>
         where TRootArgs : class, IArgs<TRootArgs>
         where TRootArgsBuilder : ArgsBuilder<TRootArgs>, new()
 {

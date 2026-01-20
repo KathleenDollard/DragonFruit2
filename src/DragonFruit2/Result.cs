@@ -24,6 +24,7 @@ public class Result<TArgs>
     public TArgs? Args { get; set; }
     public ResultStatus Status { get; internal set; }
     public bool IsValid => Status == ResultStatus.ReadyToRun;
+    public int SuggestedReturnValue => throw new NotImplementedException();
 
     public void AddFailure(ValidationFailure failure)
         => validationFailures.Add(failure);

@@ -137,7 +137,7 @@ namespace MyNamespace
 
             public override void SetDataValues(DataProvider dataProvider)
             {
-                dataProvider.SetDataValue((typeof(MyArgs), nameof(Name)), Name);
+                dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Name)), Name);
             }
 
             private Type argsType = typeof(MyArgs);

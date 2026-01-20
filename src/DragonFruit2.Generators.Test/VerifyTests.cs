@@ -24,17 +24,27 @@ public class VerifyTests
         return Verify(actual, verifySettings).UseParameters(desc);
     }
 
-    // This test would ideally use the verified CommandInfo from the previous test.
+    /// <summary>
+    /// This test returns the output for teh root args only. The integration test returns all of the files
+    /// </summary>
+    /// <param name="desc">Used as part of file name, so keep it short</param>
+    /// <param name="_">Not used</param>
+    /// <param name="__">Not used</param>
+    /// <param name="commandInfo">The CommandInfo to use for generation (from theory)</param>
+    /// <param name="___">Not used</param>
+    /// <returns></returns>
     [Theory]
     [ClassData(typeof(CommandInfoTheoryData))]
-    public Task CommandOutput(string desc, string _, string __, CommandInfo commandInfo, string expected)
+    public Task CommandOutput(string desc, string _, string __, CommandInfo commandInfo, string ___)
     {
         var actual = DragonFruit2Builder.GetSourceForCommandInfo(commandInfo);
 
         var verifySettings = new VerifySettings();
-        verifySettings.UseDirectory("Snapshots/CommandInfoOutput");
+        verifySettings.UseDirectory("Snapshots/CommandOutput");
         return Verify(actual, verifySettings).UseParameters(desc);
     }
+
+
 
 
     // The following test should ideally generate new code and compare to the code in the CommandOutput test 

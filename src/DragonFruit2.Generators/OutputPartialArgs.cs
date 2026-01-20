@@ -157,7 +157,6 @@ internal class OutputPartialArgs
         sb.AppendLine();
     }
 
-
     internal static void GetArgsBuilder(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
         sb.OpenMethod($"public static ArgsBuilder<{commandInfo.RootName}> GetArgsBuilder(Builder<{commandInfo.RootName}> builder)");

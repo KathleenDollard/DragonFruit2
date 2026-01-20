@@ -1,7 +1,9 @@
 ﻿using DragonFruit2.GeneratorSupport;
 using System.Data;
+using System.Data.SqlTypes;
 using System.Numerics;
 using System.Text;
+using System.Xml.Linq;
 
 namespace DragonFruit2.Generators;
 
@@ -124,7 +126,21 @@ internal class StringBuilderWrapper
     }
     internal void CloseIf() => CloseCurly();
 
-    internal void OpenForEach(string loopString)
+    internal void OpenElseIfAndClosePreviousIf(string condition)
+    {
+        CloseCurly();
+        AppendLine($"else if ({condition})");
+        OpenCurly();
+    }
+
+    internal void OpenElseAndClosePreviousIf()
+    {
+        CloseCurly();
+        AppendLine($"else");
+        OpenCurly();
+    }
+
+   internal void OpenForEach(string loopString)
     {
         AppendLine($"foreach ({loopString})");
         OpenCurly();
@@ -145,8 +161,33 @@ internal class StringBuilderWrapper
         AppendLine("/// </remarks>");
     }
 
+    internal void XmlTypeParam(string name, string text)
+    {
+        AppendLine($"""/// <typeparam name="{name}">{text}</typeparam>""");
+    }
+
+    internal void XmlParam(string name, string text)
+    {
+        AppendLine($"""/// <param name="{name}">{text}</param>""");
+    }
+
+    internal void XmlReturns(string text)
+    {
+        AppendLine($"""/// <returns>{text}</returns>""");
+    }
+
+    internal void XmlException(string exceptionTypeName, string text)
+    {
+        AppendLine($"""/// <exception cref="{exceptionTypeName}">{text}</param>""");
+    }
+
     internal void Comment(string line)
     {
         AppendLine($"// {line}");
+    }
+
+    internal void Return(string? returnValue = null)
+    {
+        AppendLine($"return {returnValue};");
     }
 }

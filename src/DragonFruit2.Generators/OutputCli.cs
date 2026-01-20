@@ -17,7 +17,9 @@ public class OutputCli
         sb.OpenNamespace(commandInfo.CliNamespaceName);
 
         OpenClass(commandInfo, sb);
-        ParseArgsMethod(commandInfo, sb)    ;
+        ParseArgsMethod(commandInfo, sb);
+        TryParseArgsMethod(commandInfo, sb);
+        //TryExecute(commandInfo, sb);
 
         sb.CloseClass();
         sb.CloseNamespace(commandInfo.CliNamespaceName);
@@ -51,9 +53,34 @@ public class OutputCli
     private static void ParseArgsMethod(CommandInfo rootCommandInfo, StringBuilderWrapper sb)
     {
         var rootName = rootCommandInfo.Name;
+
+        sb.XmlSummary("Parses CLI arguments to fill the specified args type.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.");
+        sb.XmlRemarks("The args class specified as the type argument must be public.");
+        sb.XmlTypeParam("TRootArgs", "The type containing the CLI definition.");
+        sb.XmlParam("args", "Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.");
+
         sb.OpenMethod($"public static Result<{rootName}> ParseArgs<TRootArgs>(string[]? args = null)",
-            constraints: "TRootArgs : IArgs<TRootArgs>");
-        sb.AppendLine($"return DragonFruit2.Cli.ParseArgs<{rootName}, {rootName}.{rootName}ArgsBuilder>(args);");
+            constraints: $"TRootArgs : {rootName}, IArgs<TRootArgs>");
+        sb.AppendLine($"return new Builder<{rootName}, {rootName}.{rootName}ArgsBuilder>(args).ParseArgs(args);");
+        sb.CloseMethod();
+    }
+
+    private static void TryParseArgsMethod(CommandInfo rootCommandInfo, StringBuilderWrapper sb)
+    {
+        var rootName = rootCommandInfo.Name;
+
+        sb.XmlSummary("Attempts to parses CLI arguments and fill the specified args type.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.");
+        sb.XmlRemarks("The args class specified as the type argument must be public.");
+        sb.XmlTypeParam("TRootArgs", "The type containing the CLI definition.");
+        sb.XmlParam("result", "An out parameter that contains an instance of the requested class and supporting data, such as diagnostics, a suggested CLI return value, etc.");
+        sb.XmlParam("args", "Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.");
+        sb.XmlException("InvalidOperationException", "To be implemented soon.");
+
+        sb.OpenMethod($"public static bool TryParseArgs<TRootArgs>(out Result<{rootName}> result, string[]? args = null)",
+            constraints: $"TRootArgs : {rootName}, IArgs<TRootArgs>");
+
+        sb.AppendLine($"result = ParseArgs<TRootArgs>(args);");
+        sb.Return("result.IsValid");
         sb.CloseMethod();
     }
 }

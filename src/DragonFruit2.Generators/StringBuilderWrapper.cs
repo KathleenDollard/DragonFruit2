@@ -1,13 +1,8 @@
-﻿using DragonFruit2.GeneratorSupport;
-using System.Data;
-using System.Data.SqlTypes;
-using System.Numerics;
-using System.Text;
-using System.Xml.Linq;
+﻿using System.Text;
 
 namespace DragonFruit2.Generators;
 
-internal class StringBuilderWrapper
+public class StringBuilderWrapper
 {
     private readonly int indentSize = 4;
     private string indent = "";

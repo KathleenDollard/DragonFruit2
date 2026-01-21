@@ -9,6 +9,10 @@
     <File Path="../docs/Transforms.md" />
     <File Path="../docs/Validation.md" />
     <File Path="../docs/_Overview.md" />
+    <File Path="TestingStrategy.md" />
+  </Folder>
+  <Folder Name="/DragonFruit2.Generation.Test.Projects/">
+    <Project Path="DragonFruit2.Generators.Test.Projects/SimpleConsoleApp/SimpleConsoleApp.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="../.gitattributes" />
@@ -16,6 +20,7 @@
     <File Path="../ReadMe.md" />
     <File Path=".editorconfig" />
     <File Path="Directory.Build.props" />
+    <File Path="DragonFruit2.Generators/CommandInfo.cs" />
   </Folder>
   <Project Path="DragonFruit2.Generators.Test/DragonFruit2.Generators.Test.csproj" Id="513239eb-873d-4d57-b95d-43eff3f81bbd" />
   <Project Path="DragonFruit2.Generators/DragonFruit2.Generators.csproj" />

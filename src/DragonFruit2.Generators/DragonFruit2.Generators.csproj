@@ -34,6 +34,10 @@
 		<MySourceFiles Include="$(OutputPath)/DragonFruit.Generators.dll, $(OutputPath)/DragonFruit.Generators.pdb" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="SampleConsoleApp\" />
+	</ItemGroup>
+
 	<Target Name="AfterBuild">
 		<Copy SourceFiles="@(MySourceFiles)" DestinationFolder="$(OutputPath)/../../DragonFruit/release" />
 	</Target>

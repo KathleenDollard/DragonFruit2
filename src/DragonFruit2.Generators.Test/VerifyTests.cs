@@ -18,7 +18,7 @@ public class VerifyTests
         var programTree = compilation.SyntaxTrees.Last();
         var invocations = TestHelpers.GetParseArgsInvocations(programTree);
         var actual = DragonFruit2Builder.GetRootCommandInfoFromInvocation(invocations.Single(), compilation.GetSemanticModel(programTree));
-        
+
         var verifySettings = new VerifySettings();
         verifySettings.UseDirectory("Snapshots/CommandInfo");
         return Verify(actual, verifySettings).UseParameters(desc);
@@ -44,15 +44,21 @@ public class VerifyTests
         return Verify(actual, verifySettings).UseParameters(desc);
     }
 
+    //[Fact()]
+    //public Task SammpleAppIntegration()
+    //{
+    //    var projectName = "SampleApp";
+    //    var projectFileName = $"""..\..\..\DragonFruit2.Generation.Test.Projects\{projectName}\{projectName}.csproj""";
 
-   //[Theory]
-   //[ClassData(typeof(CommandInfoTheoryData))]
-   // public Task Generation(string desc, string argsSource, string consoleSource, CommandInfo _, string __)
-   // {
-   //     var driver = VerifyHelpers.GetDriver(argsSource, consoleSource);
+    //}
+    //[Theory]
+    //[ClassData(typeof(CommandInfoTheoryData))]
+    // public Task Generation(string desc, string argsSource, string consoleSource, CommandInfo _, string __)
+    // {
+    //     var driver = VerifyHelpers.GetDriver(argsSource, consoleSource);
 
-   //     var verifySettings = new VerifySettings();
-   //     verifySettings.UseDirectory($"Snapshots/GeneratedOutput/{desc}");
-   //     return Verify(driver, verifySettings).UseParameters(desc);
-   // }
+    //     var verifySettings = new VerifySettings();
+    //     verifySettings.UseDirectory($"Snapshots/GeneratedOutput/{desc}");
+    //     return Verify(driver, verifySettings).UseParameters(desc);
+    // }
 }

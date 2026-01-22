@@ -10,8 +10,8 @@ public enum ValidationId
 
     SystemCommandLine = 100,
     UnknownParsingFailure = 101,
-
-
+    MinLength = 102,
+    MaxLength = 103,
 }
 
 public static class ValidationIdExtensions

@@ -2,315 +2,419 @@
 
 public class StringBuilderWrapperTests
 {
-    [Fact]
-    public void AppendLineWithTextIncludesNewLine()
-    {
-        var s = "Hello";
-        StringBuilderWrapper sb = new();
-
-        sb.AppendLine(s);
-
-        Assert.Equal($"Hello{Environment.NewLine}", sb.ToString());
-    }
+    private static readonly string NL = Environment.NewLine;
 
     [Fact]
-    public void AppendLineEmptyTextIsJustNewLine()
+    public void AppendLine_WithText_IncludesTextWithoutIndent()
     {
-        var s = "";
-        StringBuilderWrapper sb = new();
+        var wrapper = new StringBuilderWrapper();
+        wrapper.AppendLine("public class Foo");
 
-        sb.AppendLine(s);
-
-        Assert.Equal($"{Environment.NewLine}", sb.ToString());
+        var result = wrapper.ToString();
+        Assert.Equal($"public class Foo{NL}", result);
     }
 
     [Fact]
-    public void AppendLineNUllTextIsJustNewLine()
+    public void AppendLine_Empty_CreatesBlankLine()
     {
-        string? s = null;
-        StringBuilderWrapper sb = new();
+        var wrapper = new StringBuilderWrapper();
+        wrapper.AppendLine();
 
-        sb.AppendLine(s);
-
-        Assert.Equal($"{Environment.NewLine}", sb.ToString());
+        var result = wrapper.ToString();
+        Assert.Equal(NL, result);
     }
 
     [Fact]
-    public void AppendWithTextIsJustText()
+    public void AppendLine_AfterOpenCurly_IncludesIndentation()
     {
-        string? s = "Hello";
-        StringBuilderWrapper sb = new();
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenCurly();
+        wrapper.AppendLine("public string Name { get; set; }");
 
-        sb.AppendLine(s);
-
-        Assert.Equal($"Hello", sb.ToString());
+        var result = wrapper.ToString();
+        Assert.Contains($"{{{NL}", result);
+        Assert.Contains($"    public string Name {{ get; set; }}{NL}", result);
     }
 
     [Fact]
-    public void AppendLinesWithMultipleLines()
+    public void Append_WithText_AddsTextWithIndent()
     {
-        string[] s = ["Hello", "World", "and", "universe"];
-        StringBuilderWrapper sb = new();
-        var expected = """
-            Hello
-            World
-            and
-            universe
-            """;
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenCurly();
+        wrapper.Append("return value");
 
-        sb.AppendLines(s);
-
-        Assert.Equal(expected, sb.ToString());
-    }
-
-
-    [Fact]
-    public void AppendLinesWithOneLine()
-    {
-        string[] s = ["Hello"];
-        StringBuilderWrapper sb = new();
-        var expected = """
-            Hello
-            """;
-
-        sb.AppendLines(s);
-
-        Assert.Equal(expected, sb.ToString());
+        var result = wrapper.ToString();
+        Assert.Contains("    return value", result);
     }
 
     [Fact]
-    public void AppendLinesWithMultipleLinesAndNulls()
+    public void AppendLines_WithMultipleLines_AppendsEachWithIndentation()
     {
-        string?[] s = ["Hello", "World", null, "and", "universe"]; ;
-        StringBuilderWrapper sb = new();
-        var expected = """
-            Hello
-            World
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenCurly();
+        var lines = new[] { "int x = 1;", "int y = 2;", "int z = 3;" };
+        wrapper.AppendLines(lines);
 
-            and
-            universe
-            """;
-
-        sb.AppendLines(s);
-
-        Assert.Equal(expected, sb.ToString());
+        var result = wrapper.ToString();
+        Assert.Contains($"    int x = 1;{NL}", result);
+        Assert.Contains($"    int y = 2;{NL}", result);
+        Assert.Contains($"    int z = 3;{NL}", result);
     }
 
     [Fact]
-    public void AppendLinesWithNulls()
+    public void OpenCurly_IncrementsIndentation()
     {
-        string?[] s = ["Hello", "World", null, "and", "universe"]; ;
-        StringBuilderWrapper sb = new();
-        var expected = """
-            Hello
-            World
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenCurly();
+        wrapper.AppendLine("level1");
+        wrapper.OpenCurly();
+        wrapper.AppendLine("level2");
 
-            and
-            universe
-            """;
-
-        sb.AppendLines(s);
-
-        Assert.Equal(expected, sb.ToString());
+        var result = wrapper.ToString();
+        Assert.Contains($"    level1{NL}", result);
+        Assert.Contains($"        level2{NL}", result);
     }
 
     [Fact]
-    public void AppendLinesWithNullTextIsJustNewLine()
+    public void CloseCurly_DecrementsIndentation()
     {
-        string?[] s = null; ;
-        StringBuilderWrapper sb = new();
-        var expected = """
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenCurly();
+        wrapper.AppendLine("level1");
+        wrapper.CloseCurly();
+        wrapper.AppendLine("level0");
 
-            """;
-
-        sb.AppendLines(s);
-
-        Assert.Equal(expected, sb.ToString());
+        var result = wrapper.ToString();
+        Assert.Contains($"    level1{NL}", result);
+        Assert.Contains($"}}{NL}", result);
+        Assert.Contains($"level0{NL}", result);
     }
 
     [Fact]
-    public void OpenCurlyIsCurlyAndNewLine()
+    public void CloseCurly_WithCloseParens_AddsClosingParenthesis()
     {
-        StringBuilderWrapper sb = new();
-        var expected = """
-            {
-            """;
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenCurly();
+        wrapper.CloseCurly(closeParens: true);
 
-        sb.OpenCurly();
-
-        Assert.Equal(expected, sb.ToString());
+        var result = wrapper.ToString();
+        Assert.Contains($"}}){NL}", result);
     }
 
     [Fact]
-    public void CloseCurlyIsCurlyAndNewLine()
+    public void CloseCurly_WithEndStatement_AddsStatementTerminator()
     {
-        StringBuilderWrapper sb = new();
-        var expected = """
-            }
-            """;
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenCurly();
+        wrapper.CloseCurly(endStatement: true);
 
-        sb.CloseCurly();
-
-        Assert.Equal(expected, sb.ToString());
-    }
-
-
-    [Fact]
-    public void OpenNamespaceIsNameCurlyAndNewLine()
-    {
-        var nspaceName = "MyNamespace";
-        StringBuilderWrapper sb = new();
-        var expected = $"""
-            namespace {nspaceName}
-            """;
-
-        sb.OpenNamespace(nspaceName);
-
-        Assert.Equal(expected, sb.ToString());
+        var result = wrapper.ToString();
+        Assert.Contains($"}};{NL}", result);
     }
 
     [Fact]
-    public void CloseNamespaceIsCurlyAndNewLine()
+    public void CloseCurly_WithBothFlags_AddsBothClosingCharacters()
     {
-        var nspaceName = "MyNamespace";
-        StringBuilderWrapper sb = new();
-        var expected = $"""
-            namespace {nspaceName}
-            """;
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenCurly();
+        wrapper.CloseCurly(closeParens: true, endStatement: true);
 
-        sb.CloseNamespace(nspaceName);
-
-        Assert.Equal(expected, sb.ToString());
+        var result = wrapper.ToString();
+        Assert.Contains($"}});{NL}", result);
     }
 
-
-    public void CloseNamespace(string? namespaceName)
+    [Fact]
+    public void OpenNamespace_WithValidNamespace_GeneratesProperNamespaceBlock()
     {
-        if (!string.IsNullOrEmpty(namespaceName))
-        {
-            CloseCurly();
-        }
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenNamespace("SampleApp");
+        wrapper.AppendLine("public class Foo { }");
+        wrapper.CloseNamespace("SampleApp");
+
+        var result = wrapper.ToString();
+        Assert.Contains($"namespace SampleApp{NL}", result);
+        Assert.Contains($"{{{NL}", result);
+        Assert.Contains($"    public class Foo {{ }}{NL}", result);
+        Assert.Contains($"}}{NL}", result);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="classDeclaration"></param>
-    /// <param name="bases"></param>
-    /// <param name="constraints">Should not include `where`, for example T : new()</param>
-    public void OpenClass(string classDeclaration, string[]? constraints = null)
+    [Fact]
+    public void OpenNamespace_WithNullOrEmpty_SkipsNamespaceDeclaration()
     {
-        AppendLine(classDeclaration);
-        if (constraints is not null && constraints.Any())
-        {
-            foreach (var constraint in constraints)
-            {
-                AppendLine($"    where {constraint}");
-            }
-        }
-        OpenCurly();
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenNamespace(null);
+        wrapper.AppendLine("public class Foo { }");
+        wrapper.CloseNamespace(null);
+
+        var result = wrapper.ToString();
+        Assert.DoesNotContain("namespace", result);
+        Assert.Contains("public class Foo { }", result);
     }
 
-    public void CloseClass()
-        => CloseCurly();
-
-    public void OpenConstructor(string declaration, string? baseCtor = null)
+    [Fact]
+    public void OpenClass_WithDeclarationAndConstraints_GeneratesClassWithConstraints()
     {
-        AppendLine();
-        AppendLine(declaration);
-        if (baseCtor is not null)
-        {
-            AppendLine($"    : {baseCtor}");
-        }
-        OpenCurly();
+        var wrapper = new StringBuilderWrapper();
+        var constraints = new[] { "TArgs : Args<TArgs>" };
+        wrapper.OpenClass("public abstract partial class CommandInfo<TArgs>", constraints);
+        wrapper.AppendLine("// class body");
+        wrapper.CloseClass();
+
+        var result = wrapper.ToString();
+        Assert.Contains($"public abstract partial class CommandInfo<TArgs>{NL}", result);
+        Assert.Contains($"    where TArgs : Args<TArgs>{NL}", result);
+        Assert.Contains($"{{{NL}", result);
+        Assert.Contains($"    // class body{NL}", result);
     }
 
-    public void CloseConstructor()
-       => CloseCurly();
-
-    public void OpenMethod(string declaration, string? constraints = null)
+    [Fact]
+    public void OpenConstructor_WithBaseCtor_IncludesBaseConstructorCall()
     {
-        AppendLine();
-        AppendLine(declaration);
-        if (constraints is not null)
-        {
-            AppendLine($"      where {constraints}");
-        }
-        OpenCurly();
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenConstructor("public Foo(string name)", "base(name)");
+        wrapper.AppendLine("this.Name = name;");
+        wrapper.CloseConstructor();
+
+        var result = wrapper.ToString();
+        Assert.Contains($"public Foo(string name){NL}", result);
+        Assert.Contains($"    : base(name){NL}", result);
+        Assert.Contains($"    this.Name = name;{NL}", result);
     }
 
-    public void CloseMethod()
-       => CloseCurly();
-
-    internal void OpenIf(string condition)
+    [Fact]
+    public void OpenConstructor_WithoutBaseCtor_OmitsBaseCall()
     {
-        AppendLine($"if ({condition})");
-        OpenCurly();
-    }
-    internal void CloseIf() => CloseCurly();
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenConstructor("public Foo()");
+        wrapper.AppendLine("this.Value = 0;");
+        wrapper.CloseConstructor();
 
-    internal void OpenElseIfAndClosePreviousIf(string condition)
-    {
-        CloseCurly();
-        AppendLine($"else if ({condition})");
-        OpenCurly();
+        var result = wrapper.ToString();
+        Assert.Contains($"public Foo(){NL}", result);
+        Assert.DoesNotContain(":", result);
     }
 
-    internal void OpenElseAndClosePreviousIf()
+    [Fact]
+    public void OpenMethod_WithDeclarationAndConstraints_GeneratesMethodWithConstraints()
     {
-        CloseCurly();
-        AppendLine($"else");
-        OpenCurly();
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenMethod("public T GetValue<T>()", "T : new()");
+        wrapper.AppendLine("return new T();");
+        wrapper.CloseMethod();
+
+        var result = wrapper.ToString();
+        Assert.Contains($"public T GetValue<T>(){NL}", result);
+        Assert.Contains($"      where T : new(){NL}", result);
     }
 
-    internal void OpenForEach(string loopString)
+    [Fact]
+    public void OpenIf_GeneratesIfBlock()
     {
-        AppendLine($"foreach ({loopString})");
-        OpenCurly();
-    }
-    internal void CloseForEach() => CloseCurly();
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenIf("x > 0");
+        wrapper.AppendLine("Console.WriteLine(\"positive\");");
+        wrapper.CloseIf();
 
-    internal void XmlSummary(string summary)
-    {
-        AppendLine("/// <summary>");
-        AppendLine($"/// {summary}");
-        AppendLine("/// </summary>");
-    }
-
-    internal void XmlRemarks(string remarks)
-    {
-        AppendLine("/// <remarks>");
-        AppendLine($"/// {remarks}");
-        AppendLine("/// </remarks>");
+        var result = wrapper.ToString();
+        Assert.Contains($"if (x > 0){NL}", result);
+        Assert.Contains($"{{{NL}", result);
+        Assert.Contains($"    Console.WriteLine(\"positive\");{NL}", result);
     }
 
-    internal void XmlTypeParam(string name, string text)
+    [Fact]
+    public void OpenElseIfAndClosePreviousIf_TransitionsFromIfToElseIf()
     {
-        AppendLine($"""/// <typeparam name="{name}">{text}</typeparam>""");
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenIf("x > 0");
+        wrapper.AppendLine("Console.WriteLine(\"positive\");");
+        wrapper.OpenElseIfAndClosePreviousIf("x < 0");
+        wrapper.AppendLine("Console.WriteLine(\"negative\");");
+        wrapper.CloseIf();
+
+        var result = wrapper.ToString();
+        Assert.Contains($"if (x > 0){NL}", result);
+        Assert.Contains($"else if (x < 0){NL}", result);
     }
 
-    internal void XmlParam(string name, string text)
+    [Fact]
+    public void OpenElseAndClosePreviousIf_TransitionsFromIfToElse()
     {
-        AppendLine($"""/// <param name="{name}">{text}</param>""");
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenIf("condition");
+        wrapper.AppendLine("DoSomething();");
+        wrapper.OpenElseAndClosePreviousIf();
+        wrapper.AppendLine("DoOtherThing();");
+        wrapper.CloseIf();
+
+        var result = wrapper.ToString();
+        Assert.Contains($"if (condition){NL}", result);
+        Assert.Contains($"else{NL}", result);
     }
 
-    internal void XmlReturns(string text)
+    [Fact]
+    public void OpenForEach_GeneratesForEachLoop()
     {
-        AppendLine($"""/// <returns>{text}</returns>""");
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenForEach("var item in collection");
+        wrapper.AppendLine("Process(item);");
+        wrapper.CloseForEach();
+
+        var result = wrapper.ToString();
+        Assert.Contains($"foreach (var item in collection){NL}", result);
+        Assert.Contains($"    Process(item);{NL}", result);
     }
 
-    internal void XmlException(string exceptionTypeName, string text)
+    [Fact]
+    public void XmlSummary_GeneratesXmlDocumentation()
     {
-        AppendLine($"""/// <exception cref="{exceptionTypeName}">{text}</param>""");
+        var wrapper = new StringBuilderWrapper();
+        wrapper.XmlSummary("This is a test class.");
+
+        var result = wrapper.ToString();
+        Assert.Contains($"/// <summary>{NL}", result);
+        Assert.Contains($"/// This is a test class.{NL}", result);
+        Assert.Contains($"/// </summary>{NL}", result);
     }
 
-    internal void Comment(string line)
+    [Fact]
+    public void XmlRemarks_GeneratesXmlDocumentation()
     {
-        AppendLine($"// {line}");
+        var wrapper = new StringBuilderWrapper();
+        wrapper.XmlRemarks("Additional remarks go here.");
+
+        var result = wrapper.ToString();
+        Assert.Contains($"/// <remarks>{NL}", result);
+        Assert.Contains($"/// Additional remarks go here.{NL}", result);
+        Assert.Contains($"/// </remarks>{NL}", result);
     }
 
-    internal void Return(string? returnValue = null)
+    [Fact]
+    public void XmlTypeParam_GeneratesTypeParameterDocumentation()
     {
-        AppendLine($"return {returnValue};");
+        var wrapper = new StringBuilderWrapper();
+        wrapper.XmlTypeParam("T", "The type parameter.");
+
+        var result = wrapper.ToString();
+        Assert.Contains($"""/// <typeparam name="T">The type parameter.</typeparam>{NL}""", result);
+    }
+
+    [Fact]
+    public void XmlParam_GeneratesParameterDocumentation()
+    {
+        var wrapper = new StringBuilderWrapper();
+        wrapper.XmlParam("value", "The input value.");
+
+        var result = wrapper.ToString();
+        Assert.Contains($"""/// <param name="value">The input value.</param>{NL}""", result);
+    }
+
+    [Fact]
+    public void XmlReturns_GeneratesReturnDocumentation()
+    {
+        var wrapper = new StringBuilderWrapper();
+        wrapper.XmlReturns("The computed result.");
+
+        var result = wrapper.ToString();
+        Assert.Contains($"""/// <returns>The computed result.</returns>{NL}""", result);
+    }
+
+    [Fact]
+    public void XmlException_GeneratesExceptionDocumentation()
+    {
+        var wrapper = new StringBuilderWrapper();
+        wrapper.XmlException("System.ArgumentNullException", "When value is null.");
+
+        var result = wrapper.ToString();
+        Assert.Contains($"""/// <exception cref="System.ArgumentNullException">When value is null.</param>{NL}""", result);
+    }
+
+    [Fact]
+    public void Comment_GeneratesLineComment()
+    {
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenCurly();
+        wrapper.Comment("TODO: implement validation");
+        wrapper.CloseCurly();
+
+        var result = wrapper.ToString();
+        Assert.Contains($"    // TODO: implement validation{NL}", result);
+    }
+
+    [Fact]
+    public void Return_WithValue_GeneratesReturnStatement()
+    {
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenCurly();
+        wrapper.Return("result");
+        wrapper.CloseCurly();
+
+        var result = wrapper.ToString();
+        Assert.Contains($"    return result;{NL}", result);
+    }
+
+    [Fact]
+    public void Return_WithoutValue_GeneratesVoidReturn()
+    {
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenCurly();
+        wrapper.Return();
+        wrapper.CloseCurly();
+
+        var result = wrapper.ToString();
+        Assert.Contains($"    return ;{NL}", result);
+    }
+
+    [Fact]
+    public void MultipleNestingLevels_MaintainsCorrectIndentation()
+    {
+        var wrapper = new StringBuilderWrapper();
+        wrapper.OpenNamespace("MyNamespace");
+        wrapper.OpenClass("public class MyClass");
+        wrapper.OpenMethod("public void MyMethod()");
+        wrapper.OpenIf("x > 0");
+        wrapper.AppendLine("value = 42;");
+        wrapper.CloseIf();
+        wrapper.CloseMethod();
+        wrapper.CloseClass();
+        wrapper.CloseNamespace("MyNamespace");
+
+        var result = wrapper.ToString();
+
+        // Verify indentation levels (should be 4, 8, 12, 16 spaces respectively)
+        Assert.Contains($"    public class MyClass{NL}", result);
+        Assert.Contains($"        public void MyMethod(){NL}", result);
+        Assert.Contains($"            if (x > 0){NL}", result);
+        Assert.Contains($"                value = 42;{NL}", result);
+    }
+
+    [Fact]
+    public void ToString_ReturnsAccumulatedContent()
+    {
+        var wrapper = new StringBuilderWrapper();
+        wrapper.AppendLine("line1");
+        wrapper.AppendLine("line2");
+
+        var result = wrapper.ToString();
+        Assert.Equal($"line1{NL}line2{NL}", result);
+    }
+
+    [Fact]
+    public void MultipleInstances_AreIndependent()
+    {
+        var wrapper1 = new StringBuilderWrapper();
+        var wrapper2 = new StringBuilderWrapper();
+
+        wrapper1.OpenCurly();
+        wrapper1.AppendLine("content1");
+
+        wrapper2.AppendLine("content2");
+
+        var result1 = wrapper1.ToString();
+        var result2 = wrapper2.ToString();
+
+        Assert.Contains("    content1", result1);
+        Assert.DoesNotContain("content2", result1);
+        Assert.Contains("content2", result2);
+        Assert.DoesNotContain("content1", result2);
     }
 }

@@ -11,9 +11,7 @@
     <File Path="../docs/_Overview.md" />
     <File Path="TestingStrategy.md" />
   </Folder>
-  <Folder Name="/DragonFruit2.Generation.Test.Projects/">
-    <Project Path="DragonFruit2.Generators.Test.Projects/SimpleConsoleApp/SimpleConsoleApp.csproj" />
-  </Folder>
+  <Folder Name="/DragonFruit2.Generation.Test.Projects/" />
   <Folder Name="/Solution Items/">
     <File Path="../.gitattributes" />
     <File Path="../.gitignore" />

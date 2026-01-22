@@ -5,7 +5,7 @@ namespace DragonFruit2.Generators;
 public class StringBuilderWrapper
 {
     private readonly int indentSize = 4;
-    private string indent = "";
+       private string indent = "";
 
     private readonly StringBuilder _sb = new();
     public void AppendLine(string line)
@@ -171,7 +171,7 @@ public class StringBuilderWrapper
         AppendLine($"""/// <returns>{text}</returns>""");
     }
 
-    internal void XmlException(string exceptionTypeName, string text)
+        internal void XmlException(string exceptionTypeName, string text)
     {
         AppendLine($"""/// <exception cref="{exceptionTypeName}">{text}</param>""");
     }

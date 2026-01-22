@@ -1,13 +1,20 @@
 ﻿namespace DragonFruit2.Validators;
 
 
-// TODO: Add analyzer to ensure the CompareWith type in the attribute matches the property type
-[AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
 public sealed class RequiredAttribute : ValidatorAttribute
 {
 
-    // This is a positional argument
-    public RequiredAttribute(object compareWith)
+    /// <summary>
+    /// Declares whether a value is required to create an instance of the class.
+    /// If the attribute is not present, default required rules are used based on 
+    /// type and nullability, and are generally correct.
+    /// </summary>
+    /// <remarks>
+    /// The checks are required values are done after all defaults are applied and
+    /// before the object is created, and thus before validation.
+    /// </remarks>
+    /// <param name="isRquired"></param>
+    public RequiredAttribute(bool isRquired = true)
         : base(nameof(GreaterThanValidator<>))
     { }
 

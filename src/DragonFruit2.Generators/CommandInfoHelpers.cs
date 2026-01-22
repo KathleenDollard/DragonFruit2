@@ -116,6 +116,30 @@ public static class CommandInfoHelpers
             FullTypeName = attrClass.ToDisplayString()
         };
 
+        // Constructor arguments
+        var ctorArgs = validationAttribute.ConstructorArguments
+            .Select(TypedConstantToString)
+            .ToList();
+
+        // Named arguments (e.g., named properties set on the attribute)
+        var namedArgs = validationAttribute.NamedArguments
+            .ToDictionary(kv => kv.Key, kv => TypedConstantToString(kv.Value));
+
+        // Attempt to populate expected ValidatorInfo fields if they exist.
+        // Common ValidatorInfo shape: Name, FullTypeName, ConstructorArguments, NamedArguments.
+        // Populate them defensively via available properties.
+        try
+        {
+            // These properties are commonly present; adjust names if your ValidatorInfo differs.
+            info.ConstructorArguments = ctorArgs.Select(x=>x.Trim()).ToList();
+            info.NamedArguments = namedArgs;
+        }
+        catch
+        {
+            // If ValidatorInfo doesn't expose those members, silently keep minimal info (name/full type).
+            // Consumer can call a helper to read constructor args directly from AttributeData if needed.
+        }
+
         static string AttributeClassName(INamedTypeSymbol attrClass)
         {
             var attributeName = attrClass.Name;
@@ -145,29 +169,6 @@ public static class CommandInfoHelpers
             return tc.Value?.ToString() ?? "null";
         }
 
-        // Constructor arguments
-        var ctorArgs = validationAttribute.ConstructorArguments
-            .Select(TypedConstantToString)
-            .ToList();
-
-        // Named arguments (e.g., named properties set on the attribute)
-        var namedArgs = validationAttribute.NamedArguments
-            .ToDictionary(kv => kv.Key, kv => TypedConstantToString(kv.Value));
-
-        // Attempt to populate expected ValidatorInfo fields if they exist.
-        // Common ValidatorInfo shape: Name, FullTypeName, ConstructorArguments, NamedArguments.
-        // Populate them defensively via available properties.
-        try
-        {
-            // These properties are commonly present; adjust names if your ValidatorInfo differs.
-            info.ConstructorArguments = ctorArgs.Select(x=>x.Trim()).ToList();
-            info.NamedArguments = namedArgs;
-        }
-        catch
-        {
-            // If ValidatorInfo doesn't expose those members, silently keep minimal info (name/full type).
-            // Consumer can call a helper to read constructor args directly from AttributeData if needed.
-        }
 
         return info;
     }

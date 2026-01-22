@@ -228,7 +228,7 @@ public class CommandInfoHelpersTests
             
             public class MyArgs
             {
-                [Argument(Position = 5)]
+                [Argument(5)]
                 public string Name { get; set; }
             }
             """;
@@ -465,5 +465,301 @@ public class CommandInfoHelpersTests
 
         Assert.False(result.HasInitializer);
         Assert.Null(result.InitializerText);
+    }
+
+    [Fact]
+    public void CreatePropInfo_PropertyWithoutArgumentAttribute_IsArgumentFalse()
+    {
+        var source = """
+            namespace TestNamespace;
+            public class MyArgs
+            {
+                public string Name { get; set; }
+            }
+            """;
+        var compilation = TestHelpers.GetCompilation(source, "");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        Assert.NotNull(typeSymbol);
+        var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
+        Assert.NotNull(propSymbol);
+
+        var result = CommandInfoHelpers.CreatePropInfo(propSymbol);
+
+        Assert.False(result.HasArgumentAttribute);
+        Assert.False(result.IsArgument);
+    }
+
+    [Fact]
+    public void CreatePropInfo_PropertyWithoutDescriptionAttribute_DescriptionIsNull()
+    {
+        var source = """
+            namespace TestNamespace;
+            public class MyArgs
+            {
+                public string Name { get; set; }
+            }
+            """;
+        var compilation = TestHelpers.GetCompilation(source, "");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        Assert.NotNull(typeSymbol);
+        var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
+        Assert.NotNull(propSymbol);
+
+        var result = CommandInfoHelpers.CreatePropInfo(propSymbol);
+
+        Assert.Null(result.Description);
+    }
+
+    [Fact]
+    public void CreatePropInfo_PropertyWithoutValidators_ValidatorsEmpty()
+    {
+        var source = """
+            namespace TestNamespace;
+            public class MyArgs
+            {
+                public string Name { get; set; }
+            }
+            """;
+        var compilation = TestHelpers.GetCompilation(source, "");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        Assert.NotNull(typeSymbol);
+        var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
+        Assert.NotNull(propSymbol);
+
+        var result = CommandInfoHelpers.CreatePropInfo(propSymbol);
+
+        Assert.Empty(result.Validators);
+    }
+
+    [Fact]
+    public void CreatePropInfo_PropertyWithNumericInitializer_CapturesInitializer()
+    {
+        var source = """
+            namespace TestNamespace;
+            public class MyArgs
+            {
+                public int Count { get; set; } = 42;
+            }
+            """;
+        var compilation = TestHelpers.GetCompilation(source, "");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        Assert.NotNull(typeSymbol);
+        var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Count");
+        Assert.NotNull(propSymbol);
+
+        var result = CommandInfoHelpers.CreatePropInfo(propSymbol);
+
+        Assert.True(result.HasInitializer);
+        Assert.NotNull(result.InitializerText);
+        Assert.Contains("42", result.InitializerText);
+    }
+
+    [Fact]
+    public void CreatePropInfo_PropertyWithNotAnnotatedNullability_CapturesNullability()
+    {
+        var source = """
+            namespace TestNamespace;
+            #nullable enable
+            
+            public class MyArgs
+            {
+                public string Name { get; set; }
+            }
+            """;
+        var compilation = TestHelpers.GetCompilation(source, "");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        Assert.NotNull(typeSymbol);
+        var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
+        Assert.NotNull(propSymbol);
+
+        var result = CommandInfoHelpers.CreatePropInfo(propSymbol);
+
+        Assert.Equal(NullableAnnotation.NotAnnotated, result.NullableAnnotation);
+    }
+
+    [Fact]
+    public void CreatePropInfo_ValidatorWithBooleanArgument_ConvertsTrueCorrectly()
+    {
+        var source = """
+            namespace TestNamespace;
+            using DragonFruit2.Validators;
+            
+            public class MyArgs
+            {
+                [Required(true)]
+                public string Name { get; set; }
+            }
+            """;
+        var compilation = TestHelpers.GetCompilation(source, "");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        Assert.NotNull(typeSymbol);
+        var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
+        Assert.NotNull(propSymbol);
+
+        var result = CommandInfoHelpers.CreatePropInfo(propSymbol);
+
+        var validator = result.Validators.First();
+        Assert.Contains("true", validator.ConstructorArguments);
+    }
+
+    [Fact]
+    public void CreatePropInfo_ValidatorWithFalseArgument_ConvertsFalseCorrectly()
+    {
+        var source = """
+            namespace TestNamespace;
+            using DragonFruit2.Validators;
+            
+            public class MyArgs
+            {
+                [Required(false)]
+                public string Name { get; set; }
+            }
+            """;
+        var compilation = TestHelpers.GetCompilation(source, "");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        Assert.NotNull(typeSymbol);
+        var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
+        Assert.NotNull(propSymbol);
+
+        var result = CommandInfoHelpers.CreatePropInfo(propSymbol);
+
+        var validator = result.Validators.First();
+        Assert.Contains("false", validator.ConstructorArguments);
+    }
+
+    [Fact]
+    public void CreatePropInfo_ValidatorWithNullArgument_ConvertsNullCorrectly()
+    {
+        var source = """
+            namespace TestNamespace;
+            using DragonFruit2.Validators;
+            
+            public class MyArgs
+            {
+                [GreaterThan(0, null)]
+                public int Age { get; set; }
+            }
+            """;
+        var compilation = TestHelpers.GetCompilation(source, "");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        Assert.NotNull(typeSymbol);
+        var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
+        Assert.NotNull(propSymbol);
+
+        var result = CommandInfoHelpers.CreatePropInfo(propSymbol);
+
+        var validator = result.Validators.First();
+        Assert.Contains("null", validator.ConstructorArguments);
+    }
+
+    [Fact]
+    public void CreateCommandInfo_WithGenericBaseClass_ExtractsBaseName()
+    {
+        var source = """
+            namespace TestNamespace;
+            public abstract class BaseArgs<T> { }
+            public class DerivedArgs : BaseArgs<int> { }
+            """;
+        var compilation = TestHelpers.GetCompilation(source, "");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.DerivedArgs");
+        Assert.NotNull(typeSymbol);
+
+        var result = CommandInfoHelpers.CreateCommandInfo(typeSymbol, "BaseArgs", "TestCli");
+
+        Assert.NotNull(result.BaseName);
+        Assert.Equal("BaseArgs", result.BaseName);
+    }
+
+    [Fact]
+    public void CreatePropInfo_PropertyWithStringInitializerContainingSpecialChars_CapturesInitializer()
+    {
+        var source = """
+            namespace TestNamespace;
+            public class MyArgs
+            {
+                public string Path { get; set; } = "C:\\Users\\Test";
+            }
+            """;
+        var compilation = TestHelpers.GetCompilation(source, "");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        Assert.NotNull(typeSymbol);
+        var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Path");
+        Assert.NotNull(propSymbol);
+
+        var result = CommandInfoHelpers.CreatePropInfo(propSymbol);
+
+        Assert.True(result.HasInitializer);
+        Assert.NotNull(result.InitializerText);
+    }
+
+    [Fact]
+    public void CreatePropInfo_ReferenceTypeWithoutInitializer_IsValueTypeFalse()
+    {
+        var source = """
+            namespace TestNamespace;
+            public class MyArgs
+            {
+                public object Data { get; set; }
+            }
+            """;
+        var compilation = TestHelpers.GetCompilation(source, "");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        Assert.NotNull(typeSymbol);
+        var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Data");
+        Assert.NotNull(propSymbol);
+
+        var result = CommandInfoHelpers.CreatePropInfo(propSymbol);
+
+        Assert.False(result.IsValueType);
+    }
+
+    [Fact]
+    public void CreatePropInfo_NullableValueType_CapturesNullability()
+    {
+        var source = """
+            namespace TestNamespace;
+            #nullable enable
+            
+            public class MyArgs
+            {
+                public int? OptionalAge { get; set; }
+            }
+            """;
+        var compilation = TestHelpers.GetCompilation(source, "");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        Assert.NotNull(typeSymbol);
+        var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "OptionalAge");
+        Assert.NotNull(propSymbol);
+
+        var result = CommandInfoHelpers.CreatePropInfo(propSymbol);
+
+        Assert.True(result.IsValueType);
+        Assert.Equal(NullableAnnotation.Annotated, result.NullableAnnotation);
+    }
+
+    [Fact]
+    public void CreatePropInfo_ValidatorFullTypeName_IsFullyQualified()
+    {
+        var source = """
+            namespace TestNamespace;
+            using DragonFruit2.Validators;
+            
+            public class MyArgs
+            {
+                [GreaterThan(0)]
+                public int Age { get; set; }
+            }
+            """;
+        var compilation = TestHelpers.GetCompilation(source, "");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        Assert.NotNull(typeSymbol);
+        var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
+        Assert.NotNull(propSymbol);
+
+        var result = CommandInfoHelpers.CreatePropInfo(propSymbol);
+
+        var validator = result.Validators.First();
+        Assert.NotNull(validator.FullTypeName);
+        Assert.Contains("GreaterThan", validator.FullTypeName);
     }
 }

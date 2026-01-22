@@ -154,7 +154,7 @@ public class CommandInfoBuildingTests
         var sourceText = """
             public partial class MyArgs
             { 
-                [DragonFruit2.Argument(Position = 1)]
+                [DragonFruit2.Argument(1)]
                 public required string Name { get; set; }
             }
             """;

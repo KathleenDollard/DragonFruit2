@@ -3,7 +3,7 @@
 public class GreaterThanValidator<TValue> : Validator<TValue>
     where TValue : IComparable<TValue>
 {
-    public GreaterThanValidator(string valueName, TValue compareWithValue)
+    public GreaterThanValidator(string valueName, TValue compareWithValue, string? customMessage = null)
         : base((int)ValidationId.GreaterThan, valueName)
     {
         CompareWithValue = compareWithValue;
@@ -29,7 +29,7 @@ public sealed class GreaterThanAttribute : ValidatorAttribute
 {
 
     // This is a positional argument
-    public GreaterThanAttribute(object compareWith)
+    public GreaterThanAttribute(object compareWith, string? customMessage = null)
         : base(nameof(GreaterThanValidator<>))
     {
         CompareWith = compareWith;

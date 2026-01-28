@@ -14,7 +14,6 @@ public class Cli
     /// <returns>A Result instance containing the hydrated args or error messages.</returns>
     public static Builder<MyArgs> CreateBuilder()
     {
-        // TRootArgs is not used, but is retained, along with it's name to reduce confusion at the call site
         return new Builder<MyArgs, MyArgs.MyArgsBuilder>();
     }
 
@@ -33,7 +32,7 @@ public class Cli
         where TRootArgs : MyArgs, IArgs<TRootArgs>
     {
         // TRootArgs is not used, but is retained, along with it's name to reduce confusion at the call site
-        return new Builder<MyArgs, MyArgs.MyArgsBuilder>().ParseArgs(args);
+        return CreateBuilder().ParseArgs(args);
     }
 
     /// <summary>

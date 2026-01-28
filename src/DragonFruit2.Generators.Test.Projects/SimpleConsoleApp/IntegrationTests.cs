@@ -1,4 +1,5 @@
 ﻿using SampleConsoleApp;
+using System.CommandLine.Parsing;
 
 namespace SimpleConsoleApp;
 
@@ -39,45 +40,34 @@ public class IntegrationTests
     }
 
     [Theory]
-    [ClassData(typeof(ParseArgsTheoryData))]
-    public void String_options_are_retrieved(string cliInput, string consoleOutput)
+    [ClassData(typeof(IntegrationTheoryData))]
+    public void String_options_are_retrieved(string _, string cliInput, string expectedName, int __, string ___)
     {
-        try
-        {
-            SetConsoleOut();
-        }
-        finally
-        {
-            ResetConsoleOut();
-        }
+
+        var result = global::Cli.ParseArgs<MyArgs>(CommandLineParser.SplitCommandLine(cliInput).ToArray());
+
+        Assert.True(result.IsValid);
+        Assert.Equal(expectedName, result.Args?.Name);
     }
 
     [Theory]
-    [ClassData(typeof(ParseArgsTheoryData))]
-    public void Int_options_are_retrieved(string cliInput, string consoleOutput)
+    [ClassData(typeof(IntegrationTheoryData))]
+    public void Int_options_are_retrieved(string _, string cliInput, string __, int expectedAge, string ___)
     {
-        try
-        {
-            SetConsoleOut();
-        }
-        finally
-        {
-            ResetConsoleOut();
-        }
+        var result = global::Cli.ParseArgs<MyArgs>(CommandLineParser.SplitCommandLine(cliInput).ToArray());
+
+        Assert.True(result.IsValid);
+        Assert.Equal(expectedAge, result.Args?.Age);
     }
 
     [Theory]
-    [ClassData(typeof(ParseArgsTheoryData))]
-    public void Default_values_are_applied(string cliInput, string consoleOutput)
+    [ClassData(typeof(IntegrationTheoryData))]
+    public void Default_values_are_applied(string _, string cliInput, string __, int ___, string greeting)
     {
-        try
-        {
-            SetConsoleOut();
-        }
-        finally
-        {
-            ResetConsoleOut();
-        }
+        var result = global::Cli.ParseArgs<MyArgs>(CommandLineParser.SplitCommandLine(cliInput).ToArray());
+
+        Assert.True(result.IsValid);
+        Assert.Equal(greeting, result.Args?.Greeting);
     }
 
     //[Theory]

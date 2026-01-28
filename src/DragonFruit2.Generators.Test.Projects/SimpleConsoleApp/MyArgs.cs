@@ -1,5 +1,4 @@
-﻿using DragonFruit2;
-using DragonFruit2.Validators;
+﻿using DragonFruit2.Validators;
 
 namespace SampleConsoleApp;
 
@@ -16,16 +15,16 @@ public partial class MyArgs
     /// <summary>
     /// "Your age"
     /// </summary>
-    [GreaterThan(0)]
-    public int Age { get; set; } = 0;
+    [GreaterThan(-1)]
+    public int Age { get; set; }
 
     /// <summary>
     /// "Greeting message"
     /// </summary>
-    public string Greeting { get; set; } = string.Empty;
+    public string Greeting { get; set; } = "Greetings!";
 
-    static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider)
-    {
-        defaultDataProvider.RegisterDefault(typeof(MyArgs), nameof(Greeting), "Hi there!");
-    }
+    //static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider)
+    //{
+    //    defaultDataProvider.RegisterDefault(typeof(MyArgs), nameof(Greeting), "Hi there!");
+    //}
 }

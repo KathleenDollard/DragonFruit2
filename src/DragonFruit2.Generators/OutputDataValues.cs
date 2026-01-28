@@ -1,6 +1,4 @@
-﻿using DragonFruit2.GeneratorSupport;
-
-namespace DragonFruit2.Generators;
+﻿namespace DragonFruit2.Generators;
 
 internal class OutputDataValues
 {
@@ -19,11 +17,12 @@ internal class OutputDataValues
     private static void OpenClass(CommandInfo commandInfo, StringBuilderWrapper sb)
     {
         sb.AppendLine();
-        sb.OpenClass($"public class {commandInfo.Name}DataValues : DataValues");
+        sb.OpenClass($"public class {commandInfo.Name}DataValues : DataValues<{commandInfo.RootName}>");
     }
+
     private static void SetDataValues(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenMethod($"public override void SetDataValues(DataProvider dataProvider)");
+        sb.OpenMethod($"public override void SetDataValues(DataProvider<{commandInfo.RootName}> dataProvider)");
         foreach (var propInfo in commandInfo.SelfAndAncestorPropInfos)
         {
             sb.AppendLine($"dataProvider.TrySetDataValue((typeof({propInfo.ContainingTypeName}), nameof({propInfo.Name})), {propInfo.Name});");

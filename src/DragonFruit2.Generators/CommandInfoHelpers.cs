@@ -1,6 +1,4 @@
-﻿using DragonFruit2.GeneratorSupport;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace DragonFruit2.Generators;

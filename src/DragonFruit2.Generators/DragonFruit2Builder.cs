@@ -1,8 +1,6 @@
-﻿using DragonFruit2.GeneratorSupport;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
-using System.Text;
 
 namespace DragonFruit2.Generators;
 
@@ -161,13 +159,15 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         return ret;
     }
 
-    internal ImmutableArray<CommandInfo> BindParents(ImmutableArray<CommandInfo> commandInfos)
+    internal ImmutableArray<CommandInfo> BindParentsAndRemoveDuplicates(ImmutableArray<CommandInfo> commandInfos)
     {
+        commandInfos = commandInfos.Distinct(new CommandInfoEqualityComparer()).ToImmutableArray();
         foreach (var commandInfo in commandInfos)
         {
             BindParentsRecursive(commandInfo);
         }
         return commandInfos;
+
         static void BindParentsRecursive(CommandInfo commandInfo)
         {
             foreach (var sub in commandInfo.SubCommands)

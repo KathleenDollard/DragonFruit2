@@ -1,7 +1,16 @@
 ﻿[
   {
     Name: MyArgs,
-    NamespaceName: MyNamespace,
+    ArgsAccessibility: public,
+    RootName: MyArgs,
+    CliName: my,
+    IsStruct: false,
+    PropInfos: [],
+    SelfAndAncestorPropInfos: [],
+    AncestorPropInfos: []
+  },
+  {
+    Name: MyArgs,
     ArgsAccessibility: public,
     RootName: MyArgs,
     CliName: my,

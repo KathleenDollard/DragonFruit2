@@ -1,6 +1,4 @@
-﻿using DragonFruit2.GeneratorSupport;
-
-namespace DragonFruit2.Generators;
+﻿namespace DragonFruit2.Generators;
 
 internal class OutputPartialArgs
 {

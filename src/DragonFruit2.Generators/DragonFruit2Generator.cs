@@ -9,7 +9,7 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var rawCommandInfos = context.SyntaxProvider
+        var rootCommandInfos = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: static (node, _) => builder.InitialFilter(node),
                 transform: static (ctx, _) => builder.Transform(ctx))
@@ -19,13 +19,13 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
             .Collect()
             .WithTrackingName(TrackingNames.Extract);
 
-        var commandInfos = rawCommandInfos
-            .Select((infos, ctx) => builder.BindParents(infos))
-            .WithTrackingName(TrackingNames.BindParents);
+        var boundRootCommandInfos = rootCommandInfos
+            .Select((infos, ctx) => builder.BindParentsAndRemoveDuplicates(infos))
+            .WithTrackingName(TrackingNames.BindParentsAndRemoveDuplicates);
 
-        var allCommandInfos = commandInfos
+        var allCommandInfos = boundRootCommandInfos
             .SelectMany(static (collected, _) => collected.SelectMany(commandInfo => builder.GetSelfAndDescendants(commandInfo)))
-            .WithTrackingName(TrackingNames.BuildHierarchy);
+            .WithTrackingName(TrackingNames.FlattenHierarchy);
 
         var collectedAllCommandInfos = allCommandInfos.Collect();
 

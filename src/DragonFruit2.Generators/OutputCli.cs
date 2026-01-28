@@ -1,6 +1,4 @@
-﻿using DragonFruit2.GeneratorSupport;
-
-namespace DragonFruit2.Generators;
+﻿namespace DragonFruit2.Generators;
 
 // The Cli uses a trick base on C# overload resolution behavior. Items in the current namespace have precedence over those in imported namespaces.
 // When the user initially creates the app, importing DragonFruit2 supplies a CLI class for IntelliSense. When generation occurs, this call
@@ -17,6 +15,7 @@ public class OutputCli
         sb.OpenNamespace(commandInfo.CliNamespaceName);
 
         OpenClass(commandInfo, sb);
+        CreateBuilder(commandInfo, sb)  ;
         ParseArgsMethod(commandInfo, sb);
         TryParseArgsMethod(commandInfo, sb);
         //TryExecute(commandInfo, sb);
@@ -24,6 +23,22 @@ public class OutputCli
         sb.CloseClass();
         sb.CloseNamespace(commandInfo.CliNamespaceName);
         return sb.ToString();
+    }
+
+    private static void CreateBuilder(CommandInfo rootCommandInfo, StringBuilderWrapper sb)
+    {
+        var rootName = rootCommandInfo.Name;
+
+        sb.XmlSummary("Advanced: Creates a Builder, which can be configured, the System.CommandLine API can be accessed, and which can be reused (especially helpful in testing). ");
+        sb.XmlRemarks("The args class specified as the type argument must be public.");
+        sb.XmlBreak();
+        sb.XmlRemarks("You may need to build after editing this line.");
+        sb.XmlTypeParam("TRootArgs", "The type containing the CLI definition, the root command if there are subcommands.");
+
+        sb.OpenMethod($"public static Builder<{rootName}> CreateBUlder()");
+        sb.Return($"new Builder<{rootName}, {rootName}.{rootName}ArgsBuilder>();");
+        sb.CloseMethod();
+        sb.AppendLine();
     }
 
     private static void FileOpening(StringBuilderWrapper sb, string? cliNamespace, string? argsNamespace)
@@ -61,8 +76,9 @@ public class OutputCli
 
         sb.OpenMethod($"public static Result<{rootName}> ParseArgs<TRootArgs>(string[]? args = null)",
             constraints: $"TRootArgs : {rootName}, IArgs<TRootArgs>");
-        sb.AppendLine($"return new Builder<{rootName}, {rootName}.{rootName}ArgsBuilder>(args).ParseArgs(args);");
+        sb.AppendLine($"return new Builder<{rootName}, {rootName}.{rootName}ArgsBuilder>().ParseArgs(args);");
         sb.CloseMethod();
+        sb.AppendLine();
     }
 
     private static void TryParseArgsMethod(CommandInfo rootCommandInfo, StringBuilderWrapper sb)

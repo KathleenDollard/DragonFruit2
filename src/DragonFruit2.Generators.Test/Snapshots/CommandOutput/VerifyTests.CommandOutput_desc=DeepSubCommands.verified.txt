@@ -48,9 +48,9 @@ namespace MyNamespace
         {
         }
 
-        static partial void RegisterCustomDefaults(Builder<> builder, DefaultDataProvider<> defaultDataProvider);
+        static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-        public static ArgsBuilder<> GetArgsBuilder(Builder<> builder)
+        public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder)
         {
             return new MyArgs.MyArgsArgsBuilder();
         }
@@ -61,16 +61,16 @@ namespace MyNamespace
         /// <remarks>
         ///  The first type argument of the base is the Args type this builder creates, and the second is the root Args type. This means the two type arguments are the same for the root ArgsBuilder, but will differ for subcommand ArgsBuilders.
         /// </remarks>
-        internal class MyArgsArgsBuilder : ArgsBuilder<>
+        internal class MyArgsArgsBuilder : ArgsBuilder<MyArgs>
         {
 
-            public override void Initialize(Builder<> builder)
+            public override void Initialize(Builder<MyArgs> builder)
             {
-                InitializeCli(builder, builder.GetDataProvider<CliDataProvider<>>());
-                InitializeDefaults(builder, builder.GetDataProvider<DefaultDataProvider<>>());
+                InitializeCli(builder, builder.GetDataProvider<CliDataProvider<MyArgs>>());
+                InitializeDefaults(builder, builder.GetDataProvider<DefaultDataProvider<MyArgs>>());
             }
 
-            public override Command InitializeCli(Builder<> builder, CliDataProvider<>? cliDataProvider)
+            public override Command InitializeCli(Builder<MyArgs> builder, CliDataProvider<MyArgs>? cliDataProvider)
             {
                 var cmd = new System.CommandLine.RootCommand("my")
                 {
@@ -92,11 +92,12 @@ namespace MyNamespace
                 var eveningGreetingArgsCommand = EveningGreetingArgs.GetArgsBuilder(builder).InitializeCli(builder, cliDataProvider);
                 cmd.Add(eveningGreetingArgsCommand);
 
-                cmd.SetAction(p => { ArgsBuilderCache<>.ActiveArgsBuilder = this; return ; });
+                cmd.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return ; });
+                cliDataProvider.RootCommand = cmd;
                 return cmd;
             }
 
-            public void InitializeDefaults(Builder<> builder, DefaultDataProvider<>? defaultDataProvider)
+            public void InitializeDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs>? defaultDataProvider)
             {
                 if (defaultDataProvider is null) return;
                 // TODO: Register defaults based on attributes, initializer, and the RegisterDefault calls
@@ -117,12 +118,12 @@ namespace MyNamespace
                           .Select(x => x!);
             }
 
-            protected override DataValues CreateDataValues()
+            protected override DataValues<MyArgs> CreateDataValues()
             {
                 return new MyArgsDataValues();
             }
 
-            protected override  CreateInstance(DataValues dataValues)
+            protected override MyArgs CreateInstance(DataValues dataValues)
             {
                 if (dataValues is not MyArgsDataValues typedDataValues)
                 {
@@ -132,10 +133,10 @@ namespace MyNamespace
                 return new MyArgs(typedDataValues.Name);            }
         }
 
-        public class MyArgsDataValues : DataValues
+        public class MyArgsDataValues : DataValues<MyArgs>
         {
 
-            public override void SetDataValues(DataProvider dataProvider)
+            public override void SetDataValues(DataProvider<MyArgs> dataProvider)
             {
                 dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Name)), Name);
             }

@@ -1,7 +1,4 @@
-﻿using DragonFruit2.GeneratorSupport;
-using System.Text;
-
-namespace DragonFruit2.Generators;
+﻿namespace DragonFruit2.Generators;
 
 internal static class OutputArgsBuilder
 {
@@ -178,7 +175,7 @@ internal static class OutputArgsBuilder
 
     private static void CreateDataValues(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenMethod($"""protected override DataValues<TRootArgs> CreateDataValues()""");
+        sb.OpenMethod($"""protected override DataValues<{commandInfo.RootName}> CreateDataValues()""");
         sb.AppendLine($"return new {commandInfo.Name}DataValues();");
         sb.CloseMethod();
     }

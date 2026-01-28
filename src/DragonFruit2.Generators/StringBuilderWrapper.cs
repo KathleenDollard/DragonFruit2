@@ -176,6 +176,11 @@ public class StringBuilderWrapper
         AppendLine($"""/// <exception cref="{exceptionTypeName}">{text}</param>""");
     }
 
+    internal void XmlBreak()
+    {
+        AppendLine("/// <br/>");
+    }
+
     internal void Comment(string line)
     {
         AppendLine($"// {line}");
@@ -185,4 +190,6 @@ public class StringBuilderWrapper
     {
         AppendLine($"return {returnValue};");
     }
+
+
 }

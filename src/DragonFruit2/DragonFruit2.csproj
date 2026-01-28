@@ -10,7 +10,7 @@
 		<!--<IncludeBuildOutput>false</IncludeBuildOutput>-->
 
 		<PackageId>DragonFruit2</PackageId>
-		<Version>0.1.0-beta-0011</Version>
+		<Version>0.1.0-beta-0012</Version>
 		<Authors>Kathleen Dollard</Authors>
 		<Description>Source generator and analyzers for DragonFruit2 including required runtime dependencies.</Description>
 		<RepositoryUrl>https://github.com/your/repo</RepositoryUrl>

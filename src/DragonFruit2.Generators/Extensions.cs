@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Text;
 
-namespace DragonFruit2.GeneratorSupport;
+namespace DragonFruit2.Generators;
 
 public static class Extensions
 {

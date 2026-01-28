@@ -1,6 +1,4 @@
-﻿using DragonFruit2.GeneratorSupport;
-
-namespace DragonFruit2.Generators.Test;
+﻿namespace DragonFruit2.Generators.Test;
 
 public class CommandInfoTheoryData : TheoryData<string, string, string, CommandInfo>
 {
@@ -22,6 +20,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
                 new CommandInfo()
                 {
                     Name = "MyArgs",
+                    RootName = "MyArgs",
                     ArgsAccessibility = "public"
                 });
 
@@ -36,6 +35,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
                new CommandInfo()
                {
                    Name = "MyArgs",
+                   RootName = "MyArgs",
                    IsStruct = true,
                    ArgsAccessibility = "public"
                });
@@ -54,7 +54,23 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
                 new CommandInfo()
                 {
                     Name = "MyArgs",
+                    RootName = "MyArgs",
                     NamespaceName = "MyNamespace",
+                    ArgsAccessibility = "public"
+                });
+
+        AddTheoryData("Duplicate ParseArgs calls",
+            argsSource:
+                """
+                        public partial class MyArgs
+                        { }
+                        """,
+            consoleSource: TestHelpers.ConsoleAppWithDuplicateCall,
+            commandInfo:
+                new CommandInfo()
+                {
+                    Name = "MyArgs",
+                    RootName = "MyArgs",
                     ArgsAccessibility = "public"
                 });
 
@@ -62,6 +78,8 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
         AddTheoryData("SubCommands",
                 argsSource:
                    """
+                    using DragonFruit2.Validators;
+
                     namespace MyNamespace
                     {
                         public partial class MyArgs
@@ -75,6 +93,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
 
                         public partial class EveningGreetingArgs : MyArgs
                         {
+                            [GreaterThan(0)]
                             public int Age { get; init; } = 1;
                         }
                     }
@@ -113,6 +132,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
             var subCommandsCommandInfo = new CommandInfo()
             {
                 Name = "MyArgs",
+                RootName = "MyArgs",
                 NamespaceName = "MyNamespace",
                 ArgsAccessibility = "public"
             };
@@ -127,12 +147,14 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
                         new CommandInfo()
                         {
                             Name = "MorningGreetingArgs",
+                            RootName = "MyArgs",
                             NamespaceName = "MyNamespace",
                             ArgsAccessibility = "public"
                         });
             var subCommandsEveningCommandInfo = new CommandInfo()
             {
                 Name = "EveningGreetingArgs",
+                RootName = "MyArgs",
                 NamespaceName = "MyNamespace",
                 ArgsAccessibility = "public"
             };
@@ -153,6 +175,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
             var deepSubCommandInfo = new CommandInfo()
             {
                 Name = "MyArgs",
+                RootName = "MyArgs",
                 NamespaceName = "MyNamespace",
                 ArgsAccessibility = "public"
             };
@@ -167,12 +190,14 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
                         new CommandInfo()
                         {
                             Name = "MorningGreetingArgs",
+                            RootName = "MyArgs",
                             NamespaceName = "MyNamespace",
                             ArgsAccessibility = "public"
                         });
             var deepSubCommandsEveningCommandInfo = new CommandInfo()
             {
                 Name = "EveningGreetingArgs",
+                RootName = "MyArgs",
                 NamespaceName = "MyNamespace",
                 ArgsAccessibility = "public"
             };
@@ -186,6 +211,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
             var deeperSubCommandsEveningCommandInfo = new CommandInfo()
             {
                 Name = "Bar",
+                RootName = "MyArgs",
                 NamespaceName = "MyNamespace",
                 ArgsAccessibility = "public"
             };

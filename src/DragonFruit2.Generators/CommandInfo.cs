@@ -1,4 +1,4 @@
-namespace DragonFruit2.GeneratorSupport;
+namespace DragonFruit2.Generators;
 
 /// <summary>
 /// This information can be used in a generator to create classes 
@@ -14,7 +14,7 @@ public record class CommandInfo
     public string? CliNamespaceName { get; init; }
     public required string ArgsAccessibility {  get; init; }
     public string? BaseName { get; init; }
-    public string? RootName { get; init; }
+    public required string? RootName { get; init; }
     public string? CliName
     {
         get => cliName switch

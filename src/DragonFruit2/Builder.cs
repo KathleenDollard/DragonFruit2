@@ -49,6 +49,7 @@ public abstract class Builder<TRootArgs>
 
     public Result<TRootArgs> ParseArgs(string[] args)
     {
+        args ??= Environment.GetCommandLineArgs().Skip(1).ToArray();
         CommandLineArguments = args;
         GetRootArgsBuilder().Initialize(this);
 

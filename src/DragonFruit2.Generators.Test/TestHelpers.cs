@@ -18,6 +18,13 @@ public static class TestHelpers
         var myArgs = Command.ParseArgs<MyArgs>(args);
         """;
 
+    public const string ConsoleAppWithDuplicateCall = """
+        using DragonFruit2;
+        
+        var myArgs = Command.ParseArgs<MyArgs>(args);
+        var myArgs2 = Command.ParseArgs<MyArgs>(args);
+        """;
+
     public static (string?, IEnumerable<Diagnostic>) GetGeneratorDriver(params string[] sources)
     {
         var compilation = GetCompilation(sources);

@@ -18,5 +18,8 @@ dotnet reference add <myproject>
 
 From a practical perspective there are two significant benefits:
 
-- Any data entered on a parent command should be available to subcommands.
-- When working with a result it can be typed to the parent and a switch used to determine which subcommand was executed.
+- It reduces the number of attributes or special knowledge needed to build a CLI
+- Only leaf nodes are ever invoked/created as a parse result and making non-invokable classes abstract is natural
+- Any options or arguments that apply to parent commands apply to the leaf and this makes their values naturally available
+- `recursive`, which has sometimes challenged folks, is strictly an aspect of System.CommandLine and based on an attribute. It's unrelated to the Args data.
+- When working with a result it can be typed to the parent and a `switch` used to determine which subcommand was executed.

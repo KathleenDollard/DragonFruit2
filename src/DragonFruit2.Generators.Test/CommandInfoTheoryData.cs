@@ -75,6 +75,37 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
                 });
 
 
+        AddTheoryData("TryParse",
+            argsSource:
+                """
+                        public partial class MyArgs
+                        { }
+                        """,
+            consoleSource: TestHelpers.ConsoleAppWithTryParseCall,
+            commandInfo:
+                new CommandInfo()
+                {
+                    Name = "MyArgs",
+                    RootName = "MyArgs",
+                    ArgsAccessibility = "public"
+                });
+
+
+        AddTheoryData("TryExecute",
+            argsSource:
+                """
+                        public partial class MyArgs
+                        { }
+                        """,
+            consoleSource: TestHelpers.ConsoleAppWithTryExecuteCall,
+            commandInfo:
+                new CommandInfo()
+                {
+                    Name = "MyArgs",
+                    RootName = "MyArgs",
+                    ArgsAccessibility = "public"
+                });
+
         AddTheoryData("SubCommands",
                 argsSource:
                    """

@@ -8,21 +8,40 @@ public static class TestHelpers
     public const string EmptyConsoleAppCode = """
         using DragonFruit2;
         
-        var myArgs = Command.ParseArgs<MyArgs>(args);
+        var myArgs = Cli.ParseArgs<MyArgs>(args);
         """;
 
     public const string EmptyConsoleAppCodeWithArgsMyNamespace = """
         using DragonFruit2;
         using MyNamespace;
         
-        var myArgs = Command.ParseArgs<MyArgs>(args);
+        var myArgs = Cli.ParseArgs<MyArgs>(args);
         """;
 
     public const string ConsoleAppWithDuplicateCall = """
         using DragonFruit2;
         
-        var myArgs = Command.ParseArgs<MyArgs>(args);
-        var myArgs2 = Command.ParseArgs<MyArgs>(args);
+        var myArgs = Cli.ParseArgs<MyArgs>(args);
+        var myArgs2 = Cli.ParseArgs<MyArgs>(args);
+        """;
+
+    public const string ConsoleAppWithTryParseCall = """
+        using DragonFruit2;
+        
+        var success = Cli.TryParseArgs<MyArgs>(args, out var result);
+        if (success)
+        {
+            // do something
+        }
+        """;
+
+    public const string ConsoleAppWithTryExecuteCall = """
+        using DragonFruit2;
+        
+        if (Cli.TryExecute<MyArgs>(args, out var result))
+        {
+            // do something
+        }
         """;
 
     public static (string?, IEnumerable<Diagnostic>) GetGeneratorDriver(params string[] sources)
@@ -67,11 +86,12 @@ public static class TestHelpers
                 invocation.Expression switch
                 {
                     MemberAccessExpressionSyntax ma when ma.Name is GenericNameSyntax gns
-                        => gns.Identifier.ValueText == "ParseArgs" && gns.TypeArgumentList.Arguments.Count == 1,
+                        => DragonFruit2Builder.IsMethodNameOfInterest(gns.Identifier.ValueText) && gns.TypeArgumentList.Arguments.Count == 1,
                     GenericNameSyntax gns2
-                        => gns2.Identifier.ValueText == "ParseArgs" && gns2.TypeArgumentList.Arguments.Count == 1,
+                        => DragonFruit2Builder.IsMethodNameOfInterest(gns2.Identifier.ValueText) && gns2.TypeArgumentList.Arguments.Count == 1,
                     _ => false,
                 })];
+
 
 }
 

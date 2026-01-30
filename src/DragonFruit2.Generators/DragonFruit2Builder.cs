@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Net;
 
 namespace DragonFruit2.Generators;
 
@@ -23,15 +25,22 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
     /// <param name="node">The syntax node to evaluate.</param>
     /// <returns>true if the node is an invocation of 'ParseArgs' with a single type argument; otherwise, false.</returns>
     public override bool InitialFilter(SyntaxNode node)
-        => (node is InvocationExpressionSyntax inv) &&
-        inv.Expression switch
-        {
-            MemberAccessExpressionSyntax ma when ma.Name is GenericNameSyntax gns
-                => gns.Identifier.ValueText == "ParseArgs" && gns.TypeArgumentList.Arguments.Count == 1,
-            GenericNameSyntax gns2
-                => gns2.Identifier.ValueText == "ParseArgs" && gns2.TypeArgumentList.Arguments.Count == 1,
-            _ => false,
-        };
+    {
+        return (node is InvocationExpressionSyntax inv) &&
+            inv.Expression switch
+            {
+                MemberAccessExpressionSyntax ma when ma.Name is GenericNameSyntax gns
+                    => IsMethodNameOfInterest(gns.Identifier.ValueText) && gns.TypeArgumentList.Arguments.Count == 1,
+                GenericNameSyntax gns2
+                    => IsMethodNameOfInterest(gns2.Identifier.ValueText) && gns2.TypeArgumentList.Arguments.Count == 1,
+                _ => false,
+            };
+    }
+
+    internal static bool IsMethodNameOfInterest(string valueText)
+    {
+        return valueText == "ParseArgs" || valueText == "TryParseArgs" || valueText == "TryExecute";
+    }
 
     public override CommandInfo? Transform(GeneratorSyntaxContext context)
             // We only get here for ParseArg invocations with a single generic type argument

@@ -7,7 +7,7 @@ public abstract class DataValues
 }
 
 public abstract class DataValues<TRootArgs> : DataValues
-    where TRootArgs : class, IArgs<TRootArgs>
+    where TRootArgs : ArgsRootBase<TRootArgs>
 {
     public abstract void SetDataValues(DataProvider<TRootArgs> dataProvoder);
 }

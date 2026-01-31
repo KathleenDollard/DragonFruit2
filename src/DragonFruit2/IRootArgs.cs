@@ -1,9 +1,9 @@
-﻿using DragonFruit2.Validators;
+﻿//using DragonFruit2.Validators;
 
-namespace DragonFruit2;
+//namespace DragonFruit2;
 
-public interface IRootArgs<TArgs> : IArgs<TArgs>
-    where TArgs : IArgs<TArgs>
-{
+//public interface IRootArgs<TArgs> : IArgs<TArgs>
+//    where TArgs : IArgs<TArgs>
+//{
 
-}
+//}

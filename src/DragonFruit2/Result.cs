@@ -4,7 +4,7 @@ using System.Xml.Schema;
 namespace DragonFruit2;
 
 public class Result<TArgs>
-    where TArgs : IArgs<TArgs>
+    where TArgs : ArgsRootBase<TArgs>
 {
     private readonly List<ValidationFailure> validationFailures = new();
 

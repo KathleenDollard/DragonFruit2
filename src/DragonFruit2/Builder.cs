@@ -2,16 +2,17 @@
 
 namespace DragonFruit2;
 
-public abstract class Builder<TRootArgs>
-    where TRootArgs : class, IArgs<TRootArgs>
+public class Builder<TRootArgs>
+    where TRootArgs :  ArgsRootBase<TRootArgs>
 {
-    protected abstract ArgsBuilder<TRootArgs> GetRootArgsBuilder();
+    public ArgsBuilder<TRootArgs> RootArgsBuilder { get; }
 
-    protected Builder(DragonFruit2Configuration? configuration = null)
+    public Builder(ArgsBuilder<TRootArgs> rootArgsBuilder, DragonFruit2Configuration? configuration = null)
     {
         AddDataProvider(new CliDataProvider<TRootArgs>(this));
         AddDataProvider(new DefaultDataProvider<TRootArgs>(this));
         Configuration = configuration;
+        RootArgsBuilder = rootArgsBuilder;
     }
 
     public string[]? CommandLineArguments { get; protected set; }
@@ -51,7 +52,7 @@ public abstract class Builder<TRootArgs>
     {
         args ??= Environment.GetCommandLineArgs().Skip(1).ToArray();
         CommandLineArguments = args;
-        GetRootArgsBuilder().Initialize(this);
+        RootArgsBuilder.Initialize(this);
 
         var cliDataProvider = DataProviders.OfType<IActiveArgsBuilderProvider<TRootArgs>>().FirstOrDefault()
             ?? throw new InvalidOperationException("Internal error: CliDataProvider not found");
@@ -62,28 +63,6 @@ public abstract class Builder<TRootArgs>
                     ? new Result<TRootArgs>(failures, null)
                     : activeArgsBuilder.CreateArgs(this, failures);
     }
-}
-
-public class Builder<TRootArgs, TRootArgsBuilder> : Builder<TRootArgs>
-        where TRootArgs : class, IArgs<TRootArgs>
-        where TRootArgsBuilder : ArgsBuilder<TRootArgs>, new()
-{
-    private TRootArgsBuilder argsBuilder;
-
-    public Builder(DragonFruit2Configuration? configuration = null)
-        : base(configuration)
-    {
-        argsBuilder = new TRootArgsBuilder()
-        {
-            Builder = this
-        };
-    }
-
-    protected override ArgsBuilder<TRootArgs> GetRootArgsBuilder()
-    {
-        return argsBuilder;
-    }
-
 }
 
 

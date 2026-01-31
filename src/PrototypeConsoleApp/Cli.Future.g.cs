@@ -12,9 +12,18 @@ public class Cli
     /// </remarks>
     /// <typeparam name="TRootArgs">The type containing the CLI definition</typeparam>
     /// <returns>A Result instance containing the hydrated args or error messages.</returns>
-    public static Builder<MyArgs> CreateBuilder()
+    public static Builder<TRootArgs> CreateBuilder<TRootArgs>()
+        where TRootArgs : ArgsRootBase<TRootArgs>
     {
-        return new Builder<MyArgs, MyArgs.MyArgsBuilder>();
+        if (typeof(TRootArgs) == typeof(MyArgs))
+        {
+            var builder = new Builder<MyArgs>(new MyArgs.MyArgsBuilder());
+            return builder is Builder<TRootArgs> typedBuilder 
+                ? typedBuilder 
+                : throw new InvalidOperationException("Type mismatch creating builder.");
+        }
+        return null;
+        // Add the other root args types here as else if blocks
     }
 
     /// <summary>
@@ -28,11 +37,10 @@ public class Cli
     /// <typeparam name="TRootArgs">The type containing the CLI definition</typeparam>
     /// <param name="args">Optionaly pass the commandline args, if it is not passed, it will be retrieved from System.Environment.</param>
     /// <returns>A Result instance containing the hydrated args or error messages.</returns>
-    public static Result<MyArgs> ParseArgs<TRootArgs>(string[]? args = null)
-        where TRootArgs : MyArgs, IArgs<TRootArgs>
+    public static Result<TRootArgs> ParseArgs<TRootArgs>(string[]? args = null)
+        where TRootArgs : ArgsRootBase<TRootArgs>
     {
-        // TRootArgs is not used, but is retained, along with it's name to reduce confusion at the call site
-        return CreateBuilder().ParseArgs(args);
+        return CreateBuilder<TRootArgs>().ParseArgs(args);
     }
 
     /// <summary>
@@ -48,8 +56,8 @@ public class Cli
     /// <param name="args">Optionaly pass the commandline args</param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static bool TryParseArgs<TRootArgs>(out Result<MyArgs> result, string[]? args = null)
-            where TRootArgs : MyArgs, IArgs<TRootArgs>
+    public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)
+            where TRootArgs : ArgsRootBase<TRootArgs>
     {
         result = ParseArgs<TRootArgs>(args);
         return result.IsValid;

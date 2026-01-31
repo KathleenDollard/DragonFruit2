@@ -6,7 +6,7 @@ using System.ComponentModel;
 namespace DragonFruit2;
 
 public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsBuilderProvider<TRootArgs>
-    where TRootArgs : class, IArgs<TRootArgs> 
+    where TRootArgs : ArgsRootBase<TRootArgs>
 {
     public CliDataProvider(Builder<TRootArgs> builder) 
         : base(builder)

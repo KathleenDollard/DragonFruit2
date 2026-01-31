@@ -15,7 +15,7 @@ public class OutputCli
         sb.OpenNamespace(commandInfo.CliNamespaceName);
 
         OpenClass(commandInfo, sb);
-        CreateBuilder(commandInfo, sb)  ;
+        CreateBuilder(commandInfo, sb);
         ParseArgsMethod(commandInfo, sb);
         TryParseArgsMethod(commandInfo, sb);
         //TryExecute(commandInfo, sb);
@@ -23,22 +23,6 @@ public class OutputCli
         sb.CloseClass();
         sb.CloseNamespace(commandInfo.CliNamespaceName);
         return sb.ToString();
-    }
-
-    private static void CreateBuilder(CommandInfo rootCommandInfo, StringBuilderWrapper sb)
-    {
-        var rootName = rootCommandInfo.Name;
-
-        sb.XmlSummary("Advanced: Creates a Builder, which can be configured, the System.CommandLine API can be accessed, and which can be reused (especially helpful in testing). ");
-        sb.XmlRemarks("The args class specified as the type argument must be public.");
-        sb.XmlBreak();
-        sb.XmlRemarks("You may need to build after editing this line.");
-        sb.XmlTypeParam("TRootArgs", "The type containing the CLI definition, the root command if there are subcommands.");
-
-        sb.OpenMethod($"public static Builder<{rootName}> CreateBUlder()");
-        sb.Return($"new Builder<{rootName}, {rootName}.{rootName}ArgsBuilder>();");
-        sb.CloseMethod();
-        sb.AppendLine();
     }
 
     private static void FileOpening(StringBuilderWrapper sb, string? cliNamespace, string? argsNamespace)
@@ -56,7 +40,7 @@ public class OutputCli
     }
 
     internal static void OpenClass(CommandInfo commandInfo, StringBuilderWrapper sb)
-    { 
+    {
         sb.AppendLines([
                 "/// <summary>",
                 $"""/// Auto-generated partial class that supplies the root ArgsBuilder type.""",
@@ -65,6 +49,31 @@ public class OutputCli
         sb.OpenCurly();
     }
 
+    private static void CreateBuilder(CommandInfo rootCommandInfo, StringBuilderWrapper sb)
+    {
+        var rootName = rootCommandInfo.Name;
+
+        sb.XmlSummary("Advanced: Creates a Builder, which can be configured, the System.CommandLine API can be accessed, and which can be reused (especially helpful in testing). ");
+        sb.XmlRemarks("The args class specified as the type argument must be public.");
+        sb.XmlBreak();
+        sb.XmlRemarks("You may need to build after editing this line.");
+        sb.XmlTypeParam("TRootArgs", "The type containing the CLI definition, the root command if there are subcommands.");
+
+        sb.OpenMethod($"public static Builder<TRootArgs> CreateBuilder<TRootArgs>()", "TRootArgs : ArgsRootBase<TRootArgs>");
+
+        sb.OpenIf($"typeof(TRootArgs) == typeof({rootName})");
+        sb.AppendLine($"var builder = new Builder<{rootName}>(new {rootName}.{rootName}ArgsBuilder());");
+        sb.AppendLines([$"return builder is Builder<TRootArgs> typedBuilder",
+            "      ? typedBuilder",
+            "      : throw new InvalidOperationException(\"Type mismatch creating builder.\");"]);
+        sb.CloseIf();
+
+        // TODO: Switch to a compilation generator and add all root args here.
+
+        sb.Return("null");
+        sb.CloseMethod();
+        sb.AppendLine();
+    }
     private static void ParseArgsMethod(CommandInfo rootCommandInfo, StringBuilderWrapper sb)
     {
         var rootName = rootCommandInfo.Name;
@@ -74,9 +83,9 @@ public class OutputCli
         sb.XmlTypeParam("TRootArgs", "The type containing the CLI definition.");
         sb.XmlParam("args", "Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.");
 
-        sb.OpenMethod($"public static Result<{rootName}> ParseArgs<TRootArgs>(string[]? args = null)",
-            constraints: $"TRootArgs : {rootName}, IArgs<TRootArgs>");
-        sb.AppendLine($"return new Builder<{rootName}, {rootName}.{rootName}ArgsBuilder>().ParseArgs(args);");
+        sb.OpenMethod($"public static Result<TRootArgs> ParseArgs<TRootArgs>(string[]? args = null)",
+            constraints: $"TRootArgs : ArgsRootBase<TRootArgs>");
+        sb.AppendLine($"return CreateBuilder<TRootArgs>().ParseArgs(args);");
         sb.CloseMethod();
         sb.AppendLine();
     }
@@ -92,8 +101,8 @@ public class OutputCli
         sb.XmlParam("args", "Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.");
         sb.XmlException("InvalidOperationException", "To be implemented soon.");
 
-        sb.OpenMethod($"public static bool TryParseArgs<TRootArgs>(out Result<{rootName}> result, string[]? args = null)",
-            constraints: $"TRootArgs : {rootName}, IArgs<TRootArgs>");
+        sb.OpenMethod($"public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)",
+            constraints: $"TRootArgs : ArgsRootBase<TRootArgs>");
 
         sb.AppendLine($"result = ParseArgs<TRootArgs>(args);");
         sb.Return("result.IsValid");

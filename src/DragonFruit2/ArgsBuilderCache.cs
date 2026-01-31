@@ -13,7 +13,7 @@
 /// </remarks>
 /// <typeparam name="TRootArgs"></typeparam>
 public static class ArgsBuilderCache<TRootArgs>
-    where TRootArgs : class, IArgs<TRootArgs>
+    where TRootArgs : ArgsRootBase<TRootArgs>
 {
     private static Dictionary<Type, ArgsBuilder<TRootArgs>> availableArgsBuilders = new();
     private static ArgsBuilder<TRootArgs>? activeArgsBuilder;
@@ -26,7 +26,7 @@ public static class ArgsBuilderCache<TRootArgs>
     internal static ArgsBuilder<TRootArgs>? GetActiveArgsBuilder() => ActiveArgsBuilder;
 
     public static void AddArgsBuilder<TArgs>(ArgsBuilder<TRootArgs> builder)
-        where TArgs : IArgs<TArgs>
+        where TArgs : ArgsRootBase<TRootArgs>
     {
         var type = typeof(TArgs);
         if (!typeof(ArgsBuilder<TRootArgs>).IsAssignableFrom(type))
@@ -40,7 +40,7 @@ public static class ArgsBuilderCache<TRootArgs>
     }
 
     public static ArgsBuilder<TArgs> GetArgsBuilder<TArgs>()
-        where TArgs : class, IArgs<TArgs>
+        where TArgs : ArgsRootBase<TArgs>
     {
         return (ArgsBuilder<TArgs>)GetArgsBuilder(typeof(TArgs));
     }

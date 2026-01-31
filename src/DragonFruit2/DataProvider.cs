@@ -5,7 +5,7 @@ public abstract class DataProvider
 }
 
 public abstract class DataProvider<TRootArgs> : DataProvider
-    where TRootArgs : class, IArgs<TRootArgs>
+    where TRootArgs : ArgsRootBase<TRootArgs>
 {
     protected DataProvider(Builder<TRootArgs> builder)
     {

@@ -18,4 +18,3 @@ else
 
 Console.WriteLine();
 Console.WriteLine("Goodbye from the Sample Console App!");
-

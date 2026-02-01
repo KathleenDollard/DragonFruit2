@@ -22,9 +22,17 @@ public class Cli
     /// </remarks>
     /// <typeparam name="TRootArgs">The type containing the CLI definition, the root command if there are subcommands.</typeparam>
 
-    public static Builder<MyArgs> CreateBUlder()
+    public static Builder<TRootArgs> CreateBuilder<TRootArgs>()
+          where TRootArgs : ArgsRootBase<TRootArgs>
     {
-        return new Builder<MyArgs, MyArgs.MyArgsArgsBuilder>();;
+        if (typeof(TRootArgs) == typeof(MyArgs))
+        {
+            var builder = new Builder<MyArgs>(new MyArgs.MyArgsArgsBuilder());
+            return builder is Builder<TRootArgs> typedBuilder
+                  ? typedBuilder
+                  : throw new InvalidOperationException("Type mismatch creating builder.");
+        }
+        return null;
     }
 
     /// <summary>
@@ -36,10 +44,10 @@ public class Cli
     /// <typeparam name="TRootArgs">The type containing the CLI definition.</typeparam>
     /// <param name="args">Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.</param>
 
-    public static Result<MyArgs> ParseArgs<TRootArgs>(string[]? args = null)
-          where TRootArgs : MyArgs, IArgs<TRootArgs>
+    public static Result<TRootArgs> ParseArgs<TRootArgs>(string[]? args = null)
+          where TRootArgs : ArgsRootBase<TRootArgs>
     {
-        return new Builder<MyArgs, MyArgs.MyArgsArgsBuilder>().ParseArgs(args);
+        return CreateBuilder<TRootArgs>().ParseArgs(args);
     }
 
     /// <summary>
@@ -53,8 +61,8 @@ public class Cli
     /// <param name="args">Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.</param>
     /// <exception cref="InvalidOperationException">To be implemented soon.</param>
 
-    public static bool TryParseArgs<TRootArgs>(out Result<MyArgs> result, string[]? args = null)
-          where TRootArgs : MyArgs, IArgs<TRootArgs>
+    public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)
+          where TRootArgs : ArgsRootBase<TRootArgs>
     {
         result = ParseArgs<TRootArgs>(args);
         return result.IsValid;

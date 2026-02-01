@@ -1,9 +1,9 @@
-﻿using DragonFruit2.Validators;
+﻿//using DragonFruit2.Validators;
 
-namespace DragonFruit2;
+//namespace DragonFruit2;
 
-public interface IArgs<TArgs>
-    where TArgs : IArgs<TArgs>
-{
-   IEnumerable<ValidationFailure> Validate();
-}
+//public interface IArgs<TArgs>
+//    where TArgs : IArgs<TArgs>
+//{
+//   IEnumerable<ValidationFailure> Validate();
+//}

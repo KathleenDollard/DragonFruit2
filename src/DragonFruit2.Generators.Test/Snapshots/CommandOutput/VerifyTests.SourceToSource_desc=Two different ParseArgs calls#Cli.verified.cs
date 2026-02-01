@@ -31,6 +31,13 @@ public class Cli
                   ? typedBuilder
                   : throw new InvalidOperationException("Type mismatch creating builder.");
         }
+        if (typeof(TRootArgs) == typeof(MyOtherArgs))
+        {
+            var builder = new Builder<MyOtherArgs>(new MyOtherArgs.MyOtherArgsArgsBuilder());
+            return builder is Builder<TRootArgs> typedBuilder
+                  ? typedBuilder
+                  : throw new InvalidOperationException("Type mismatch creating builder.");
+        }
         return null;
     }
 

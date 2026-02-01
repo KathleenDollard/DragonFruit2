@@ -11,7 +11,7 @@ namespace SampleConsoleApp;
 /// <summary>
 /// 
 /// </summary>
-public partial class MyArgs : IArgs<MyArgs>
+public partial class MyArgs : ArgsRootBase<MyArgs>
 {
     private List<Validator<int>>? ageValidators;
 

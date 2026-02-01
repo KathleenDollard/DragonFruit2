@@ -41,7 +41,7 @@ internal class OutputPartialArgs
 
     internal static void OpenClass(CommandInfo commandInfo, StringBuilderWrapper sb)
     {
-        var baseType = commandInfo.BaseName ?? $"IArgs<{commandInfo.Name}>";
+        var baseType = commandInfo.BaseName ?? $"ArgsRootBase<{commandInfo.Name}>";
         sb.XmlSummary(
                 $"""Auto-generated partial class for building CLI commands for <see cref="{commandInfo.Name}"/>" and creating a new {commandInfo.Name} instance from a <see cref="System.CommandLine.ParseResult" />.""");
         sb.OpenClass($"{commandInfo.ArgsAccessibility} partial class {commandInfo.Name} : {baseType}");

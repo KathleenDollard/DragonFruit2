@@ -1,7 +1,7 @@
 ﻿namespace DragonFruit2;
 
 public class DefaultDataProvider<TRootArgs> : DataProvider<TRootArgs>
-     where TRootArgs : class, IArgs<TRootArgs>
+     where TRootArgs : ArgsRootBase<TRootArgs>
 
 {
     public DefaultDataProvider(Builder<TRootArgs> builder)

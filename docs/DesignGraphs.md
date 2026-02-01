@@ -1,5 +1,24 @@
 # Design drawings
 
+## Phases
+
+```mermaid
+---
+config:
+  title: Phases
+---
+flowchart TD
+  cliEntry[Program calls a DragonFruit2 entry point<br/>ParseArgs, etc.]
+  cliEntry ==>findArgsBuilder[Find ArgsBuilder for requested root]
+  findArgsBuilder ==> init[Initialize data providers]
+  init ==> getActive[Get active ArgsBuilderValues from DataProviders]
+  getActive ==> getData[Get data for ArgBuilderValues from DataProviders<br/>including configuration defaults]
+  getData ==> getProgramDefaults[Get programmatic defaults<br/>includes dependent defaults]
+  getProgramDefaults ==> createArgs[Create Args instance]
+  createArgs ==> validate[Validate Args instance]
+  validate ==> returnResult[Return result]
+```
+
 ## `DataProvider` flow
 
 ```mermaid

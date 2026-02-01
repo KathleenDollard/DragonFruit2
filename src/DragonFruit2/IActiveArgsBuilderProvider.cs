@@ -3,7 +3,7 @@
 namespace DragonFruit2;
 
 public interface IActiveArgsBuilderProvider<TRootArgs>
-    where TRootArgs : class, IArgs<TRootArgs>
+    where TRootArgs : ArgsRootBase<TRootArgs>
 {
     (IEnumerable<ValidationFailure>? failures, ArgsBuilder<TRootArgs>? builder) GetActiveArgsBuilder();
 }

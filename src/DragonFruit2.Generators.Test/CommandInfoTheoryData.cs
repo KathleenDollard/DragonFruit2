@@ -12,7 +12,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
         AddTheoryData("Empty args class",
             argsSource:
                 """
-                public partial class MyArgs
+                public partial class MyArgs : ArgsRootBase<MyArgs>
                 { }
                 """,
             consoleSource: TestHelpers.EmptyConsoleAppCode,
@@ -27,7 +27,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
         AddTheoryData("Empty args struct",
            argsSource:
                 """
-                public partial struct MyArgs
+                public partial struct MyArgs : ArgsRootBase<MyArgs>
                 { }
                 """,
            consoleSource: TestHelpers.EmptyConsoleAppCode,
@@ -45,7 +45,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
                 """
                 namespace MyNamespace
                 {
-                    public partial class MyArgs
+                    public partial class MyArgs : ArgsRootBase<MyArgs>
                     { }
                 }
                 """,
@@ -62,7 +62,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
         AddTheoryData("Duplicate ParseArgs calls",
             argsSource:
                 """
-                        public partial class MyArgs
+                        public partial class MyArgs : ArgsRootBase<MyArgs>
                         { }
                         """,
             consoleSource: TestHelpers.ConsoleAppWithDuplicateCall,
@@ -74,11 +74,28 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
                     ArgsAccessibility = "public"
                 });
 
+        AddTheoryData("Two different ParseArgs calls",
+             argsSource:
+                 """
+                        public partial class MyArgs : ArgsRootBase<MyArgs>
+                        { }
+
+                        public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
+                        { }
+                        """,
+            consoleSource: TestHelpers.ConsoleAppWithTwoDifferentCalls,
+            commandInfo:
+                new CommandInfo()
+                {
+                    Name = "MyArgs",
+                    RootName = "MyArgs",
+                    ArgsAccessibility = "public"
+                });
 
         AddTheoryData("TryParse",
             argsSource:
                 """
-                        public partial class MyArgs
+                        public partial class MyArgs : ArgsRootBase<MyArgs>
                         { }
                         """,
             consoleSource: TestHelpers.ConsoleAppWithTryParseCall,
@@ -90,11 +107,10 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
                     ArgsAccessibility = "public"
                 });
 
-
         AddTheoryData("TryExecute",
             argsSource:
                 """
-                        public partial class MyArgs
+                        public partial class MyArgs : ArgsRootBase<MyArgs>
                         { }
                         """,
             consoleSource: TestHelpers.ConsoleAppWithTryExecuteCall,
@@ -113,7 +129,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
 
                     namespace MyNamespace
                     {
-                        public partial class MyArgs
+                        public partial class MyArgs : ArgsRootBase<MyArgs>
                         {
                             public required string Name { get; set; }
                         }
@@ -137,7 +153,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
                     """
                     namespace MyNamespace
                     {
-                        public partial class MyArgs
+                        public partial class MyArgs : ArgsRootBase<MyArgs>
                         {
                             public required string Name { get; set; }
                         }

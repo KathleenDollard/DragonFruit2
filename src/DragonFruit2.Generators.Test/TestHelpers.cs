@@ -25,6 +25,13 @@ public static class TestHelpers
         var myArgs2 = Cli.ParseArgs<MyArgs>(args);
         """;
 
+    public const string ConsoleAppWithTwoDifferentCalls = """
+        using DragonFruit2;
+        
+        var myArgs = Cli.ParseArgs<MyArgs>(args);
+        var myArgs2 = Cli.ParseArgs<MyOtherArgs>(args);
+        """;
+
     public const string ConsoleAppWithTryParseCall = """
         using DragonFruit2;
         

@@ -6,7 +6,7 @@ namespace SampleConsoleApp;
 /// <summary>
 /// This is a test command
 /// </summary>
-public partial class MyArgs
+public partial class MyArgs : ArgsRootBase<MyArgs>
 {
     /// <summary>
     /// "Your name"

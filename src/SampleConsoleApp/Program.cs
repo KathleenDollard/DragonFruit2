@@ -16,5 +16,7 @@ else
     result.ReportErrorsToConsole();
 }
 
+var otherArgsResult = Cli.ParseArgs<MyOtherArgs>();
+
 Console.WriteLine();
 Console.WriteLine("Goodbye from the Sample Console App!");

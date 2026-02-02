@@ -19,7 +19,6 @@ internal static class OutputArgsBuilder
     {
         sb.AppendLine();
         sb.XmlSummary(" This static builder supplies the CLI declaration and filling the Result and return instance.");
-        sb.XmlRemarks(" The first type argument of the base is the Args type this builder creates, and the second is the root Args type. This means the two type arguments are the same for the root ArgsBuilder, but will differ for subcommand ArgsBuilders.");
         sb.OpenClass($"internal class {commandInfo.Name}ArgsBuilder : ArgsBuilder<{commandInfo.RootName}>");
     }
 

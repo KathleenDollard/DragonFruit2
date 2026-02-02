@@ -191,5 +191,17 @@ public class StringBuilderWrapper
         AppendLine($"return {returnValue};");
     }
 
-
+    internal string CSharpString<T>(T input)
+    {
+        return input switch
+        {
+            null => "null",
+            string s => $"@\"{s.Replace("\"", "\"\"")}\"",
+            char c => $"'{c}'",
+            bool b => b ? "true" : "false",
+            Enum e => $"{e.GetType().FullName}.{e}",
+            _ when input.GetType().IsPrimitive => input.ToString()!,
+            _ => throw new NotSupportedException($"Type {typeof(T).FullName} is not supported for C# literal conversion"),
+        };
+    }
 }

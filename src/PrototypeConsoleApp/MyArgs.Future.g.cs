@@ -181,7 +181,7 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
     // Generation Note: MyArgs in the class declaration is TArgs.
     public class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
     {
-        // Generation Note: MyArgs in the following constructor is TRootArgs.
+        // Generation Note: MyArgs in the following constructor is TArgs.
         public MyArgsDataDefinition(MyArgs rootArgs)
             : base(rootArgs)
         {

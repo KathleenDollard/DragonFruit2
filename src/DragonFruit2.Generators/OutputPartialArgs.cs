@@ -20,6 +20,7 @@ internal class OutputPartialArgs
 
         OutputArgsBuilder.GetClass(sb, commandInfo);
         OutputDataValues.GetClass(sb, commandInfo);
+        OutputDataDefinition.GetClass(sb, commandInfo);
 
         sb.CloseClass();
         sb.CloseNamespace(commandInfo.NamespaceName);

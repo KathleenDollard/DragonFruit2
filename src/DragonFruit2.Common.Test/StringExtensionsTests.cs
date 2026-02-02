@@ -76,7 +76,7 @@ public class StringExtensionsTests
     [InlineData("myVariableName", "My Variable Name")]
     [InlineData("my_variable_name", "My Variable Name")]
     [InlineData("my-variable-name", "My Variable Name")]
-    [InlineData("HTTPServer", "H T T P Server")]
+    [InlineData("HTTPServer", "Http Server")]
     [InlineData("simple", "Simple")]
     public void ToDisplayName_ReturnsReadableFormat(string input, string expected)
     {
@@ -111,9 +111,9 @@ public class StringExtensionsTests
     [InlineData("config-file-path", "CONFIG_FILE_PATH")]
     [InlineData("2ndValue", "_2ND_VALUE")]
     [InlineData("simple", "SIMPLE")]
-    public void ToEnvironmentVariableName_ReturnsUppercaseWithUnderscores(string input, string expected)
+    public void ToConstantName_ReturnsUppercaseWithUnderscores(string input, string expected)
     {
-        var result = input.ToEnvironmentVariableName();
+        var result = input.ToConstantName();
         Assert.Equal(expected, result);
     }
 
@@ -197,7 +197,7 @@ public class StringExtensionsTests
     [InlineData("2ndValue", "_2ND_VALUE")]
     public void ToConstant_ReturnsUppercaseWithUnderscores(string input, string expected)
     {
-        var result = input.ToConstant();
+        var result = input.ToConstantName();
         Assert.Equal(expected, result);
     }
 
@@ -205,8 +205,8 @@ public class StringExtensionsTests
     public void ToConstant_EquivalentToEnvironmentVariableName()
     {
         var input = "MyConstantValue";
-        var constant = input.ToConstant();
-        var envVar = input.ToEnvironmentVariableName();
+        var constant = input.ToConstantName();
+        var envVar = input.ToConstantName();
         Assert.Equal(envVar, constant);
     }
 
@@ -240,11 +240,11 @@ public class StringExtensionsTests
         Assert.Null(nullInput.ToCamelCase());
         Assert.Null(nullInput.ToDisplayName());
         Assert.Null(nullInput.ToUrlSlug());
-        Assert.Null(nullInput.ToEnvironmentVariableName());
+        Assert.Null(nullInput.ToConstantName());
         Assert.Null(nullInput.ToConfigName());
         Assert.Null(nullInput.ToXmlName());
         Assert.Null(nullInput.ToJsonName());
-        Assert.Null(nullInput.ToConstant());
+        Assert.Null(nullInput.ToConstantName());
         Assert.Null(nullInput.ToPosixName());
     }
 
@@ -259,11 +259,11 @@ public class StringExtensionsTests
         Assert.Empty(empty.ToCamelCase());
         Assert.Empty(empty.ToDisplayName());
         Assert.Empty(empty.ToUrlSlug());
-        Assert.Empty(empty.ToEnvironmentVariableName());
+        Assert.Empty(empty.ToConstantName());
         Assert.Empty(empty.ToConfigName());
         Assert.Empty(empty.ToXmlName());
         Assert.Empty(empty.ToJsonName());
-        Assert.Empty(empty.ToConstant());
+        Assert.Empty(empty.ToConstantName());
         Assert.Empty(empty.ToPosixName());
     }
 
@@ -278,11 +278,11 @@ public class StringExtensionsTests
         Assert.Equal("a", single.ToCamelCase());
         Assert.Equal("A", single.ToDisplayName());
         Assert.Equal("a", single.ToUrlSlug());
-        Assert.Equal("A", single.ToEnvironmentVariableName());
+        Assert.Equal("A", single.ToConstantName());
         Assert.Equal("a", single.ToConfigName());
         Assert.Equal("a", single.ToXmlName());
         Assert.Equal("a", single.ToJsonName());
-        Assert.Equal("A", single.ToConstant());
+        Assert.Equal("A", single.ToConstantName());
         Assert.Equal("a", single.ToPosixName());
     }
 
@@ -304,7 +304,7 @@ public class StringExtensionsTests
         Assert.DoesNotContain("--", posixName);
         Assert.DoesNotContain("__", posixName);
 
-        var envVar = input.ToEnvironmentVariableName();
+        var envVar = input.ToConstantName();
         Assert.DoesNotContain("__", envVar);
 
         var displayName = input.ToDisplayName();

@@ -2,9 +2,18 @@
 
 namespace DragonFruit2;
 
+public enum CasingStyle
+{
+    ToLower,
+    ToUpper,
+    NoChanges,
+}
+
 public static class StringExtensions
 {
-    private static string InsertDelimiter(this string input, char delimiter)
+
+
+    private static string InsertDelimiter(this string input, char delimiter, CasingStyle casing)
     {
         if (string.IsNullOrEmpty(input))
             return input;
@@ -25,173 +34,30 @@ public static class StringExtensions
                 if (shouldAddDelimiter)
                     result.Append(delimiter);
 
-                result.Append(char.ToLower(input[i]));
+                result.Append(
+                    casing switch
+                    {
+                        CasingStyle.ToUpper => char.ToUpper(input[i]),
+                        CasingStyle.ToLower => char.ToLower(input[i]),
+                        _ => input[i],
+                    });
             }
             else
             {
-                result.Append(input[i]);
+                result.Append(
+                    casing switch
+                    {
+                        CasingStyle.ToUpper => char.ToUpper(input[i]),
+                        CasingStyle.ToLower => char.ToLower(input[i]),
+                        _ => input[i],
+                    });
             }
         }
 
         return result.ToString();
     }
 
-    /// <summary>
-    /// Converts a Pascal case or camel case string to kebab case.
-    /// </summary>
-    /// <param name="input">The input string in Pascal or camel case.</param>
-    /// <returns>The string converted to kebab case (lowercase with hyphens).</returns>
-    /// <example>
-    /// "MyString".ToKebabCase() returns "my-string"
-    /// "myString".ToKebabCase() returns "my-string"
-    /// "HTTPServer".ToKebabCase() returns "http-server"
-    /// "simple".ToKebabCase() returns "simple"
-    /// "".ToKebabCase() returns ""
-    /// </example>
-    public static string ToKebabCase(this string input)
-    {
-        if (string.IsNullOrEmpty(input))
-            return input;
-
-        var result = new StringBuilder();
-
-        for (int i = 0; i < input.Length; i++)
-        {
-            if (char.IsUpper(input[i]))
-            {
-                // Add hyphen only at word boundaries:
-                // - After lowercase or digit
-                // - Before lowercase letter (end of acronym)
-                bool shouldAddHyphen = i > 0 && 
-                    (char.IsLower(input[i - 1]) || char.IsDigit(input[i - 1]) || 
-                     (i + 1 < input.Length && char.IsLower(input[i + 1])));
-
-                if (shouldAddHyphen)
-                    result.Append('-');
-
-                result.Append(char.ToLower(input[i]));
-            }
-            else
-            {
-                result.Append(input[i]);
-            }
-        }
-
-        return result.ToString();
-    }
-
-    /// <summary>
-    /// Converts a Pascal case or camel case string to snake case.
-    /// </summary>
-    /// <param name="input">The input string in Pascal or camel case.</param>
-    /// <returns>The string converted to snake case (lowercase with underscores).</returns>
-    /// <example>
-    /// "MyString".ToSnakeCase() returns "my_string"
-    /// "myString".ToSnakeCase() returns "my_string"
-    /// "HTTPServer".ToSnakeCase() returns "http_server"
-    /// </example>
-    public static string ToSnakeCase(this string input)
-    {
-        if (string.IsNullOrEmpty(input))
-            return input;
-
-        var result = new StringBuilder();
-
-        for (int i = 0; i < input.Length; i++)
-        {
-            if (char.IsUpper(input[i]))
-            {
-                if (i > 0)
-                    result.Append('_');
-                result.Append(char.ToLower(input[i]));
-            }
-            else
-            {
-                result.Append(input[i]);
-            }
-        }
-
-        return result.ToString();
-    }
-
-    /// <summary>
-    /// Converts a string to Pascal case (PascalCase) format.
-    /// </summary>
-    /// <param name="input">The input string in any format.</param>
-    /// <returns>The string converted to Pascal case (uppercase first letter, then camelCase).</returns>
-    /// <remarks>
-    /// Pascal case is the C# standard for class names, method names, and public properties.
-    /// Each word starts with an uppercase letter, with no separators.
-    /// </remarks>
-    /// <example>
-    /// "my-variable".ToPascalCase() returns "MyVariable"
-    /// "my_variable_name".ToPascalCase() returns "MyVariableName"
-    /// "myVariableName".ToPascalCase() returns "MyVariableName"
-    /// "HTTPServer".ToPascalCase() returns "HttpServer"
-    /// </example>
-    public static string ToPascalCase(this string input)
-    {
-        if (string.IsNullOrEmpty(input))
-            return input;
-
-        var result = new StringBuilder();
-        bool nextCharIsUpper = true;
-
-        for (int i = 0; i < input.Length; i++)
-        {
-            char c = input[i];
-            char nextChar = i + 1 < input.Length ? input[i + 1] : '\0';
-
-            if (char.IsLetter(c))
-            {
-                if (nextCharIsUpper)
-                {
-                    result.Append(char.ToUpper(c));
-                    nextCharIsUpper = false;
-                }
-                else if (char.IsUpper(c) && i + 1 < input.Length && char.IsLower(input[i + 1]))
-                {
-                    // Transition from upper to lower = word boundary
-                    result.Append(char.ToUpper(c));
-                    nextCharIsUpper = false;
-                }
-                else
-                {
-                    result.Append(char.ToLower(c));
-                }
-            }
-            else if (char.IsDigit(c))
-            {
-                result.Append(c);
-                nextCharIsUpper = false;
-            }
-            else if (c == '_' || c == '-' || c == '.' || char.IsWhiteSpace(c))
-            {
-                // Delimiters trigger uppercase for next letter
-                nextCharIsUpper = true;
-            }
-            // Skip all other characters
-        }
-
-        return result.ToString();
-    }
-
-    /// <summary>
-    /// Converts a string to camel case format.
-    /// </summary>
-    /// <param name="input">The input string in any format.</param>
-    /// <returns>The string converted to camel case (lowercase first letter, then PascalCase).</returns>
-    /// <remarks>
-    /// Camel case is used for C# local variables, method parameters, and private fields.
-    /// The first letter is lowercase, with subsequent words starting with uppercase.
-    /// </remarks>
-    /// <example>
-    /// "my-variable".ToCamelCase() returns "myVariable"
-    /// "my_variable_name".ToCamelCase() returns "myVariableName"
-    /// "MyVariableName".ToCamelCase() returns "myVariableName"
-    /// "HTTPServer".ToCamelCase() returns "httpServer"
-    /// </example>
-    public static string ToCamelCase(this string input)
+    private static string CapitalDelimiters(this string input, bool capitalizeFirstChar, char[] passThrough)
     {
         if (string.IsNullOrEmpty(input))
             return input;
@@ -209,7 +75,10 @@ public static class StringExtensions
             {
                 if (isFirstChar)
                 {
-                    result.Append(char.ToLower(c));
+                    result.Append(
+                        capitalizeFirstChar
+                          ? char.ToUpper(c)
+                          : char.ToLower(c));
                     isFirstChar = false;
                     nextCharIsUpper = false;
                 }
@@ -236,6 +105,11 @@ public static class StringExtensions
                 isFirstChar = false;
                 nextCharIsUpper = false;
             }
+            else if (passThrough.Contains(c))
+            {
+                result.Append(c);
+                nextCharIsUpper = true; // Capitalize next letter after delimiter
+            }
             else if (c == '_' || c == '-' || c == '.' || char.IsWhiteSpace(c))
             {
                 nextCharIsUpper = true;
@@ -243,6 +117,117 @@ public static class StringExtensions
         }
 
         return result.ToString();
+    }
+
+    private static string CleanPunctuation(this string input, char expectedDelimiter, Func<char, bool> replaceWithExpectedPredicate, bool removeDuplicate)
+    {
+        var result = new StringBuilder();
+        bool lastWasDelimiter = false;
+
+        for (int i = 0; i < input.Length; i++)
+        {
+            char c = input[i];
+
+            if (char.IsLetterOrDigit(c))
+            {
+                result.Append(c);
+                lastWasDelimiter = false;
+            }
+            else if (c == expectedDelimiter)
+            {
+                // Preserve expected delimiter
+                if (!lastWasDelimiter)
+                {
+                    result.Append(c);
+                    lastWasDelimiter = true;
+                }
+            }
+            else if (replaceWithExpectedPredicate(c))
+            {
+                // Replace with expected delimiter, avoiding consecutive delimiters
+                if (!lastWasDelimiter && result.Length > 0)
+                {
+                    result.Append(expectedDelimiter);
+                    lastWasDelimiter = true;
+                }
+            }
+            // Skip all other characters
+        }
+
+        return result.ToString();
+
+    }
+
+    /// <summary>
+    /// Converts a Pascal case or camel case string to kebab case.
+    /// </summary>
+    /// <param name="input">The input string in Pascal or camel case.</param>
+    /// <returns>The string converted to kebab case (lowercase with hyphens).</returns>
+    /// <example>
+    /// "MyString".ToKebabCase() returns "my-string"
+    /// "myString".ToKebabCase() returns "my-string"
+    /// "HTTPServer".ToKebabCase() returns "http-server"
+    /// "simple".ToKebabCase() returns "simple"
+    /// "".ToKebabCase() returns ""
+    /// </example>
+    public static string ToKebabCase(this string input)
+    {
+        return input.InsertDelimiter('-', CasingStyle.ToLower);
+    }
+
+    /// <summary>
+    /// Converts a Pascal case or camel case string to snake case.
+    /// </summary>
+    /// <param name="input">The input string in Pascal or camel case.</param>
+    /// <returns>The string converted to snake case (lowercase with underscores).</returns>
+    /// <example>
+    /// "MyString".ToSnakeCase() returns "my_string"
+    /// "myString".ToSnakeCase() returns "my_string"
+    /// "HTTPServer".ToSnakeCase() returns "http_server"
+    /// </example>
+    public static string ToSnakeCase(this string input, CasingStyle casing = CasingStyle.ToLower)
+    {
+        return input.InsertDelimiter('_', casing);
+    }
+
+    /// <summary>
+    /// Converts a string to Pascal case (PascalCase) format.
+    /// </summary>
+    /// <param name="input">The input string in any format.</param>
+    /// <returns>The string converted to Pascal case (uppercase first letter, then camelCase).</returns>
+    /// <remarks>
+    /// Pascal case is the C# standard for class names, method names, and public properties.
+    /// Each word starts with an uppercase letter, with no separators.
+    /// </remarks>
+    /// <example>
+    /// "my-variable".ToPascalCase() returns "MyVariable"
+    /// "my_variable_name".ToPascalCase() returns "MyVariableName"
+    /// "myVariableName".ToPascalCase() returns "MyVariableName"
+    /// "HTTPServer".ToPascalCase() returns "HttpServer"
+    /// </example>
+    public static string ToPascalCase(this string input)
+    {
+        return input.CapitalDelimiters(true, []);
+    }
+
+    /// <summary>
+    /// Converts a string to camel case format.
+    /// </summary>
+    /// <param name="input">The input string in any format.</param>
+    /// <returns>The string converted to camel case (lowercase first letter, then PascalCase).</returns>
+    /// <remarks>
+    /// Camel case is used for C# local variables, method parameters, and private fields.
+    /// The first letter is lowercase, with subsequent words starting with uppercase.
+    /// </remarks>
+    /// <example>
+    /// "my-variable".ToCamelCase() returns "myVariable"
+    /// "my_variable_name".ToCamelCase() returns "myVariableName"
+    /// "MyVariableName".ToCamelCase() returns "myVariableName"
+    /// "HTTPServer".ToCamelCase() returns "httpServer"
+    /// </example>
+    public static string ToCamelCase(this string input)
+    {
+        return input.CapitalDelimiters(false, []);
     }
 
     /// <summary>
@@ -265,55 +250,10 @@ public static class StringExtensions
         if (string.IsNullOrEmpty(input))
             return input;
 
-        var result = new StringBuilder();
-        bool capitalizeNext = true;
-
-        for (int i = 0; i < input.Length; i++)
-        {
-            char c = input[i];
-
-            if (char.IsLetter(c))
-            {
-                // Capitalize if it's first char or after a delimiter
-                if (capitalizeNext)
-                {
-                    result.Append(char.ToUpper(c));
-                    capitalizeNext = false;
-                }
-                // Insert space before uppercase letters (except first or those after space)
-                else if (char.IsUpper(c) && result.Length > 0 && result[result.Length - 1] != ' ')
-                {
-                    result.Append(' ');
-                    result.Append(c);
-                }
-                else
-                {
-                    result.Append(c);
-                }
-            }
-            else if (char.IsDigit(c))
-            {
-                if (result.Length > 0 && result[result.Length - 1] != ' ')
-                {
-                    result.Append(' ');
-                }
-                result.Append(c);
-            }
-            else if (c == '_' || c == '-' || char.IsWhiteSpace(c))
-            {
-                // Add space for delimiter (avoid consecutive spaces)
-                if (result.Length > 0 && result[result.Length - 1] != ' ')
-                {
-                    result.Append(' ');
-                }
-                capitalizeNext = true;  // Capitalize next letter after delimiter
-            }
-        }
-
-        return result.ToString();
+        var result = input.CapitalDelimiters(true, []);
+        result = result.InsertDelimiter(' ', CasingStyle.NoChanges);
+        return result;
     }
-
-
 
     /// <summary>
     /// Converts a string to POSIX-compliant portable filename format.
@@ -334,31 +274,12 @@ public static class StringExtensions
         if (string.IsNullOrEmpty(input))
             return input;
 
-        var kebabized = input.ToKebabCase();
-        var result = new StringBuilder();
-        bool lastWasDelimiter = false;
+        var result = input.ToKebabCase();
+        result = result.CleanPunctuation('-',
+            c => c == '_' || c == '-' || c == '.' || char.IsWhiteSpace(c) || char.IsSymbol(c) || char.IsPunctuation(c),
+            true);
 
-        for (int i = 0; i < kebabized.Length; i++)
-        {
-            char c = kebabized[i];
-
-            if (char.IsLetterOrDigit(c))
-            {
-                result.Append(c);
-                lastWasDelimiter = false;
-            }
-            else if (c == '_' || c == '-' || c == '.' || char.IsWhiteSpace(c) || char.IsSymbol(c) || char.IsPunctuation(c))
-            {
-                // Convert ALL delimiters (including dots) to hyphens
-                if (!lastWasDelimiter && result.Length > 0)
-                {
-                    result.Append('-');
-                    lastWasDelimiter = true;
-                }
-            }
-        }
-
-        return result.ToString().TrimEnd('-');
+        return result.TrimEnd('-');
     }
 
     /// <summary>
@@ -382,36 +303,20 @@ public static class StringExtensions
         if (string.IsNullOrEmpty(input))
             return input;
 
-        var result = new StringBuilder();
-        bool nextCharIsUpper = false;
-        bool isFirstChar = true;
-
-        for (int i = 0; i < input.Length; i++)
-        {
-            if (char.IsUpper(input[i]))
-            {
-                if (i > 0)
-                    result.Append('-');
-                result.Append(char.ToLower(input[i]));
-            }
-            else
-            {
-                result.Append(input[i]);
-            }
-        }
+        var result = input.ToCamelCase();
 
         // Remove trailing delimiters
-        var final = result.ToString().TrimEnd('.', ':');
+        result = result.TrimEnd('.', ':');
 
         // Ensure it starts with a letter or underscore (not a digit)
-        if (final.Length > 0 && char.IsDigit(final[0]))
-            final = "_" + final;
+        if (result.Length > 0 && char.IsDigit(result[0]))
+            result = "_" + result;
 
         // XML names cannot start with "xml" (case-insensitive) as they are reserved
-        if (final.Length >= 3 && final.Substring(0, 3).Equals("xml", System.StringComparison.OrdinalIgnoreCase))
-            final = "_" + final;
+        if (result.Length >= 3 && result.Substring(0, 3).Equals("xml", System.StringComparison.OrdinalIgnoreCase))
+            result = "_" + result;
 
-        return final;
+        return result;
     }
 
     /// <summary>
@@ -435,65 +340,13 @@ public static class StringExtensions
         if (string.IsNullOrEmpty(input))
             return input;
 
-        var result = new StringBuilder();
-        bool nextCharIsUpper = false;
-        bool isFirstChar = true;
-
-        for (int i = 0; i < input.Length; i++)
-        {
-            char c = input[i];
-            char nextChar = i + 1 < input.Length ? input[i + 1] : '\0';
-
-            if (char.IsLetter(c))
-            {
-                if (isFirstChar)
-                {
-                    result.Append(char.ToLower(c));
-                    isFirstChar = false;
-                }
-                else if (nextCharIsUpper)
-                {
-                    result.Append(char.ToUpper(c));
-                    nextCharIsUpper = false;
-                }
-                else if (char.IsUpper(c) && i + 1 < input.Length && char.IsLower(input[i + 1]))
-                {
-                    // Transition from upper to lower = word boundary
-                    result.Append(char.ToUpper(c));
-                    nextCharIsUpper = false;
-                }
-                else
-                {
-                    result.Append(char.ToLower(c));
-                }
-            }
-            else if (char.IsDigit(c))
-            {
-                result.Append(c);
-                isFirstChar = false;
-                nextCharIsUpper = false;
-            }
-            else if (c == '_' || c == '$')
-            {
-                // Preserve underscores and dollar signs (valid JSON identifier characters)
-                result.Append(c);
-                nextCharIsUpper = true; // Capitalize next letter after delimiter
-            }
-            else if (c == '-' || c == '.' || char.IsWhiteSpace(c))
-            {
-                // Convert common delimiters to camelCase transition
-                nextCharIsUpper = true;
-            }
-            // Skip all other characters
-        }
-
-        var final = result.ToString();
+        var result = input.CapitalDelimiters(false, ['_', '$']);
 
         // Ensure it starts with a letter, underscore, or dollar sign (not a digit)
-        if (final.Length > 0 && char.IsDigit(final[0]))
-            final = "_" + final;
+        if (result.Length > 0 && char.IsDigit(result[0]))
+            result = "_" + result;
 
-        return final;
+        return result;
     }
 
     /// <summary>
@@ -513,46 +366,14 @@ public static class StringExtensions
     /// "config-file-path".ToEnvironmentVariableName() returns "CONFIG_FILE_PATH"
     /// "2ndValue".ToEnvironmentVariableName() returns "_2ND_VALUE"
     /// </example>
-    public static string ToEnvironmentVariableName(this string input)
+    public static string ToConstantName(this string input)
     {
         if (string.IsNullOrEmpty(input))
             return input;
 
         // First, use ToSnakeCase to handle camelCase/PascalCase conversions
-        var snakized = input.ToSnakeCase();
-
-        var result = new StringBuilder();
-        bool lastWasDelimiter = false;
-
-        for (int i = 0; i < snakized.Length; i++)
-        {
-            char c = snakized[i];
-
-            if (char.IsLetterOrDigit(c))
-            {
-                result.Append(char.ToUpper(c));
-                lastWasDelimiter = false;
-            }
-            else if (c == '_')
-            {
-                // Preserve underscores
-                if (!lastWasDelimiter)
-                {
-                    result.Append(c);
-                    lastWasDelimiter = true;
-                }
-            }
-            else if (char.IsWhiteSpace(c) || c == '-' || char.IsSymbol(c) || char.IsPunctuation(c))
-            {
-                // Replace other special characters with underscores, avoiding consecutive delimiters
-                if (!lastWasDelimiter && result.Length > 0)
-                {
-                    result.Append('_');
-                    lastWasDelimiter = true;
-                }
-            }
-            // Skip all other characters
-        }
+        var result = input.ToSnakeCase(CasingStyle.ToUpper);
+        result = result.CleanPunctuation('_', c => char.IsWhiteSpace(c) || c == '-' || char.IsSymbol(c) || char.IsPunctuation(c), true);
 
         var final = result.ToString().TrimEnd('_');
 
@@ -661,7 +482,7 @@ public static class StringExtensions
             {
                 // Add hyphen before uppercase letters at word boundaries
                 if (char.IsUpper(c) && result.Length > 0 && result[result.Length - 1] != '-' &&
-                    (char.IsLower(prevChar) || char.IsDigit(prevChar) || 
+                    (char.IsLower(prevChar) || char.IsDigit(prevChar) ||
                      (i + 1 < input.Length && char.IsLower(nextChar))))
                 {
                     result.Append('-');
@@ -691,24 +512,4 @@ public static class StringExtensions
         return result.ToString().TrimEnd('-');
     }
 
-    /// <summary>
-    /// Converts a string to constant name format (SCREAMING_SNAKE_CASE).
-    /// </summary>
-    /// <param name="input">The input string in any format.</param>
-    /// <returns>The string converted to constant format (UPPERCASE with underscores).</returns>
-    /// <remarks>
-    /// Constant names in C# are conventionally uppercase with underscores (SCREAMING_SNAKE_CASE).
-    /// This is equivalent to environment variable naming but emphasizes C# constant intent.
-    /// </remarks>
-    /// <example>
-    /// "MyConstant".ToConstant() returns "MY_CONSTANT"
-    /// "myConstantValue".ToConstant() returns "MY_CONSTANT_VALUE"
-    /// "max-timeout".ToConstant() returns "MAX_TIMEOUT"
-    /// "2ndValue".ToConstant() returns "_2ND_VALUE"
-    /// </example>
-    public static string ToConstant(this string input)
-    {
-        // ToConstant is an alias for ToEnvironmentVariableName with the same implementation
-        return input.ToEnvironmentVariableName();
-    }
 }

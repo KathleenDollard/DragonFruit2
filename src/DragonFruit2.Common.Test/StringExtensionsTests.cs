@@ -19,6 +19,20 @@ public class StringExtensionsTests
         Assert.Equal(expected, result);
     }
 
+    [Theory]
+    [InlineData("XMLParser", "xml-parser")]
+    [InlineData("parseHTMLString", "parse-html-string")]
+    [InlineData("IOError", "io-error")]
+    [InlineData("MyHTTPSConnection", "my-https-connection")]
+    [InlineData("ABC", "abc")]
+    [InlineData("ABCDef", "abc-def")]
+    [InlineData("myABCDef", "my-abc-def")]
+    public void ToKebabCase_HandlesAcronyms(string input, string expected)
+    {
+        var result = input.ToKebabCase();
+        Assert.Equal(expected, result);
+    }
+
     #endregion
 
     #region ToSnakeCase
@@ -31,6 +45,27 @@ public class StringExtensionsTests
     public void ToSnakeCase_ReturnsCorrectFormat(string input, string expected)
     {
         var result = input.ToSnakeCase();
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("XMLParser", "xml_parser")]
+    [InlineData("parseHTMLString", "parse_html_string")]
+    [InlineData("IOError", "io_error")]
+    [InlineData("MyHTTPSConnection", "my_https_connection")]
+    public void ToSnakeCase_HandlesAcronyms(string input, string expected)
+    {
+        var result = input.ToSnakeCase();
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("MyString", CasingStyle.ToUpper, "MY_STRING")]
+    [InlineData("HTTPServer", CasingStyle.ToUpper, "HTTP_SERVER")]
+    [InlineData("myString", CasingStyle.NoChanges, "my_String")]
+    public void ToSnakeCase_RespectsCasingStyle(string input, CasingStyle casing, string expected)
+    {
+        var result = input.ToSnakeCase(casing);
         Assert.Equal(expected, result);
     }
 
@@ -52,6 +87,17 @@ public class StringExtensionsTests
         Assert.Equal(expected, result);
     }
 
+    [Theory]
+    [InlineData("http-server", "HttpServer")]
+    [InlineData("xml-parser", "XmlParser")]
+    [InlineData("io-error", "IoError")]
+    [InlineData("https-connection", "HttpsConnection")]
+    public void ToPascalCase_HandlesAcronyms(string input, string expected)
+    {
+        var result = input.ToPascalCase();
+        Assert.Equal(expected, result);
+    }
+
     #endregion
 
     #region ToCamelCase
@@ -68,6 +114,16 @@ public class StringExtensionsTests
         Assert.Equal(expected, result);
     }
 
+    [Theory]
+    [InlineData("XMLParser", "xmlParser")]
+    [InlineData("IOError", "ioError")]
+    [InlineData("HTTP-Server", "httpServer")]
+    public void ToCamelCase_HandlesAcronyms(string input, string expected)
+    {
+        var result = input.ToCamelCase();
+        Assert.Equal(expected, result);
+    }
+
     #endregion
 
     #region ToDisplayName
@@ -79,6 +135,18 @@ public class StringExtensionsTests
     [InlineData("HTTPServer", "Http Server")]
     [InlineData("simple", "Simple")]
     public void ToDisplayName_ReturnsReadableFormat(string input, string expected)
+    {
+        var result = input.ToDisplayName();
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("XMLParser", "Xml Parser")]
+    [InlineData("parseHTMLString", "Parse Html String")]
+    [InlineData("IOError", "Io Error")]
+    [InlineData("MyHTTPSConnection", "My Https Connection")]
+    [InlineData("ABCDef", "Abc Def")]
+    public void ToDisplayName_HandlesAcronyms(string input, string expected)
     {
         var result = input.ToDisplayName();
         Assert.Equal(expected, result);
@@ -101,6 +169,16 @@ public class StringExtensionsTests
         Assert.Equal(expected, result);
     }
 
+    [Theory]
+    [InlineData("XMLParser", "xml-parser")]
+    [InlineData("HTTPSConnection", "https-connection")]
+    [InlineData("My XML Parser 2.0", "my-xml-parser-2-0")]
+    public void ToUrlSlug_HandlesAcronyms(string input, string expected)
+    {
+        var result = input.ToUrlSlug();
+        Assert.Equal(expected, result);
+    }
+
     #endregion
 
     #region ToEnvironmentVariableName
@@ -117,6 +195,18 @@ public class StringExtensionsTests
         Assert.Equal(expected, result);
     }
 
+    [Theory]
+    [InlineData("HTTPTimeout", "HTTP_TIMEOUT")]
+    [InlineData("XMLParser", "XML_PARSER")]
+    [InlineData("database-connection-string", "DATABASE_CONNECTION_STRING")]
+    [InlineData("myHTTPSConnection", "MY_HTTPS_CONNECTION")]
+    [InlineData("IOError", "IO_ERROR")]
+    public void ToConstantName_HandlesAcronyms(string input, string expected)
+    {
+        var result = input.ToConstantName();
+        Assert.Equal(expected, result);
+    }
+
     #endregion
 
     #region ToConfigName
@@ -128,6 +218,16 @@ public class StringExtensionsTests
     [InlineData("MyApp.Config", "my-app.config")]
     [InlineData("2ndLevelConfig", "2nd-level-config")]
     public void ToConfigName_ReturnsConfigFormat(string input, string expected)
+    {
+        var result = input.ToConfigName();
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("HTTPTimeout", "http-timeout")]
+    [InlineData("XMLParser.config", "xml-parser.config")]
+    [InlineData("MyHTTPSConnection", "my-https-connection")]
+    public void ToConfigName_HandlesAcronyms(string input, string expected)
     {
         var result = input.ToConfigName();
         Assert.Equal(expected, result);
@@ -164,6 +264,16 @@ public class StringExtensionsTests
         Assert.StartsWith("_", result);
     }
 
+    [Theory]
+    [InlineData("HTTPServer", "httpServer")]
+    [InlineData("XMLParser", "_xmlParser")]
+    [InlineData("IOError", "ioError")]
+    public void ToXmlName_HandlesAcronyms(string input, string expected)
+    {
+        var result = input.ToXmlName();
+        Assert.Equal(expected, result);
+    }
+
     #endregion
 
     #region ToJsonName
@@ -184,6 +294,16 @@ public class StringExtensionsTests
     {
         var result = "$variable".ToJsonName();
         Assert.StartsWith("$", result);
+    }
+
+    [Theory]
+    [InlineData("HTTPTimeout", "httpTimeout")]
+    [InlineData("XMLParser", "xmlParser")]
+    [InlineData("IOError", "ioError")]
+    public void ToJsonName_HandlesAcronyms(string input, string expected)
+    {
+        var result = input.ToJsonName();
+        Assert.Equal(expected, result);
     }
 
     #endregion
@@ -220,6 +340,16 @@ public class StringExtensionsTests
     [InlineData("HTTP Server 2.0", "http-server-2-0")]
     [InlineData("simple.txt", "simple-txt")]
     public void ToPosixName_ReturnsPosixCompliantFormat(string input, string expected)
+    {
+        var result = input.ToPosixName();
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("XMLParser", "xml-parser")]
+    [InlineData("HTTPServer.txt", "http-server-txt")]
+    [InlineData("MyIOError", "my-io-error")]
+    public void ToPosixName_HandlesAcronyms(string input, string expected)
     {
         var result = input.ToPosixName();
         Assert.Equal(expected, result);
@@ -310,6 +440,30 @@ public class StringExtensionsTests
         var displayName = input.ToDisplayName();
         // DisplayName should not have consecutive spaces
         Assert.DoesNotContain("  ", displayName);
+    }
+
+    [Theory]
+    [InlineData("HTTP")]
+    [InlineData("XML")]
+    [InlineData("API")]
+    public void AllMethods_HandleFullAcronyms(string input)
+    {
+       
+        Assert.NotNull(input.ToKebabCase());
+        Assert.NotNull(input.ToSnakeCase());
+        Assert.NotNull(input.ToPascalCase());
+        Assert.NotNull(input.ToCamelCase());
+        Assert.NotNull(input.ToDisplayName());
+    }
+
+
+    [Theory]
+    [InlineData("myHTTPSConnectionAPI", "my-https-connection-api")]
+    [InlineData("parseXMLWithHTTPClient", "parse-xml-with-http-client")]
+    public void ToKebabCase_HandlesComplexAcronymPatterns(string input, string expected)
+    {
+        var result = input.ToKebabCase();
+        Assert.Equal(expected, result);
     }
 
     #endregion

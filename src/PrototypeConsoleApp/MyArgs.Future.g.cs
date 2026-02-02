@@ -41,7 +41,7 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
         }
     }
 
-    public IEnumerable<ValidationFailure> Validate()
+    public override IEnumerable<ValidationFailure> Validate()
     {
         var failures = new List<ValidationFailure>();
         InitializeValidators();
@@ -178,6 +178,33 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
             => new MyArgsDataValues();
     }
 
+    // Generation Note: MyArgs in the class declaration is TArgs.
+    public class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
+    {
+        // Generation Note: MyArgs in the following constructor is TRootArgs.
+        public MyArgsDataDefinition(MyArgs rootArgs)
+            : base(rootArgs)
+        {
+            Add(new OptionDataDefinition
+            {
+                FullName = typeof(MyArgs).FullName + "." + nameof(Name),
+                DataType = typeof(string),
+                IsRequired = true,
+            });
+            Add(new OptionDataDefinition
+            {
+                FullName = typeof(MyArgs).FullName + "." + nameof(Age),
+                DataType = typeof(int),
+                IsRequired = false,
+            });
+            Add(new OptionDataDefinition
+            {
+                FullName = typeof(MyArgs).FullName + "." + nameof(Greeting),
+                DataType = typeof(string),
+                IsRequired = false,
+            });
+        }
+    }
 
     // Generation Note: MyArgs in the following class is TRootArgs, except for the private srgsType.
     public class MyArgsDataValues : DataValues<MyArgs>

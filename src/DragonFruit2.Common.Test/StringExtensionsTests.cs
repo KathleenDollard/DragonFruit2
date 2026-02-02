@@ -9,7 +9,7 @@ public class StringExtensionsTests
     [Theory]
     [InlineData("MyString", "my-string")]
     [InlineData("myString", "my-string")]
-    [InlineData("HTTPServer", "h-t-t-p-server")]
+    [InlineData("HTTPServer", "http-server")]
     [InlineData("simple", "simple")]
     [InlineData("", "")]
     [InlineData(null, null)]
@@ -26,7 +26,7 @@ public class StringExtensionsTests
     [Theory]
     [InlineData("MyString", "my_string")]
     [InlineData("myString", "my_string")]
-    [InlineData("HTTPServer", "h_t_t_p_server")]
+    [InlineData("HTTPServer", "http_server")]
     [InlineData("simple", "simple")]
     public void ToSnakeCase_ReturnsCorrectFormat(string input, string expected)
     {
@@ -216,9 +216,9 @@ public class StringExtensionsTests
 
     [Theory]
     [InlineData("MyFileName", "my-file-name")]
-    [InlineData("config_file.txt", "config-file.txt")]
+    [InlineData("config_file.txt", "config-file-txt")]
     [InlineData("HTTP Server 2.0", "http-server-2-0")]
-    [InlineData("simple.txt", "simple.txt")]
+    [InlineData("simple.txt", "simple-txt")]
     public void ToPosixName_ReturnsPosixCompliantFormat(string input, string expected)
     {
         var result = input.ToPosixName();

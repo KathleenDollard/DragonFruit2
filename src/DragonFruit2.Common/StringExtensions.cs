@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace DragonFruit2;
 
@@ -22,14 +22,28 @@ public static class StringExtensions
 
         for (int i = 0; i < input.Length; i++)
         {
-            if (char.IsUpper(input[i]))
+            char current = input[i];
+
+            if (char.IsUpper(current))
             {
-                // Add hyphen only at word boundaries:
-                // - After lowercase or digit
-                // - Before lowercase letter (end of acronym)
-                bool shouldAddDelimiter = i > 0 &&
-                    (char.IsLower(input[i - 1]) || char.IsDigit(input[i - 1]) ||
-                     (i + 1 < input.Length && char.IsLower(input[i + 1])));
+                bool shouldAddDelimiter = false;
+
+                if (i > 0)
+                {
+                    char previous = input[i - 1];
+                
+                    if (char.IsLower(previous) || char.IsDigit(previous))
+                    {
+                        shouldAddDelimiter = true;
+                    }
+                
+                    else if (char.IsUpper(previous) &&
+                             i + 1 < input.Length &&
+                             char.IsLower(input[i + 1]))
+                    {
+                        shouldAddDelimiter = true;
+                    }
+                }
 
                 if (shouldAddDelimiter)
                     result.Append(delimiter);
@@ -37,9 +51,9 @@ public static class StringExtensions
                 result.Append(
                     casing switch
                     {
-                        CasingStyle.ToUpper => char.ToUpper(input[i]),
-                        CasingStyle.ToLower => char.ToLower(input[i]),
-                        _ => input[i],
+                        CasingStyle.ToUpper => char.ToUpperInvariant(current),
+                        CasingStyle.ToLower => char.ToLowerInvariant(current),
+                        _ => current,
                     });
             }
             else
@@ -47,9 +61,9 @@ public static class StringExtensions
                 result.Append(
                     casing switch
                     {
-                        CasingStyle.ToUpper => char.ToUpper(input[i]),
-                        CasingStyle.ToLower => char.ToLower(input[i]),
-                        _ => input[i],
+                        CasingStyle.ToUpper => char.ToUpperInvariant(current),
+                        CasingStyle.ToLower => char.ToLowerInvariant(current),
+                        _ => current,
                     });
             }
         }
@@ -77,25 +91,25 @@ public static class StringExtensions
                 {
                     result.Append(
                         capitalizeFirstChar
-                          ? char.ToUpper(c)
-                          : char.ToLower(c));
+                          ? char.ToUpperInvariant(c)
+                          : char.ToLowerInvariant(c));
                     isFirstChar = false;
                     nextCharIsUpper = false;
                 }
                 else if (nextCharIsUpper)
                 {
-                    result.Append(char.ToUpper(c));
+                    result.Append(char.ToUpperInvariant(c));
                     nextCharIsUpper = false;
                 }
                 else if (char.IsUpper(c) && i + 1 < input.Length && char.IsLower(input[i + 1]))
                 {
                     // Transition from upper to lower = word boundary
-                    result.Append(char.ToUpper(c));
+                    result.Append(char.ToUpperInvariant(c));
                     nextCharIsUpper = false;
                 }
                 else
                 {
-                    result.Append(char.ToLower(c));
+                    result.Append(char.ToLowerInvariant(c));
                     nextCharIsUpper = false;
                 }
             }
@@ -243,16 +257,68 @@ public static class StringExtensions
     /// "myVariableName".ToDisplayName() returns "My Variable Name"
     /// "my_variable_name".ToDisplayName() returns "My Variable Name"
     /// "my-variable-name".ToDisplayName() returns "My Variable Name"
-    /// "HTTPServer".ToDisplayName() returns "H T T P Server"
+    /// "HTTPServer".ToDisplayName() returns "Http Server"
     /// </example>
     public static string ToDisplayName(this string input)
     {
         if (string.IsNullOrEmpty(input))
             return input;
 
-        var result = input.CapitalDelimiters(true, []);
-        result = result.InsertDelimiter(' ', CasingStyle.NoChanges);
-        return result;
+        var result = new StringBuilder();
+        bool shouldCapitalizeNext = true; 
+
+        for (int i = 0; i < input.Length; i++)
+        {
+            char current = input[i];
+            char? previous = i > 0 ? input[i - 1] : null;
+            char? next = i + 1 < input.Length ? input[i + 1] : null;
+
+           
+            if (current == '_' || current == '-' || current == '.' || char.IsWhiteSpace(current))
+            {
+                if (result.Length > 0 && result[result.Length - 1] != ' ')
+                {
+                    result.Append(' ');
+                    shouldCapitalizeNext = true; 
+                }
+                continue;
+            }
+
+            if (char.IsLetterOrDigit(current))
+            {
+               
+                if (char.IsUpper(current) && result.Length > 0 && result[result.Length - 1] != ' ')
+                {
+                  
+                    if (previous.HasValue && (char.IsLower(previous.Value) || char.IsDigit(previous.Value)))
+                    {
+                        result.Append(' ');
+                        shouldCapitalizeNext = true;
+                    }
+                  
+                    else if (previous.HasValue && char.IsUpper(previous.Value) &&
+                             next.HasValue && char.IsLower(next.Value))
+                    {
+                        result.Append(' ');
+                        shouldCapitalizeNext = true;
+                    }
+                }
+
+               
+                if (shouldCapitalizeNext)
+                {
+                    result.Append(char.ToUpperInvariant(current));
+                    shouldCapitalizeNext = false;
+                }
+                else
+                {
+                    result.Append(char.ToLowerInvariant(current));
+                }
+            }
+          
+        }
+
+        return result.ToString();
     }
 
     /// <summary>
@@ -488,7 +554,7 @@ public static class StringExtensions
                     result.Append('-');
                 }
 
-                result.Append(char.ToLower(c));
+                result.Append(char.ToLowerInvariant(c));
                 lastWasDelimiter = false;
             }
             else if (char.IsDigit(c))

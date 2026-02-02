@@ -182,8 +182,8 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
     public class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
     {
         // Generation Note: MyArgs in the following constructor is TArgs.
-        public MyArgsDataDefinition(MyArgs rootArgs)
-            : base(rootArgs)
+        public MyArgsDataDefinition(CommandDataDefinition<MyArgs> parentDataDefinition,CommandDataDefinition<MyArgs> rootDataDefinition)
+            : base(parentDataDefinition, rootDataDefinition)
         {
             Add(new OptionDataDefinition
             {

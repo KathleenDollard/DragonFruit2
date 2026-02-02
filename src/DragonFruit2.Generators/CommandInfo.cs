@@ -6,7 +6,7 @@ namespace DragonFruit2.Generators;
 /// </summary>
 public record class CommandInfo
 {
-    private string? cliName;
+    private string? simpleName;
 
     // TODO: Make these required and use init scope. That will remove warning, but needs some downlevel magic
     public required string Name { get; init; }
@@ -15,17 +15,18 @@ public record class CommandInfo
     public required string ArgsAccessibility {  get; init; }
     public string? BaseName { get; init; }
     public required string? RootName { get; init; }
-    public string? CliName
+
+    public string? SimpleName
     {
-        get => cliName switch
+        get => simpleName switch
         {
-            null => $"{ToCliName(Name)}",
-            _ => cliName
+            null => $"{ToSimpleName(Name)}",
+            _ => simpleName
         };
-        init => cliName = value;
+        init => simpleName = value;
     }
 
-    private string ToCliName(string name)
+    private string ToSimpleName(string name)
     {
         name = Name.EndsWith("Args")
                ? Name.Substring(0, Name.Length - 4)
@@ -34,12 +35,11 @@ public record class CommandInfo
     }
     public CommandInfo? ParentCommandInfo { get; set; } = null;
 
-    public string? Description { get; init; } = null;
-    public bool IsStruct { get; init; }
-
     public List<PropInfo> Arguments => field ??= [];
 
     public List<PropInfo> Options => field ??= [];
+
+    public List<CommandInfo> SubCommands => field ??= [];
 
     public IEnumerable<PropInfo> PropInfos => Options.Concat(Arguments);
     public IEnumerable<PropInfo> SelfAndAncestorPropInfos
@@ -62,7 +62,5 @@ public record class CommandInfo
             }
         }
     }
-
-    public List<CommandInfo> SubCommands => field ??= [];
 }
 

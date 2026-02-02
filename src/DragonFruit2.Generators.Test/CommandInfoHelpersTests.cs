@@ -25,7 +25,6 @@ public class CommandInfoHelpersTests
         Assert.Equal("TestCli", result.CliNamespaceName);
         Assert.Null(result.BaseName);
         Assert.Equal(typeName, result.RootName);
-        Assert.False(result.IsStruct);
     }
 
     [Fact]
@@ -45,19 +44,6 @@ public class CommandInfoHelpersTests
         Assert.Equal("DerivedArgs", result.Name);
         Assert.Equal("BaseArgs", result.BaseName);
         Assert.Equal("BaseArgs", result.RootName);
-    }
-
-    [Fact]
-    public void CreateCommandInfo_StructType_SetsIsStruct()
-    {
-        var source = "namespace TestNamespace; public struct MyArgs { }";
-        var compilation = TestHelpers.GetCompilation(source, "");
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
-        Assert.NotNull(typeSymbol);
-
-        var result = CommandInfoHelpers.CreateCommandInfo(typeSymbol, "MyArgs", "TestCli");
-
-        Assert.True(result.IsStruct);
     }
 
     [Theory]

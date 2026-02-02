@@ -20,7 +20,6 @@ public static class CommandInfoHelpers
             ArgsAccessibility = typeSymbol.DeclaredAccessibility.ToCSharpString(),
             BaseName = baseTypeName,
             RootName = rootName,
-            IsStruct = typeSymbol.IsValueType,
         };
     }
 

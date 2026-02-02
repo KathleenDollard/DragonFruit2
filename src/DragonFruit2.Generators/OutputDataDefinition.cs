@@ -20,8 +20,8 @@ public class OutputDataDefinition
     }
     private static void Constructor(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenConstructor($"""public {commandInfo.Name}DataDefinition({commandInfo.RootName} rootArgs)""",
-              $"""base(rootArgs)""");
+        sb.OpenConstructor($"""public {commandInfo.Name}DataDefinition(CommandDataDefinition<{commandInfo.RootName}> parentDataDefinition, CommandDataDefinition<{commandInfo.RootName}> rootDataDefinition)""",
+              $"""base(parentDataDefinition, rootDataDefinition)""");
 
         foreach (var optionInfo in commandInfo.Options)
         {

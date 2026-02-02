@@ -36,14 +36,10 @@ internal static class OutputArgsBuilder
 
     private static void InitializeCli(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        var commandDescription = commandInfo.Description is null
-                                  ? "null"
-                                  : $"\"{commandInfo.Description.Replace("\"", "\"\"")}\"";
         sb.OpenMethod($"""public override Command InitializeCli(Builder<{commandInfo.RootName}> builder, CliDataProvider<{commandInfo.RootName}>? cliDataProvider)""");
 
-        sb.AppendLine($"""var cmd = new System.CommandLine.{(commandInfo.BaseName is null ? "Root" : "")}Command("{commandInfo.CliName}")""");
+        sb.AppendLine($"""var cmd = new System.CommandLine.{(commandInfo.BaseName is null ? "Root" : "")}Command("{commandInfo.SimpleName}")""");
         sb.OpenCurly();
-        sb.AppendLine($"""Description = {commandDescription},""");
         sb.CloseCurly(endStatement: true);
 
         sb.AppendLine();

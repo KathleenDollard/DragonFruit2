@@ -3,13 +3,13 @@
 
 public class CommandDataDefinition : DataDefinition
 {
-    public CommandDataDefinition(ArgsRootBase argsRoot)
+    public CommandDataDefinition(CommandDataDefinition parentDataDefinition, CommandDataDefinition rootDataDefinition)
     {
-        ArgsRoot = argsRoot;
+        ParentDataDefinition = parentDataDefinition;
     }
-    public bool IsBranch { get; set; }
+    public required CommandDataDefinition ParentDataDefinition { get; init; }
+    // IsOptionStyle is not yet implemented, and will indicate whether the option performs an action, thus behaving like a command
     public bool IsOptionStyle { get; set; }
-    public ArgsRootBase ArgsRoot { get;  }
 
     private readonly List<OptionDataDefinition> _options = [];
     private readonly List<ArgumentDataDefinition> _arguments = [];
@@ -24,7 +24,9 @@ public class CommandDataDefinition : DataDefinition
     public void Add(CommandDataDefinition subcommand) => _subcommands.Add(subcommand);
 }
 
-public class CommandDataDefinition<TArgs>(ArgsRootBase argsRoot) 
-    : CommandDataDefinition(argsRoot)
+public class CommandDataDefinition<TArgs> : CommandDataDefinition
 {
+    public CommandDataDefinition(CommandDataDefinition parentDataDefinition, CommandDataDefinition rootDataDefinition) : base(parentDataDefinition, rootDataDefinition)
+    {
+    }
 }

@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace DragonFruit2.Generators;
 
-    public static class Helpers
+public static class Helpers
 {
     extension(Accessibility accessibility)
     {

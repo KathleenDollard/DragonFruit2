@@ -3,11 +3,17 @@
 
 public class CommandDataDefinition : DataDefinition
 {
-    public CommandDataDefinition(CommandDataDefinition parentDataDefinition, CommandDataDefinition rootDataDefinition)
+    public CommandDataDefinition(string fullName,
+                                 CommandDataDefinition? parentDataDefinition,
+                                 CommandDataDefinition? rootDataDefinition)
+        : base(fullName)
     {
         ParentDataDefinition = parentDataDefinition;
+        RootDataDefinition = rootDataDefinition ?? this;
     }
-    public required CommandDataDefinition ParentDataDefinition { get; init; }
+    public CommandDataDefinition? ParentDataDefinition { get;  }
+    public CommandDataDefinition RootDataDefinition { get;  }
+
     // IsOptionStyle is not yet implemented, and will indicate whether the option performs an action, thus behaving like a command
     public bool IsOptionStyle { get; set; }
 
@@ -26,7 +32,8 @@ public class CommandDataDefinition : DataDefinition
 
 public class CommandDataDefinition<TArgs> : CommandDataDefinition
 {
-    public CommandDataDefinition(CommandDataDefinition parentDataDefinition, CommandDataDefinition rootDataDefinition) : base(parentDataDefinition, rootDataDefinition)
+    public CommandDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition) 
+        : base(typeof(TArgs).FullName!,parentDataDefinition, rootDataDefinition)
     {
     }
 }

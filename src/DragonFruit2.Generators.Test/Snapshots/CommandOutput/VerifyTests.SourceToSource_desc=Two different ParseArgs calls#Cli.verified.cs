@@ -26,14 +26,14 @@ public class Cli
     {
         if (typeof(TRootArgs) == typeof(MyArgs))
         {
-            var builder = new Builder<MyArgs>(new MyArgs.MyArgsArgsBuilder());
+            var builder = new Builder<MyArgs>(new MyArgs.MyArgsArgsBuilder(null, null));
             return builder is Builder<TRootArgs> typedBuilder
                   ? typedBuilder
                   : throw new InvalidOperationException("Type mismatch creating builder.");
         }
         if (typeof(TRootArgs) == typeof(MyOtherArgs))
         {
-            var builder = new Builder<MyOtherArgs>(new MyOtherArgs.MyOtherArgsArgsBuilder());
+            var builder = new Builder<MyOtherArgs>(new MyOtherArgs.MyOtherArgsArgsBuilder(null, null));
             return builder is Builder<TRootArgs> typedBuilder
                   ? typedBuilder
                   : throw new InvalidOperationException("Type mismatch creating builder.");

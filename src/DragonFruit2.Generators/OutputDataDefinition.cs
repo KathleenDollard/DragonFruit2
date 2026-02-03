@@ -20,12 +20,13 @@ public class OutputDataDefinition
     }
     private static void Constructor(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenConstructor($"""public {commandInfo.Name}DataDefinition(CommandDataDefinition<{commandInfo.RootName}> parentDataDefinition, CommandDataDefinition<{commandInfo.RootName}> rootDataDefinition)""",
+        sb.OpenConstructor($"""public {commandInfo.Name}DataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)""",
               $"""base(parentDataDefinition, rootDataDefinition)""");
 
+        sb.AppendLine($"string fullArgsName = typeof({commandInfo.FullName}).FullName!;");
         foreach (var optionInfo in commandInfo.Options)
         {
-            sb.AppendLine($"""Add(new OptionDataDefinition""");
+            sb.AppendLine($"""Add(new OptionDataDefinition(fullArgsName + nameof({optionInfo.Name}))""");
             sb.OpenCurly();
             AddMemberInfo(sb, optionInfo);
             sb.CloseCurly(closeParens: true, endStatement: true);
@@ -33,19 +34,34 @@ public class OutputDataDefinition
 
         foreach (var argumentInfo in commandInfo.Arguments)
         {
-            sb.AppendLine($"""Add(new OptionDataDefinition""");
+            sb.AppendLine($"""Add(new ArgumentDataDefinition(fullArgsName + nameof({argumentInfo.Name}))""");
             sb.OpenCurly();
             AddMemberInfo(sb, argumentInfo);
             sb.CloseCurly(closeParens: true, endStatement: true);
         }
+
+        foreach (var subcommandInfo in commandInfo.SubCommands)
+        {
+            AddSubcommandInfo(sb, subcommandInfo);
+        }
+
         sb.CloseConstructor();
 
         static void AddMemberInfo(StringBuilderWrapper sb, PropInfo propInfo)
         {
-            sb.AppendLine($"""FullName = typeof({propInfo.ContainingTypeName}).FullName + nameof({propInfo.Name}), """);
             sb.AppendLine($"""DataType = typeof({propInfo.TypeName}), """);
             sb.AppendLine($"""IsRequired = {sb.CSharpString(propInfo.IsRequiredForCli)}, """);
         }
+
+        static void AddSubcommandInfo(StringBuilderWrapper sb, CommandInfo subcommandInfo)
+        {
+            sb.AppendLine($"Add(new CommandDataDefinition(typeof({subcommandInfo.Name}).FullName,this, this.RootDataDefinition)");
+            sb.OpenCurly();
+            sb.CloseCurly(closeParens: true, endStatement: true);
+
+        }
     }
+
+
 
 }

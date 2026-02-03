@@ -11,6 +11,10 @@ public record class CommandInfo
     // TODO: Make these required and use init scope. That will remove warning, but needs some downlevel magic
     public required string Name { get; init; }
     public string? NamespaceName { get; init; }
+    public string FullName
+        => NamespaceName is null
+            ? Name
+            : $"{NamespaceName}.{Name}";
     public string? CliNamespaceName { get; init; }
     public required string ArgsAccessibility {  get; init; }
     public string? BaseName { get; init; }

@@ -2,10 +2,10 @@
   {
     Name: MyArgs,
     NamespaceName: MyNamespace,
+    FullName: MyNamespace.MyArgs,
     ArgsAccessibility: public,
     RootName: MyArgs,
-    CliName: my,
-    IsStruct: false,
+    SimpleName: my,
     Options: [
       {
         Name: Name,
@@ -20,44 +20,15 @@
         IsRequiredForCli: true
       }
     ],
-    PropInfos: [
-      {
-        Name: Name,
-        CliName: --name,
-        TypeName: string,
-        ContainingTypeName: MyArgs,
-        IsValueType: false,
-        HasRequiredModifier: true,
-        HasArgumentAttribute: false,
-        IsArgument: false,
-        HasInitializer: false,
-        IsRequiredForCli: true
-      }
-    ],
-    SelfAndAncestorPropInfos: [
-      {
-        Name: Name,
-        CliName: --name,
-        TypeName: string,
-        ContainingTypeName: MyArgs,
-        IsValueType: false,
-        HasRequiredModifier: true,
-        HasArgumentAttribute: false,
-        IsArgument: false,
-        HasInitializer: false,
-        IsRequiredForCli: true
-      }
-    ],
-    AncestorPropInfos: [],
     SubCommands: [
       {
         Name: MorningGreetingArgs,
         NamespaceName: MyNamespace,
+        FullName: MyNamespace.MorningGreetingArgs,
         ArgsAccessibility: public,
         BaseName: MyArgs,
         RootName: MyArgs,
-        CliName: morning-greeting,
-        IsStruct: false,
+        SimpleName: morning-greeting,
         PropInfos: [],
         SelfAndAncestorPropInfos: [],
         AncestorPropInfos: []
@@ -65,11 +36,11 @@
       {
         Name: EveningGreetingArgs,
         NamespaceName: MyNamespace,
+        FullName: MyNamespace.EveningGreetingArgs,
         ArgsAccessibility: public,
         BaseName: MyArgs,
         RootName: MyArgs,
-        CliName: evening-greeting,
-        IsStruct: false,
+        SimpleName: evening-greeting,
         Options: [
           {
             Name: Age,
@@ -150,6 +121,35 @@
         ],
         AncestorPropInfos: []
       }
-    ]
+    ],
+    PropInfos: [
+      {
+        Name: Name,
+        CliName: --name,
+        TypeName: string,
+        ContainingTypeName: MyArgs,
+        IsValueType: false,
+        HasRequiredModifier: true,
+        HasArgumentAttribute: false,
+        IsArgument: false,
+        HasInitializer: false,
+        IsRequiredForCli: true
+      }
+    ],
+    SelfAndAncestorPropInfos: [
+      {
+        Name: Name,
+        CliName: --name,
+        TypeName: string,
+        ContainingTypeName: MyArgs,
+        IsValueType: false,
+        HasRequiredModifier: true,
+        HasArgumentAttribute: false,
+        IsArgument: false,
+        HasInitializer: false,
+        IsRequiredForCli: true
+      }
+    ],
+    AncestorPropInfos: []
   }
 ]

@@ -43,19 +43,21 @@ public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
 
     static partial void RegisterCustomDefaults(Builder<MyOtherArgs> builder, DefaultDataProvider<MyOtherArgs> defaultDataProvider);
 
-    public static ArgsBuilder<MyOtherArgs> GetArgsBuilder(Builder<MyOtherArgs> builder)
+    public static ArgsBuilder<MyOtherArgs> GetArgsBuilder(Builder<MyOtherArgs> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
     {
-        return new MyOtherArgs.MyOtherArgsArgsBuilder();
+        return new MyOtherArgs.MyOtherArgsArgsBuilder(parentDataDefinition, rootDataDefinition);
     }
 
     /// <summary>
     ///  This static builder supplies the CLI declaration and filling the Result and return instance.
     /// </summary>
-    /// <remarks>
-    ///  The first type argument of the base is the Args type this builder creates, and the second is the root Args type. This means the two type arguments are the same for the root ArgsBuilder, but will differ for subcommand ArgsBuilders.
-    /// </remarks>
     internal class MyOtherArgsArgsBuilder : ArgsBuilder<MyOtherArgs>
     {
+
+        public MyOtherArgsArgsBuilder(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+            : base(new MyOtherArgsDataDefinition(parentDataDefinition, rootDataDefinition), () => new MyOtherArgsDataValues())
+        {
+        }
 
         public override void Initialize(Builder<MyOtherArgs> builder)
         {
@@ -67,7 +69,6 @@ public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
         {
             var cmd = new System.CommandLine.RootCommand("my-other")
             {
-                Description = null,
             };
 
             cmd.SetAction(p => { ArgsBuilderCache<MyOtherArgs>.ActiveArgsBuilder = this; return ; });
@@ -94,20 +95,6 @@ public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
                       .Where(x => x is not null)
                       .Select(x => x!);
         }
-
-        protected override DataValues<MyOtherArgs> CreateDataValues()
-        {
-            return new MyOtherArgsDataValues();
-        }
-
-        protected override MyOtherArgs CreateInstance(DataValues dataValues)
-        {
-            if (dataValues is not MyOtherArgsDataValues typedDataValues)
-            {
-                throw new InvalidOperationException("Internal error: passed incorrect data values");
-            }
-
-            return new MyOtherArgs();        }
     }
 
     public class MyOtherArgsDataValues : DataValues<MyOtherArgs>
@@ -118,5 +105,23 @@ public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
         }
 
         private Type argsType = typeof(MyOtherArgs);
+
+        protected override MyOtherArgs CreateInstance()
+        {
+            return new MyOtherArgs();        }
+    }
+
+    /// <summary>
+    ///  The data definition is available to data providers and are used for initialization.
+    /// </summary>
+    internal class MyOtherArgsDataDefinition : CommandDataDefinition<MyOtherArgs>
+    {
+
+        public MyOtherArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+            : base(parentDataDefinition, rootDataDefinition)
+        {
+            string fullArgsName = typeof(MyOtherArgs).FullName!;
+        }
+
     }
 }

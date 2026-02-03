@@ -62,19 +62,21 @@ namespace MyNamespace
 
         static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-        public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder)
+        public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
         {
-            return new EveningGreetingArgs.EveningGreetingArgsArgsBuilder();
+            return new EveningGreetingArgs.EveningGreetingArgsArgsBuilder(parentDataDefinition, rootDataDefinition);
         }
 
         /// <summary>
         ///  This static builder supplies the CLI declaration and filling the Result and return instance.
         /// </summary>
-        /// <remarks>
-        ///  The first type argument of the base is the Args type this builder creates, and the second is the root Args type. This means the two type arguments are the same for the root ArgsBuilder, but will differ for subcommand ArgsBuilders.
-        /// </remarks>
         internal class EveningGreetingArgsArgsBuilder : ArgsBuilder<MyArgs>
         {
+
+            public EveningGreetingArgsArgsBuilder(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+                : base(new EveningGreetingArgsDataDefinition(parentDataDefinition, rootDataDefinition), () => new EveningGreetingArgsDataValues())
+            {
+            }
 
             public override void Initialize(Builder<MyArgs> builder)
             {
@@ -86,7 +88,6 @@ namespace MyNamespace
             {
                 var cmd = new System.CommandLine.Command("evening-greeting")
                 {
-                    Description = null,
                 };
 
                 var ageOption = new Option<int>("--age")
@@ -121,20 +122,6 @@ namespace MyNamespace
                           .Where(x => x is not null)
                           .Select(x => x!);
             }
-
-            protected override DataValues<MyArgs> CreateDataValues()
-            {
-                return new EveningGreetingArgsDataValues();
-            }
-
-            protected override MyArgs CreateInstance(DataValues dataValues)
-            {
-                if (dataValues is not EveningGreetingArgsDataValues typedDataValues)
-                {
-                    throw new InvalidOperationException("Internal error: passed incorrect data values");
-                }
-
-                return new EveningGreetingArgs(typedDataValues.Age, typedDataValues.Name);            }
         }
 
         public class EveningGreetingArgsDataValues : DataValues<MyArgs>
@@ -149,6 +136,29 @@ namespace MyNamespace
             private Type argsType = typeof(EveningGreetingArgs);
             public DataValue<int> Age { get; } = DataValue<int>.Create(nameof(Age), typeof(EveningGreetingArgs));
             public DataValue<string> Name { get; } = DataValue<string>.Create(nameof(Name), typeof(EveningGreetingArgs));
+
+            protected override EveningGreetingArgs CreateInstance()
+            {
+                return new EveningGreetingArgs(Age, Name);            }
+        }
+
+        /// <summary>
+        ///  The data definition is available to data providers and are used for initialization.
+        /// </summary>
+        internal class EveningGreetingArgsDataDefinition : CommandDataDefinition<EveningGreetingArgs>
+        {
+
+            public EveningGreetingArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+                : base(parentDataDefinition, rootDataDefinition)
+            {
+                string fullArgsName = typeof(MyNamespace.EveningGreetingArgs).FullName!;
+                Add(new OptionDataDefinition(fullArgsName + nameof(Age))
+                {
+                    DataType = typeof(int), 
+                    IsRequired = false, 
+                });
+            }
+
         }
     }
 }

@@ -46,19 +46,21 @@ namespace MyNamespace
 
         static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-        public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder)
+        public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
         {
-            return new Bar.BarArgsBuilder();
+            return new Bar.BarArgsBuilder(parentDataDefinition, rootDataDefinition);
         }
 
         /// <summary>
         ///  This static builder supplies the CLI declaration and filling the Result and return instance.
         /// </summary>
-        /// <remarks>
-        ///  The first type argument of the base is the Args type this builder creates, and the second is the root Args type. This means the two type arguments are the same for the root ArgsBuilder, but will differ for subcommand ArgsBuilders.
-        /// </remarks>
         internal class BarArgsBuilder : ArgsBuilder<MyArgs>
         {
+
+            public BarArgsBuilder(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+                : base(new BarDataDefinition(parentDataDefinition, rootDataDefinition), () => new BarDataValues())
+            {
+            }
 
             public override void Initialize(Builder<MyArgs> builder)
             {
@@ -70,7 +72,6 @@ namespace MyNamespace
             {
                 var cmd = new System.CommandLine.Command("bar")
                 {
-                    Description = null,
                 };
 
                 cmd.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return 22; });
@@ -96,20 +97,6 @@ namespace MyNamespace
                           .Where(x => x is not null)
                           .Select(x => x!);
             }
-
-            protected override DataValues<MyArgs> CreateDataValues()
-            {
-                return new BarDataValues();
-            }
-
-            protected override MyArgs CreateInstance(DataValues dataValues)
-            {
-                if (dataValues is not BarDataValues typedDataValues)
-                {
-                    throw new InvalidOperationException("Internal error: passed incorrect data values");
-                }
-
-                return new Bar(typedDataValues.Age, typedDataValues.Name);            }
         }
 
         public class BarDataValues : DataValues<MyArgs>
@@ -124,6 +111,24 @@ namespace MyNamespace
             private Type argsType = typeof(Bar);
             public DataValue<int> Age { get; } = DataValue<int>.Create(nameof(Age), typeof(Bar));
             public DataValue<string> Name { get; } = DataValue<string>.Create(nameof(Name), typeof(Bar));
+
+            protected override Bar CreateInstance()
+            {
+                return new Bar(Age, Name);            }
+        }
+
+        /// <summary>
+        ///  The data definition is available to data providers and are used for initialization.
+        /// </summary>
+        internal class BarDataDefinition : CommandDataDefinition<Bar>
+        {
+
+            public BarDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+                : base(parentDataDefinition, rootDataDefinition)
+            {
+                string fullArgsName = typeof(MyNamespace.Bar).FullName!;
+            }
+
         }
     }
 }

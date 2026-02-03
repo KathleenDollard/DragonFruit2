@@ -27,7 +27,7 @@ public class Cli
     {
         if (typeof(TRootArgs) == typeof(MyArgs))
         {
-            var builder = new Builder<MyArgs>(new MyArgs.MyArgsArgsBuilder());
+            var builder = new Builder<MyArgs>(new MyArgs.MyArgsArgsBuilder(null, null));
             return builder is Builder<TRootArgs> typedBuilder
                   ? typedBuilder
                   : throw new InvalidOperationException("Type mismatch creating builder.");

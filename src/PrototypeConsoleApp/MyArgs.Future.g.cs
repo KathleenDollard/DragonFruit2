@@ -5,6 +5,7 @@ using DragonFruit2;
 using DragonFruit2.Validators;
 using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace SampleConsoleApp;
 
@@ -74,9 +75,11 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
 
     static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-    public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder)
+    public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder,
+                                CommandDataDefinition? parentCommandDataDefinition,
+                                CommandDataDefinition? rootDataDefinition)
     {
-        return new MyArgs.MyArgsBuilder();
+        return new MyArgs.MyArgsBuilder(parentCommandDataDefinition, rootDataDefinition);
     }
 
     /// <summary>
@@ -91,11 +94,16 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
     /// </remarks>
     internal class MyArgsBuilder : ArgsBuilder<MyArgs>
     {
-        static MyArgsBuilder()
-        {
-            ArgsBuilderCache<MyArgs>.AddArgsBuilder<MyArgs>(new MyArgsBuilder());
-        }
+        //static MyArgsBuilder()
+        //{
+        //    ArgsBuilderCache<MyArgs>.AddArgsBuilder<MyArgs>(new MyArgsBuilder());
+        //}
 
+        public MyArgsBuilder(CommandDataDefinition? parentDataDefinition,
+                             CommandDataDefinition? rootDataDefinition)
+            : base(new MyArgsDataDefinition(parentDataDefinition, rootDataDefinition), () => new MyArgsDataValues())
+        {
+        }
 
         public override void Initialize(Builder<MyArgs> builder)
         {
@@ -150,16 +158,6 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
             RegisterCustomDefaults(builder, defaultDataProvider);
         }
 
-        protected override MyArgs CreateInstance(DataValues dataValues)
-        {
-            if (dataValues is not MyArgsDataValues typedDataValues)
-            {
-                throw new InvalidOperationException("Internal error: passed incorrect data values");
-            }
-
-            return new MyArgs(typedDataValues.Name, typedDataValues.Age, typedDataValues.Greeting);
-        }
-
         protected override IEnumerable<ValidationFailure> CheckRequiredValues(DataValues dataValues)
         {
             if (dataValues is not MyArgsDataValues typedDataValues)
@@ -173,33 +171,28 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
                     .Where(x => x is not null)
                     .Select(x => x!);
         }
-
-        protected override DataValues<MyArgs> CreateDataValues()
-            => new MyArgsDataValues();
     }
 
     // Generation Note: MyArgs in the class declaration is TArgs.
     public class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
     {
         // Generation Note: MyArgs in the following constructor is TArgs.
-        public MyArgsDataDefinition(CommandDataDefinition<MyArgs> parentDataDefinition,CommandDataDefinition<MyArgs> rootDataDefinition)
+        public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
             : base(parentDataDefinition, rootDataDefinition)
         {
-            Add(new OptionDataDefinition
+            string fullName = typeof(MyArgs).FullName!;
+            Add(new OptionDataDefinition(fullName + "." + nameof(Name))
             {
-                FullName = typeof(MyArgs).FullName + "." + nameof(Name),
                 DataType = typeof(string),
                 IsRequired = true,
             });
-            Add(new OptionDataDefinition
+            Add(new OptionDataDefinition(fullName + "." + nameof(Age))
             {
-                FullName = typeof(MyArgs).FullName + "." + nameof(Age),
                 DataType = typeof(int),
                 IsRequired = false,
             });
-            Add(new OptionDataDefinition
+            Add(new OptionDataDefinition(fullName + "." + nameof(Greeting))
             {
-                FullName = typeof(MyArgs).FullName + "." + nameof(Greeting),
                 DataType = typeof(string),
                 IsRequired = false,
             });
@@ -220,6 +213,11 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
 
         public DataValue<string> Name { get; } = DataValue<string>.Create(nameof(Name), typeof(MyArgs));
         public DataValue<int> Age { get; } = DataValue<int>.Create(nameof(Age), typeof(int));
-        public DataValue<string> Greeting {  get; }= DataValue<string>.Create(nameof(Greeting), typeof(string));
+        public DataValue<string> Greeting { get; } = DataValue<string>.Create(nameof(Greeting), typeof(string));
+
+        protected override MyArgs CreateInstance()
+        {
+            return new MyArgs(Name, Age, Greeting);
+        }
     }
 }

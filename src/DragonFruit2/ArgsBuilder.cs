@@ -22,9 +22,17 @@ public abstract class ArgsBuilder<TRootArgs> : ArgsBuilder
 
     public abstract void Initialize(Builder<TRootArgs> builder);
     public abstract Command InitializeCli(Builder<TRootArgs> builder, CliDataProvider<TRootArgs>? cliDataProvider);
-    protected abstract TRootArgs CreateInstance(DataValues dataValues);
     protected abstract IEnumerable<ValidationFailure> CheckRequiredValues(DataValues dataValues);
-    protected abstract DataValues<TRootArgs> CreateDataValues();
+
+    private readonly Func<DataValues<TRootArgs>> _createDataValues;
+
+    protected ArgsBuilder(CommandDataDefinition commandDataDefintion, Func<DataValues<TRootArgs>> createDataValues)
+    {
+        CommandDataDefinition = commandDataDefintion;
+        _createDataValues = createDataValues;
+    }
+
+    public readonly CommandDataDefinition CommandDataDefinition;
 
     public Builder<TRootArgs>? Builder
     {
@@ -38,7 +46,7 @@ public abstract class ArgsBuilder<TRootArgs> : ArgsBuilder
     public Result<TRootArgs> CreateArgs(Builder<TRootArgs> builder, IEnumerable<ValidationFailure>? existingFailures)
     {
         existingFailures ??= Enumerable.Empty<ValidationFailure>();
-        var dataValues = CreateDataValues();
+        var dataValues = _createDataValues();
         foreach (var dataProvider in builder.DataProviders)
         {
             dataValues.SetDataValues(dataProvider);
@@ -49,7 +57,7 @@ public abstract class ArgsBuilder<TRootArgs> : ArgsBuilder
         TRootArgs? args = null;
         if (!currentFailures.Any(x => x.Severity == DiagnosticSeverity.Error))
         {
-            args = CreateInstance(dataValues);
+            args = dataValues.CreateInstance();
         }
 
         var result = new Result<TRootArgs>(currentFailures, args);

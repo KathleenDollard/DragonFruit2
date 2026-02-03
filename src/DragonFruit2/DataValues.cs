@@ -10,4 +10,6 @@ public abstract class DataValues<TRootArgs> : DataValues
     where TRootArgs : ArgsRootBase<TRootArgs>
 {
     public abstract void SetDataValues(DataProvider<TRootArgs> dataProvoder);
+
+    protected internal abstract TRootArgs CreateInstance();
 }

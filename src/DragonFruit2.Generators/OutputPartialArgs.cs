@@ -158,8 +158,8 @@ internal class OutputPartialArgs
 
     internal static void GetArgsBuilder(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenMethod($"public static ArgsBuilder<{commandInfo.RootName}> GetArgsBuilder(Builder<{commandInfo.RootName}> builder)");
-        sb.AppendLine($"return new {commandInfo.Name}.{commandInfo.Name}ArgsBuilder();");
+        sb.OpenMethod($"public static ArgsBuilder<{commandInfo.RootName}> GetArgsBuilder(Builder<{commandInfo.RootName}> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)");
+        sb.AppendLine($"return new {commandInfo.Name}.{commandInfo.Name}ArgsBuilder(parentDataDefinition, rootDataDefinition);");
         sb.CloseMethod();
     }
 }

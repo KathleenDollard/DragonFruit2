@@ -1,4 +1,6 @@
-﻿namespace DragonFruit2.Generators;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace DragonFruit2.Generators;
 
 internal static class OutputArgsBuilder
 {
@@ -6,11 +8,10 @@ internal static class OutputArgsBuilder
     {
         OpenClass(commandInfo, sb);
 
+        Constructor(sb, commandInfo);
         Initialize(sb, commandInfo);
         sb.AppendLine();
         CheckRequiredValues(sb, commandInfo);  // not yet implemented
-        CreateDataValues(sb, commandInfo);
-        CreateInstance(sb, commandInfo);
 
         sb.CloseClass();
     }
@@ -22,6 +23,12 @@ internal static class OutputArgsBuilder
         sb.OpenClass($"internal class {commandInfo.Name}ArgsBuilder : ArgsBuilder<{commandInfo.RootName}>");
     }
 
+    private static void Constructor(StringBuilderWrapper sb, CommandInfo commandInfo)
+    {
+        sb.OpenConstructor($"""public {commandInfo.Name}ArgsBuilder(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)""",
+              $"""base(new {commandInfo.Name}DataDefinition(parentDataDefinition, rootDataDefinition), () => new {commandInfo.Name}DataValues())""");
+        sb.CloseConstructor();
+    }
 
     private static void Initialize(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
@@ -49,7 +56,7 @@ internal static class OutputArgsBuilder
         }
         foreach (var argumentInfo in commandInfo.Arguments)
         {
-            GetArgumentDeclaration(sb, commandInfo,argumentInfo);
+            GetArgumentDeclaration(sb, commandInfo, argumentInfo);
         }
         foreach (var subcommand in commandInfo.SubCommands)
         {
@@ -117,7 +124,7 @@ internal static class OutputArgsBuilder
     internal static void GetSubCommandDeclaration(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
         string symbolName = $"{OutputHelpers.GetLocalSymbolName(commandInfo.Name)}Command";
-        sb.AppendLine($"""var {symbolName} = {commandInfo.Name}.GetArgsBuilder(builder).InitializeCli(builder, cliDataProvider);""");
+        sb.AppendLine($"""var {symbolName} = {commandInfo.Name}.GetArgsBuilder(builder, this.CommandDataDefinition, this.CommandDataDefinition.RootDataDefinition).InitializeCli(builder, cliDataProvider);""");
         sb.AppendLine($"""cmd.Add({symbolName});""");
         sb.AppendLine();
     }
@@ -125,21 +132,6 @@ internal static class OutputArgsBuilder
     private static void AddSymbolToLookup(StringBuilderWrapper sb, CommandInfo commandInfo, PropInfo propInfo, string symbolName)
     {
         sb.AppendLine($"""cliDataProvider.AddNameLookup((typeof({commandInfo.Name}), nameof({propInfo.Name})), {symbolName});""");
-    }
-
-    private static void CreateInstance(StringBuilderWrapper sb, CommandInfo commandInfo)
-    {
-        sb.OpenMethod($"""protected override {commandInfo.RootName} CreateInstance(DataValues dataValues)""");
-
-        sb.OpenIf($"dataValues is not {commandInfo.Name}DataValues typedDataValues");
-        sb.AppendLine("throw new InvalidOperationException(\"Internal error: passed incorrect data values\");");
-        sb.CloseIf();
-
-        var ctorArguments = commandInfo.SelfAndAncestorPropInfos.Select(p => $"typedDataValues.{p.Name}");
-        sb.AppendLine();
-        sb.Append($"return new {commandInfo.Name}({string.Join(", ", ctorArguments)});");
-        sb.CloseMethod();
-
     }
 
     private static void CheckRequiredValues(StringBuilderWrapper sb, CommandInfo commandInfo)
@@ -168,11 +160,5 @@ internal static class OutputArgsBuilder
         sb.CloseMethod();
     }
 
-    private static void CreateDataValues(StringBuilderWrapper sb, CommandInfo commandInfo)
-    {
-        sb.OpenMethod($"""protected override DataValues<{commandInfo.RootName}> CreateDataValues()""");
-        sb.AppendLine($"return new {commandInfo.Name}DataValues();");
-        sb.CloseMethod();
-    }
 }
 

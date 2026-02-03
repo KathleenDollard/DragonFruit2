@@ -75,7 +75,7 @@ public class OutputCli
         {
             var rootName = rootCommandInfo.Name;
             sb.OpenIf($"typeof(TRootArgs) == typeof({rootName})");
-            sb.AppendLine($"var builder = new Builder<{rootName}>(new {rootName}.{rootName}ArgsBuilder());");
+            sb.AppendLine($"var builder = new Builder<{rootName}>(new {rootName}.{rootName}ArgsBuilder(null, null));");
             sb.AppendLines([$"return builder is Builder<TRootArgs> typedBuilder",
             "      ? typedBuilder",
             "      : throw new InvalidOperationException(\"Type mismatch creating builder.\");"]);

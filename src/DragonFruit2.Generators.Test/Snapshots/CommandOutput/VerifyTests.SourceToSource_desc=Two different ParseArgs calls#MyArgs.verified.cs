@@ -43,19 +43,21 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
 
     static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-    public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder)
+    public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
     {
-        return new MyArgs.MyArgsArgsBuilder();
+        return new MyArgs.MyArgsArgsBuilder(parentDataDefinition, rootDataDefinition);
     }
 
     /// <summary>
     ///  This static builder supplies the CLI declaration and filling the Result and return instance.
     /// </summary>
-    /// <remarks>
-    ///  The first type argument of the base is the Args type this builder creates, and the second is the root Args type. This means the two type arguments are the same for the root ArgsBuilder, but will differ for subcommand ArgsBuilders.
-    /// </remarks>
     internal class MyArgsArgsBuilder : ArgsBuilder<MyArgs>
     {
+
+        public MyArgsArgsBuilder(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+            : base(new MyArgsDataDefinition(parentDataDefinition, rootDataDefinition), () => new MyArgsDataValues())
+        {
+        }
 
         public override void Initialize(Builder<MyArgs> builder)
         {
@@ -67,7 +69,6 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
         {
             var cmd = new System.CommandLine.RootCommand("my")
             {
-                Description = null,
             };
 
             cmd.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return ; });
@@ -94,20 +95,6 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
                       .Where(x => x is not null)
                       .Select(x => x!);
         }
-
-        protected override DataValues<MyArgs> CreateDataValues()
-        {
-            return new MyArgsDataValues();
-        }
-
-        protected override MyArgs CreateInstance(DataValues dataValues)
-        {
-            if (dataValues is not MyArgsDataValues typedDataValues)
-            {
-                throw new InvalidOperationException("Internal error: passed incorrect data values");
-            }
-
-            return new MyArgs();        }
     }
 
     public class MyArgsDataValues : DataValues<MyArgs>
@@ -118,5 +105,23 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
         }
 
         private Type argsType = typeof(MyArgs);
+
+        protected override MyArgs CreateInstance()
+        {
+            return new MyArgs();        }
+    }
+
+    /// <summary>
+    ///  The data definition is available to data providers and are used for initialization.
+    /// </summary>
+    internal class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
+    {
+
+        public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+            : base(parentDataDefinition, rootDataDefinition)
+        {
+            string fullArgsName = typeof(MyArgs).FullName!;
+        }
+
     }
 }

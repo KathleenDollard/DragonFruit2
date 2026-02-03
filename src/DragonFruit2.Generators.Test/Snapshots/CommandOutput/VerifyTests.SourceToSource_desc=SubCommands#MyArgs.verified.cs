@@ -51,19 +51,21 @@ namespace MyNamespace
 
         static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-        public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder)
+        public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
         {
-            return new MyArgs.MyArgsArgsBuilder();
+            return new MyArgs.MyArgsArgsBuilder(parentDataDefinition, rootDataDefinition);
         }
 
         /// <summary>
         ///  This static builder supplies the CLI declaration and filling the Result and return instance.
         /// </summary>
-        /// <remarks>
-        ///  The first type argument of the base is the Args type this builder creates, and the second is the root Args type. This means the two type arguments are the same for the root ArgsBuilder, but will differ for subcommand ArgsBuilders.
-        /// </remarks>
         internal class MyArgsArgsBuilder : ArgsBuilder<MyArgs>
         {
+
+            public MyArgsArgsBuilder(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+                : base(new MyArgsDataDefinition(parentDataDefinition, rootDataDefinition), () => new MyArgsDataValues())
+            {
+            }
 
             public override void Initialize(Builder<MyArgs> builder)
             {
@@ -75,7 +77,6 @@ namespace MyNamespace
             {
                 var cmd = new System.CommandLine.RootCommand("my")
                 {
-                    Description = null,
                 };
 
                 var nameOption = new Option<string>("--name")
@@ -87,10 +88,10 @@ namespace MyNamespace
                 cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(Name)), nameOption);
                 cmd.Add(nameOption);
 
-                var morningGreetingArgsCommand = MorningGreetingArgs.GetArgsBuilder(builder).InitializeCli(builder, cliDataProvider);
+                var morningGreetingArgsCommand = MorningGreetingArgs.GetArgsBuilder(builder, this.CommandDataDefinition, this.CommandDataDefinition.RootDataDefinition).InitializeCli(builder, cliDataProvider);
                 cmd.Add(morningGreetingArgsCommand);
 
-                var eveningGreetingArgsCommand = EveningGreetingArgs.GetArgsBuilder(builder).InitializeCli(builder, cliDataProvider);
+                var eveningGreetingArgsCommand = EveningGreetingArgs.GetArgsBuilder(builder, this.CommandDataDefinition, this.CommandDataDefinition.RootDataDefinition).InitializeCli(builder, cliDataProvider);
                 cmd.Add(eveningGreetingArgsCommand);
 
                 cmd.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return ; });
@@ -118,20 +119,6 @@ namespace MyNamespace
                           .Where(x => x is not null)
                           .Select(x => x!);
             }
-
-            protected override DataValues<MyArgs> CreateDataValues()
-            {
-                return new MyArgsDataValues();
-            }
-
-            protected override MyArgs CreateInstance(DataValues dataValues)
-            {
-                if (dataValues is not MyArgsDataValues typedDataValues)
-                {
-                    throw new InvalidOperationException("Internal error: passed incorrect data values");
-                }
-
-                return new MyArgs(typedDataValues.Name);            }
         }
 
         public class MyArgsDataValues : DataValues<MyArgs>
@@ -144,6 +131,35 @@ namespace MyNamespace
 
             private Type argsType = typeof(MyArgs);
             public DataValue<string> Name { get; } = DataValue<string>.Create(nameof(Name), typeof(MyArgs));
+
+            protected override MyArgs CreateInstance()
+            {
+                return new MyArgs(Name);            }
+        }
+
+        /// <summary>
+        ///  The data definition is available to data providers and are used for initialization.
+        /// </summary>
+        internal class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
+        {
+
+            public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+                : base(parentDataDefinition, rootDataDefinition)
+            {
+                string fullArgsName = typeof(MyNamespace.MyArgs).FullName!;
+                Add(new OptionDataDefinition(fullArgsName + nameof(Name))
+                {
+                    DataType = typeof(string), 
+                    IsRequired = true, 
+                });
+                Add(new CommandDataDefinition(typeof(MorningGreetingArgs).FullName,this, this.RootDataDefinition)
+                {
+                });
+                Add(new CommandDataDefinition(typeof(EveningGreetingArgs).FullName,this, this.RootDataDefinition)
+                {
+                });
+            }
+
         }
     }
 }

@@ -46,19 +46,21 @@ namespace MyNamespace
 
         static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-        public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder)
+        public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
         {
-            return new MorningGreetingArgs.MorningGreetingArgsArgsBuilder();
+            return new MorningGreetingArgs.MorningGreetingArgsArgsBuilder(parentDataDefinition, rootDataDefinition);
         }
 
         /// <summary>
         ///  This static builder supplies the CLI declaration and filling the Result and return instance.
         /// </summary>
-        /// <remarks>
-        ///  The first type argument of the base is the Args type this builder creates, and the second is the root Args type. This means the two type arguments are the same for the root ArgsBuilder, but will differ for subcommand ArgsBuilders.
-        /// </remarks>
         internal class MorningGreetingArgsArgsBuilder : ArgsBuilder<MyArgs>
         {
+
+            public MorningGreetingArgsArgsBuilder(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+                : base(new MorningGreetingArgsDataDefinition(parentDataDefinition, rootDataDefinition), () => new MorningGreetingArgsDataValues())
+            {
+            }
 
             public override void Initialize(Builder<MyArgs> builder)
             {
@@ -70,7 +72,6 @@ namespace MyNamespace
             {
                 var cmd = new System.CommandLine.Command("morning-greeting")
                 {
-                    Description = null,
                 };
 
                 cmd.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return 25; });
@@ -96,20 +97,6 @@ namespace MyNamespace
                           .Where(x => x is not null)
                           .Select(x => x!);
             }
-
-            protected override DataValues<MyArgs> CreateDataValues()
-            {
-                return new MorningGreetingArgsDataValues();
-            }
-
-            protected override MyArgs CreateInstance(DataValues dataValues)
-            {
-                if (dataValues is not MorningGreetingArgsDataValues typedDataValues)
-                {
-                    throw new InvalidOperationException("Internal error: passed incorrect data values");
-                }
-
-                return new MorningGreetingArgs(typedDataValues.Name);            }
         }
 
         public class MorningGreetingArgsDataValues : DataValues<MyArgs>
@@ -122,6 +109,24 @@ namespace MyNamespace
 
             private Type argsType = typeof(MorningGreetingArgs);
             public DataValue<string> Name { get; } = DataValue<string>.Create(nameof(Name), typeof(MorningGreetingArgs));
+
+            protected override MorningGreetingArgs CreateInstance()
+            {
+                return new MorningGreetingArgs(Name);            }
+        }
+
+        /// <summary>
+        ///  The data definition is available to data providers and are used for initialization.
+        /// </summary>
+        internal class MorningGreetingArgsDataDefinition : CommandDataDefinition<MorningGreetingArgs>
+        {
+
+            public MorningGreetingArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+                : base(parentDataDefinition, rootDataDefinition)
+            {
+                string fullArgsName = typeof(MyNamespace.MorningGreetingArgs).FullName!;
+            }
+
         }
     }
 }

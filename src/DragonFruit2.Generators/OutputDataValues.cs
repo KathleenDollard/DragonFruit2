@@ -10,6 +10,7 @@ internal class OutputDataValues
         sb.AppendLine();
         Fields(sb, commandInfo);
         Properties(sb, commandInfo);
+        CreateInstance(sb, commandInfo);
 
         sb.CloseClass();
     }
@@ -41,5 +42,14 @@ internal class OutputDataValues
         {
             sb.AppendLine($"public DataValue<{propInfo.TypeName}> {propInfo.Name} {{ get; }} = DataValue<{propInfo.TypeName}>.Create(nameof({propInfo.Name}), typeof({commandInfo.Name}));");
         }
+    }
+
+    private static void CreateInstance(StringBuilderWrapper sb, CommandInfo commandInfo)
+    {
+        sb.OpenMethod($"""protected override {commandInfo.Name} CreateInstance()""");
+        var ctorArguments = commandInfo.SelfAndAncestorPropInfos.Select(p => p.Name);
+        sb.Append($"return new {commandInfo.Name}({string.Join(", ", ctorArguments)});");
+        sb.CloseMethod();
+
     }
 }

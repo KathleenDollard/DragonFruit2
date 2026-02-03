@@ -8,6 +8,11 @@
 /// </remarks>
 public class MemberDataDefinition : DataDefinition
 {
+    public MemberDataDefinition(string fullName) 
+        : base(fullName)
+    {
+    }
+
     public required Type DataType { get; set;  }
     public bool IsRequired { get; set; }
 

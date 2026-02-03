@@ -4,13 +4,14 @@ public class DataDefinition
 {
     public IEnumerable<string> ReusableDefinitionsUsed = new List<string>();
 
-    public DataDefinition(string fullName)
+    public DataDefinition(Type argsType, string name)
     {
-        FullName = fullName;
+        ArgsType = argsType;
+        Name = name;
     }
 
-    public string FullName { get; }
-    public string Name => FullName.Split('.').Last();
+    public Type ArgsType { get; }
+    public string Name { get; } 
 
     public ObsoleteInfo? Obsolete { get; set; }
     public bool HiddenInCli { get; set; }

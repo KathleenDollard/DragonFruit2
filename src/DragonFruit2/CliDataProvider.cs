@@ -2,15 +2,19 @@
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.ComponentModel;
+using System.Xml.Linq;
 
 namespace DragonFruit2;
 
 public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsBuilderProvider<TRootArgs>
     where TRootArgs : ArgsRootBase<TRootArgs>
 {
-    public CliDataProvider(Builder<TRootArgs> builder) 
+    public CliDataProvider(Builder<TRootArgs> builder)
         : base(builder)
     { }
+
+    // This is not a great way to cache the _parseResut if this method is reentrant
+    private ParseResult? _parseResult = null;
 
     public string[]? InputArgs => Builder.CommandLineArguments;
 
@@ -50,6 +54,50 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsBu
     }
 
     public Dictionary<(Type argsType, string propertyName), Symbol> LookupSymbol { get; set; } = [];
+
+    public override void Initialize(Builder<TRootArgs> builder, CommandDataDefinition<TRootArgs> commandDefinition)
+    {
+        RootCommand = InitializeCommand(builder, commandDefinition);
+    }
+
+    private Command InitializeCommand(Builder<TRootArgs> builder, CommandDataDefinition commandDefinition)
+    {
+        var cmd = new System.CommandLine.RootCommand(commandDefinition.PosixName)
+        {
+        };
+
+        foreach (var optionDefinition in commandDefinition.Options)
+        {
+            var option = new Option<string>(optionDefinition.OptionName)
+            {
+                Description = null,
+                Required = optionDefinition.IsRequired,
+                Recursive = optionDefinition.Recursive,
+            };
+            AddNameLookup((commandDefinition.ArgsType, optionDefinition.Name), option);
+            cmd.Add(option);
+        }
+
+        foreach (var argumentDefinition in commandDefinition.Arguments.OrderBy(x => x.Position))
+        {
+            var argument = new Argument<string>(argumentDefinition.Name)
+            {
+                Description = null,
+            };
+            AddNameLookup((commandDefinition.ArgsType, argumentDefinition.Name), argument);
+            cmd.Add(argument);
+        }
+
+        foreach (var subcommandDefinition in commandDefinition.Subcommands)
+        {
+            var subCommand = InitializeCommand(builder, subcommandDefinition);
+            cmd.Add(subCommand);
+        }
+
+        cmd.SetAction(p => _parseResult = p);
+        return cmd;
+    }
+
 
     public override bool TryGetValue<TValue>((Type argsType, string propertyName) key, DataValue<TValue> dataValue)
     {
@@ -93,7 +141,7 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsBu
                     return true;
                 }
             }
-            else if ((typeof(TValue) == typeof( bool) || typeof(TValue) == typeof( bool?)) 
+            else if ((typeof(TValue) == typeof(bool) || typeof(TValue) == typeof(bool?))
                    && symbolResult is OptionResult optionResult
                    && optionResult.Option.ValueType == typeof(bool))
             {

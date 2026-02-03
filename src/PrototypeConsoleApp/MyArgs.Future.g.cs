@@ -180,18 +180,18 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
         public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
             : base(parentDataDefinition, rootDataDefinition)
         {
-            string fullName = typeof(MyArgs).FullName!;
-            Add(new OptionDataDefinition(fullName + "." + nameof(Name))
+            var argsType = typeof(MyArgs);
+            Add(new OptionDataDefinition(argsType, nameof(Name))
             {
                 DataType = typeof(string),
                 IsRequired = true,
             });
-            Add(new OptionDataDefinition(fullName + "." + nameof(Age))
+            Add(new OptionDataDefinition(argsType ,nameof(Age))
             {
                 DataType = typeof(int),
                 IsRequired = false,
             });
-            Add(new OptionDataDefinition(fullName + "." + nameof(Greeting))
+            Add(new OptionDataDefinition(argsType, nameof(Greeting))
             {
                 DataType = typeof(string),
                 IsRequired = false,

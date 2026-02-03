@@ -120,7 +120,7 @@ public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
         public MyOtherArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
             : base(parentDataDefinition, rootDataDefinition)
         {
-            string fullArgsName = typeof(MyOtherArgs).FullName!;
+            var argsType = typeof(MyOtherArgs);
         }
 
     }

@@ -24,4 +24,6 @@ public abstract class DataProvider<TRootArgs> : DataProvider
         }
         return false;
     }
+
+    public abstract void Initialize(Builder<TRootArgs> builder, CommandDataDefinition<TRootArgs> commandDefinition);
 }

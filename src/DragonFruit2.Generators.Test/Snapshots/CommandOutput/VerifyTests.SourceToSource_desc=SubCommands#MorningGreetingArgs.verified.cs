@@ -124,7 +124,7 @@ namespace MyNamespace
             public MorningGreetingArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
                 : base(parentDataDefinition, rootDataDefinition)
             {
-                string fullArgsName = typeof(MyNamespace.MorningGreetingArgs).FullName!;
+                var argsType = typeof(MyNamespace.MorningGreetingArgs);
             }
 
         }

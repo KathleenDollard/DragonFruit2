@@ -32,4 +32,9 @@ public class DefaultDataProvider<TRootArgs> : DataProvider<TRootArgs>
             defaultValues[(argsType, propertyName)] = value;
         }
     }
+
+    public override void Initialize(Builder<TRootArgs> builder, CommandDataDefinition<TRootArgs> commandDefinition)
+    {
+        throw new NotImplementedException();
+    }
 }

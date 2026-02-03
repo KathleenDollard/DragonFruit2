@@ -8,8 +8,8 @@
 /// </remarks>
 public class MemberDataDefinition : DataDefinition
 {
-    public MemberDataDefinition(string fullName) 
-        : base(fullName)
+    public MemberDataDefinition(Type argsType, string name) 
+        : base(argsType, name)
     {
     }
 

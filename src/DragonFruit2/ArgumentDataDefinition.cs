@@ -2,8 +2,8 @@
 
 public class ArgumentDataDefinition : MemberDataDefinition
 {
-    public ArgumentDataDefinition(string fullName) 
-        : base(fullName)
+    public ArgumentDataDefinition(Type argsType, string name) 
+        : base(argsType, name)
     {
     }
 

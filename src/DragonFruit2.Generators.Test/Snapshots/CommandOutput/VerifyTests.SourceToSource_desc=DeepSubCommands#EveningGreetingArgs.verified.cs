@@ -143,13 +143,13 @@ namespace MyNamespace
             public EveningGreetingArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
                 : base(parentDataDefinition, rootDataDefinition)
             {
-                string fullArgsName = typeof(MyNamespace.EveningGreetingArgs).FullName!;
-                Add(new OptionDataDefinition(fullArgsName + nameof(Age))
+                var argsType = typeof(MyNamespace.EveningGreetingArgs);
+                Add(new OptionDataDefinition(argsType, nameof(Age))
                 {
                     DataType = typeof(int), 
                     IsRequired = false, 
                 });
-                Add(new CommandDataDefinition(typeof(Bar).FullName,this, this.RootDataDefinition)
+                Add(new CommandDataDefinition(typeof(Bar),this, this.RootDataDefinition)
                 {
                 });
             }

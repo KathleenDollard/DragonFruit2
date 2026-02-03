@@ -121,7 +121,7 @@ namespace MyNamespace
             public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
                 : base(parentDataDefinition, rootDataDefinition)
             {
-                string fullArgsName = typeof(MyNamespace.MyArgs).FullName!;
+                var argsType = typeof(MyNamespace.MyArgs);
             }
 
         }

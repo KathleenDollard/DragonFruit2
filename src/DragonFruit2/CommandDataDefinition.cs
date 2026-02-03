@@ -3,10 +3,10 @@
 
 public class CommandDataDefinition : DataDefinition
 {
-    public CommandDataDefinition(string fullName,
+    public CommandDataDefinition(Type argsType,
                                  CommandDataDefinition? parentDataDefinition,
                                  CommandDataDefinition? rootDataDefinition)
-        : base(fullName)
+        : base(argsType, argsType.Name)
     {
         ParentDataDefinition = parentDataDefinition;
         RootDataDefinition = rootDataDefinition ?? this;
@@ -33,7 +33,7 @@ public class CommandDataDefinition : DataDefinition
 public class CommandDataDefinition<TArgs> : CommandDataDefinition
 {
     public CommandDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition) 
-        : base(typeof(TArgs).FullName!,parentDataDefinition, rootDataDefinition)
+        : base(typeof(TArgs),parentDataDefinition, rootDataDefinition)
     {
     }
 }

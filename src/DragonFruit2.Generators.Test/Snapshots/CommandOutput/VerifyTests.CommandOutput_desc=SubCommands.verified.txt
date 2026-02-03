@@ -145,16 +145,16 @@ namespace MyNamespace
             public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
                 : base(parentDataDefinition, rootDataDefinition)
             {
-                string fullArgsName = typeof(MyNamespace.MyArgs).FullName!;
-                Add(new OptionDataDefinition(fullArgsName + nameof(Name))
+                var argsType = typeof(MyNamespace.MyArgs);
+                Add(new OptionDataDefinition(argsType, nameof(Name))
                 {
                     DataType = typeof(string), 
                     IsRequired = true, 
                 });
-                Add(new CommandDataDefinition(typeof(MorningGreetingArgs).FullName,this, this.RootDataDefinition)
+                Add(new CommandDataDefinition(typeof(MorningGreetingArgs),this, this.RootDataDefinition)
                 {
                 });
-                Add(new CommandDataDefinition(typeof(EveningGreetingArgs).FullName,this, this.RootDataDefinition)
+                Add(new CommandDataDefinition(typeof(EveningGreetingArgs),this, this.RootDataDefinition)
                 {
                 });
             }

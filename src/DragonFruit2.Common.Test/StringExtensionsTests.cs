@@ -443,19 +443,17 @@ public class StringExtensionsTests
     }
 
     [Theory]
-    [InlineData("HTTP")]
-    [InlineData("XML")]
-    [InlineData("API")]
-    public void AllMethods_HandleFullAcronyms(string input)
-    {
-       
-        Assert.NotNull(input.ToKebabCase());
-        Assert.NotNull(input.ToSnakeCase());
-        Assert.NotNull(input.ToPascalCase());
-        Assert.NotNull(input.ToCamelCase());
-        Assert.NotNull(input.ToDisplayName());
-    }
-
+    [InlineData("HTTP", "http", "Http")]
+    [InlineData("XML", "xml", "Xml")]
+    [InlineData("API", "api", "Api")]
+    public void AllMethods_HandleFullAcronyms(string input, string expectedLower, string expectedCapitalized)
+{
+        Assert.Equal(expectedLower, input.ToKebabCase());
+        Assert.Equal(expectedLower, input.ToSnakeCase());
+        Assert.Equal(expectedCapitalized, input.ToPascalCase());
+        Assert.Equal(expectedLower, input.ToCamelCase());
+        Assert.Equal(expectedCapitalized, input.ToDisplayName());
+}
 
     [Theory]
     [InlineData("myHTTPSConnectionAPI", "my-https-connection-api")]

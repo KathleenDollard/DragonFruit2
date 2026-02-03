@@ -2,6 +2,14 @@
 
 DragonFruit2 is intended as the next generation of the DragonFruit portion of System.CommandLine. The simplicity of System.CommandLine.DragonFruit made it very popular. However, it was a proof of concept and the underlying approach was not customizable or extensible. Also, we have come to believe that the key win is to maximize the scenarios where the implementing programmer can rely on their C# knowledge and avoid the distraction of learning a new library.
 
+## Notes on docs
+
+Unfortunately, the docs are not up to date as the system is evolving relatively rapidly. (The overview)[docs/__Overview.md] gives an idea of project thinking and [this design document](docs/DesignOverview.md) gives a view of what the individual pieces are intended to do. 
+
+This `ReadMe.md` file is also being kept up to date.
+
+Issues and PRs are welcome to keep these docs current, and all other docs can be considered suspect. As other documents are updated, they will be included here.
+
 ## Scenarios
 
 ### Build a simple console app

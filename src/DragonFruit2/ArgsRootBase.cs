@@ -4,9 +4,9 @@ namespace DragonFruit2;
 
 public abstract class ArgsRootBase
 {
-    public virtual IEnumerable<ValidationFailure> Validate()
+    public virtual IEnumerable<Diagnostic> Validate()
     {
-        return Enumerable.Empty<ValidationFailure>();
+        return Enumerable.Empty<Diagnostic>();
     }
 
     public virtual bool Initialize()

@@ -3,40 +3,35 @@ using System.Xml.Schema;
 
 namespace DragonFruit2;
 
-public class Result<TArgs>
-    where TArgs : ArgsRootBase<TArgs>
+public class Result<TRootArgs>
+    where TRootArgs : ArgsRootBase<TRootArgs>
 {
-    private readonly List<ValidationFailure> validationFailures = new();
+    private readonly List<Diagnostic> diagnostics = new();
 
-    public Result(IEnumerable<ValidationFailure>? failures, TArgs? args)
+    public Result(string[] commandLineArguments)
     {
-        validationFailures.AddRange(failures);
-        Args = args;
-        Status = (failures, args) switch
-        {
-            (not null, null) when failures.Any(x => x.Severity == DiagnosticSeverity.Error) => ResultStatus.Invalid,
-            (_, null) => ResultStatus.SclHandled,
-            (_, not null) => ResultStatus.ReadyToRun,
-        }; ;
+        CommandLineArguments = commandLineArguments;
     }
 
-    public IEnumerable<ValidationFailure> ValidationFailures => validationFailures;
-    public TArgs? Args { get; set; }
-    public ResultStatus Status { get; internal set; }
-    public bool IsValid => Status == ResultStatus.ReadyToRun;
+    public TRootArgs? Args { get; internal set; }
+    public IEnumerable<Diagnostic> ValidationFailures => diagnostics;
+    public string[] CommandLineArguments { get;  }
+    public bool IsValid => !ValidationFailures.Any();
+    public CommandDataDefinition<TRootArgs>? ActiveCommandDefinition { get; internal set; }
+    public DataValues<TRootArgs>? DataValues { get; internal set; }
     public int SuggestedReturnValue => throw new NotImplementedException();
 
-    public void AddFailure(ValidationFailure failure)
-        => validationFailures.Add(failure);
-    public void AddFailures(IEnumerable<ValidationFailure> failures)
-     => validationFailures.AddRange(failures);
+    public void AddDiagnostic(Diagnostic failure)
+        => diagnostics.Add(failure);
+    public void AddDiagnostics(IEnumerable<Diagnostic> failures)
+     => diagnostics.AddRange(failures);
 
     public void ReportErrorsToConsole()
     {
         if (ValidationFailures.Any())
         {
             Console.WriteLine("The input was not valid. Problems included:");
-            foreach (ValidationFailure failure in ValidationFailures)
+            foreach (Diagnostic failure in ValidationFailures)
             {
                 Console.WriteLine($"* {failure.Message}");
             }

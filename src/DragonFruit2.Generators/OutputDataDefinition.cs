@@ -16,12 +16,12 @@ public class OutputDataDefinition
     {
         sb.AppendLine();
         sb.XmlSummary(" The data definition is available to data providers and are used for initialization.");
-        sb.OpenClass($"internal class {commandInfo.Name}DataDefinition : CommandDataDefinition<{commandInfo.Name}>");
+        sb.OpenClass($"internal class {commandInfo.Name}DataDefinition : CommandDataDefinition<{commandInfo.RootName}>");
     }
     private static void Constructor(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
         sb.OpenConstructor($"""public {commandInfo.Name}DataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)""",
-              $"""base(parentDataDefinition, rootDataDefinition)""");
+              $"""base(parentDataDefinition, rootDataDefinition, () => new {commandInfo.Name}DataValues())""");
 
         sb.AppendLine($"var argsType = typeof({commandInfo.FullName});");
         foreach (var optionInfo in commandInfo.Options)
@@ -55,7 +55,7 @@ public class OutputDataDefinition
 
         static void AddSubcommandInfo(StringBuilderWrapper sb, CommandInfo subcommandInfo)
         {
-            sb.AppendLine($"Add(new CommandDataDefinition(typeof({subcommandInfo.Name}),this, this.RootDataDefinition)");
+            sb.AppendLine($"Add(new CommandDataDefinition(this, this.RootDataDefinition)");
             sb.OpenCurly();
             sb.CloseCurly(closeParens: true, endStatement: true);
 

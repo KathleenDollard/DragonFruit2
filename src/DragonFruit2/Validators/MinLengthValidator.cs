@@ -3,7 +3,7 @@
 public class MinLengthValidator : Validator<string>
 {
     public MinLengthValidator(string valueName, int minLengthValue)
-        : base((int)ValidationId.MinLength, valueName)
+        : base((int)DiagnosticId.MinLength, valueName)
     {
         minLengthValue = MinLengthValue;
     }
@@ -11,12 +11,12 @@ public class MinLengthValidator : Validator<string>
     public override string Description => $"The string {ValueName} must be longer than {MinLengthValue}";
     public int MinLengthValue { get; }
 
-    public override IEnumerable<ValidationFailure<string>> Validate(string value)
+    public override IEnumerable<Diagnostic<string>> Validate(string value)
     {
         if (value.Length < MinLengthValue)
         {
             var message = $"The value of {ValueName} must be greater than {MinLengthValue}, and {value} is not.";
-            return [new ValidationFailure<string>(Id, message, ValueName, DiagnosticSeverity.Error, value)];
+            return [new Diagnostic<string>(Id, message, ValueName, DiagnosticSeverity.Error, value)];
         }
         return [];
     }

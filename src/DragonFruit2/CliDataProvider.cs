@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace DragonFruit2;
 
-public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsBuilderProvider<TRootArgs>
+public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsProvider<TRootArgs>
     where TRootArgs : ArgsRootBase<TRootArgs>
 {
     public CliDataProvider(Builder<TRootArgs> builder)
@@ -18,24 +18,24 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsBu
 
     public string[]? InputArgs => Builder.CommandLineArguments;
 
-    public (IEnumerable<ValidationFailure>? failures, ArgsBuilder<TRootArgs>? builder) GetActiveArgsBuilder()
-    {
-        ParseResult = RootCommand?.Parse(InputArgs);
-        ArgsBuilderCache<TRootArgs>.ActiveArgsBuilder = null;
-        var _ = ParseResult?.Invoke();
-        var failures = ParseResult is not null && ParseResult.Errors.Any()
-                        ? TransformErrors(ParseResult.Errors)
-                        : Enumerable.Empty<ValidationFailure>();
+    //public (IEnumerable<Diagnostic>? failures, ArgsBuilder<TRootArgs>? builder) GetActiveArgsBuilder()
+    //{
+    //    ParseResult = RootCommand?.Parse(InputArgs);
+    //    ArgsBuilderCache<TRootArgs>.ActiveArgsBuilder = null;
+    //    var _ = ParseResult?.Invoke();
+    //    var failures = ParseResult is not null && ParseResult.Errors.Any()
+    //                    ? TransformErrors(ParseResult.Errors)
+    //                    : Enumerable.Empty<Diagnostic>();
 
-        return (failures, ArgsBuilderCache<TRootArgs>.GetActiveArgsBuilder());
-    }
+    //    return (failures, ArgsBuilderCache<TRootArgs>.GetActiveArgsBuilder());
+    //}
 
-    private IEnumerable<ValidationFailure>? TransformErrors(IReadOnlyList<ParseError> errors)
+    private IEnumerable<Diagnostic>? TransformErrors(IReadOnlyList<ParseError> errors)
     {
         return errors.Select(CreateValidationFailure);
 
-        static ValidationFailure CreateValidationFailure(ParseError error)
-            => new(ValidationId.SystemCommandLine.ToValidationIdString(),
+        static Diagnostic CreateValidationFailure(ParseError error)
+            => new(DiagnosticId.SystemCommandLine.ToValidationIdString(),
                    error.Message,
                    string.Empty,
                    DiagnosticSeverity.Error);
@@ -47,9 +47,21 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsBu
         set;
     }
 
+    public string[] _parseResultArgs;
     public ParseResult? ParseResult
     {
-        get => field ??= RootCommand?.Parse(InputArgs);
+        get
+        {
+            if (RootCommand is null) throw new InvalidOperationException("RootCommand cannot be null");
+            if (InputArgs is null) throw new InvalidOperationException("InputArgs cannot be null");
+            if (field is null || _parseResultArgs != InputArgs)
+            {
+                field = RootCommand?.Parse(InputArgs);
+                _parseResultArgs = InputArgs ?? [];
+            }
+            return field;
+        }
+
         private set;
     }
 
@@ -101,10 +113,6 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsBu
 
     public override bool TryGetValue<TValue>((Type argsType, string propertyName) key, DataValue<TValue> dataValue)
     {
-        if (RootCommand is null) throw new ArgumentNullException(nameof(RootCommand));
-        if (InputArgs is null) throw new ArgumentNullException(nameof(InputArgs));
-        ParseResult ??= RootCommand.Parse(InputArgs);
-
         var symbol = LookupSymbol[key];
         if (symbol is not null)
         {
@@ -166,4 +174,8 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsBu
         LookupSymbol[key] = symbol;
     }
 
+    public bool TryGetActiveArgsDefinition(out CommandDataDefinition<TRootArgs> args)
+    {
+        throw new NotImplementedException();
+    }
 }

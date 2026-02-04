@@ -16,9 +16,9 @@ internal class OutputPartialArgs
         ValidateMethod(sb, commandInfo);
         InitializeValidatorsMethod(sb, commandInfo);
         RegisterCustomDefaultsPartialMethod(sb, commandInfo);
-        GetArgsBuilder(sb, commandInfo);
+        //GetArgsBuilder(sb, commandInfo);
 
-        OutputArgsBuilder.GetClass(sb, commandInfo);
+        //OutputArgsBuilder.GetClass(sb, commandInfo);
         OutputDataValues.GetClass(sb, commandInfo);
         OutputDataDefinition.GetClass(sb, commandInfo);
 
@@ -102,8 +102,8 @@ internal class OutputPartialArgs
 
     internal static void ValidateMethod(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenMethod("public IEnumerable<ValidationFailure> Validate()");
-        sb.AppendLine("var failures = new List<ValidationFailure>();");
+        sb.OpenMethod("public IEnumerable<Diagnostic> Validate()");
+        sb.AppendLine("var failures = new List<Diagnostic>();");
         sb.AppendLine("InitializeValidators();");
         sb.AppendLine();
         foreach (var prop in commandInfo.PropInfos)

@@ -3,16 +3,15 @@
 
 public class CommandDataDefinition : DataDefinition
 {
-    public CommandDataDefinition(Type argsType,
-                                 CommandDataDefinition? parentDataDefinition,
+    public CommandDataDefinition(CommandDataDefinition? parentDataDefinition,
                                  CommandDataDefinition? rootDataDefinition)
-        : base(argsType, argsType.Name)
+        : base()
     {
         ParentDataDefinition = parentDataDefinition;
         RootDataDefinition = rootDataDefinition ?? this;
     }
-    public CommandDataDefinition? ParentDataDefinition { get;  }
-    public CommandDataDefinition RootDataDefinition { get;  }
+    public CommandDataDefinition? ParentDataDefinition { get; }
+    public CommandDataDefinition RootDataDefinition { get; }
 
     // IsOptionStyle is not yet implemented, and will indicate whether the option performs an action, thus behaving like a command
     public bool IsOptionStyle { get; set; }
@@ -30,10 +29,20 @@ public class CommandDataDefinition : DataDefinition
     public void Add(CommandDataDefinition subcommand) => _subcommands.Add(subcommand);
 }
 
-public class CommandDataDefinition<TArgs> : CommandDataDefinition
+public class CommandDataDefinition<TRootArgs> : CommandDataDefinition
+    where TRootArgs : ArgsRootBase<TRootArgs>
 {
-    public CommandDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition) 
-        : base(typeof(TArgs),parentDataDefinition, rootDataDefinition)
+    private Func<DataValues<TRootArgs>> _getDataValues;
+    public CommandDataDefinition(CommandDataDefinition? parentDataDefinition,
+                                 CommandDataDefinition? rootDataDefinition,
+                                 Func<DataValues<TRootArgs>> getDataValues)
+        : base( parentDataDefinition, rootDataDefinition)
     {
+        _getDataValues = getDataValues;
+    }
+
+    internal DataValues<TRootArgs> CreateDataValues()
+    {
+        return _getDataValues();
     }
 }

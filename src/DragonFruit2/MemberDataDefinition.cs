@@ -9,7 +9,7 @@
 public class MemberDataDefinition : DataDefinition
 {
     public MemberDataDefinition(Type argsType, string name) 
-        : base(argsType, name)
+        : base( name)
     {
     }
 

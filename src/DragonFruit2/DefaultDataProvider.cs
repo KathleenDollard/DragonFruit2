@@ -35,6 +35,6 @@ public class DefaultDataProvider<TRootArgs> : DataProvider<TRootArgs>
 
     public override void Initialize(Builder<TRootArgs> builder, CommandDataDefinition<TRootArgs> commandDefinition)
     {
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
     }
 }

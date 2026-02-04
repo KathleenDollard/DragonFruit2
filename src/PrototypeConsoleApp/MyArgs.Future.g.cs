@@ -42,9 +42,9 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
         }
     }
 
-    public override IEnumerable<ValidationFailure> Validate()
+    public override IEnumerable<Diagnostic> Validate()
     {
-        var failures = new List<ValidationFailure>();
+        var failures = new List<Diagnostic>();
         InitializeValidators();
 
         if (ageValidators is not null)
@@ -75,110 +75,110 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
 
     static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-    public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder,
-                                CommandDataDefinition? parentCommandDataDefinition,
-                                CommandDataDefinition? rootDataDefinition)
-    {
-        return new MyArgs.MyArgsBuilder(parentCommandDataDefinition, rootDataDefinition);
-    }
+    //public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder,
+    //                            CommandDataDefinition? parentCommandDataDefinition,
+    //                            CommandDataDefinition? rootDataDefinition)
+    //{
+    //    return new MyArgs.MyArgsBuilder(parentCommandDataDefinition, rootDataDefinition);
+    //}
 
-    /// <summary>
-    /// This static builder supplies the CLI declaration and filling the Result and 
-    /// return instance.
-    /// </summary>
-    /// <remarks>
-    /// The first type argument of the base is the Args type this builder creates, and the second is the root Args type. 
-    /// This means the two type arguments are the same for the root ArgsBuilder, but will differ for subcommand ArgsBuilders.
-    /// <br/>
-    /// Instances of this class are created in the <see IArgs.
-    /// </remarks>
-    internal class MyArgsBuilder : ArgsBuilder<MyArgs>
-    {
-        //static MyArgsBuilder()
-        //{
-        //    ArgsBuilderCache<MyArgs>.AddArgsBuilder<MyArgs>(new MyArgsBuilder());
-        //}
+    ///// <summary>
+    ///// This static builder supplies the CLI declaration and filling the Result and 
+    ///// return instance.
+    ///// </summary>
+    ///// <remarks>
+    ///// The first type argument of the base is the Args type this builder creates, and the second is the root Args type. 
+    ///// This means the two type arguments are the same for the root ArgsBuilder, but will differ for subcommand ArgsBuilders.
+    ///// <br/>
+    ///// Instances of this class are created in the <see IArgs.
+    ///// </remarks>
+    //internal class MyArgsBuilder : ArgsBuilder<MyArgs>
+    //{
+    //    //static MyArgsBuilder()
+    //    //{
+    //    //    ArgsBuilderCache<MyArgs>.AddArgsBuilder<MyArgs>(new MyArgsBuilder());
+    //    //}
 
-        public MyArgsBuilder(CommandDataDefinition? parentDataDefinition,
-                             CommandDataDefinition? rootDataDefinition)
-            : base(new MyArgsDataDefinition(parentDataDefinition, rootDataDefinition), () => new MyArgsDataValues())
-        {
-        }
+    //    public MyArgsBuilder(CommandDataDefinition? parentDataDefinition,
+    //                         CommandDataDefinition? rootDataDefinition)
+    //        : base(new MyArgsDataDefinition(parentDataDefinition, rootDataDefinition), () => new MyArgsDataValues())
+    //    {
+    //    }
 
-        public override void Initialize(Builder<MyArgs> builder)
-        {
-            // Generate for each data provider
-            InitializeCli(builder, builder.GetDataProvider<CliDataProvider<MyArgs>>());
-            InitializeDefaults(builder, builder.GetDataProvider<DefaultDataProvider<MyArgs>>());
-        }
+    //    public override void Initialize(Builder<MyArgs> builder)
+    //    {
+    //        // Generate for each data provider
+    //        InitializeCli(builder, builder.GetDataProvider<CliDataProvider<MyArgs>>());
+    //        InitializeDefaults(builder, builder.GetDataProvider<DefaultDataProvider<MyArgs>>());
+    //    }
 
-        public override Command InitializeCli(Builder<MyArgs> builder, CliDataProvider<MyArgs>? cliDataProvider)
-        {
-            if (cliDataProvider is null) throw new ArgumentNullException(nameof(cliDataProvider));
+    //    public override Command InitializeCli(Builder<MyArgs> builder, CliDataProvider<MyArgs>? cliDataProvider)
+    //    {
+    //        if (cliDataProvider is null) throw new ArgumentNullException(nameof(cliDataProvider));
 
-            var rootCommand = new System.CommandLine.Command("Test")
-            {
-                Description = "This is a test command"
-            };
-            var nameOption = new Option<string>("--name")
-            {
-                Description = "Your name",
-                Required = true
-            };
-            cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(MyArgs.Name)), nameOption);
-            rootCommand.Add(nameOption);
+    //        var rootCommand = new System.CommandLine.Command("Test")
+    //        {
+    //            Description = "This is a test command"
+    //        };
+    //        var nameOption = new Option<string>("--name")
+    //        {
+    //            Description = "Your name",
+    //            Required = true
+    //        };
+    //        cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(MyArgs.Name)), nameOption);
+    //        rootCommand.Add(nameOption);
 
-            var ageOption = new Option<System.Int32>("--age")
-            {
-                Description = "Your Age"
-            };
-            cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(MyArgs.Age)), ageOption);
-            rootCommand.Add(ageOption);
+    //        var ageOption = new Option<System.Int32>("--age")
+    //        {
+    //            Description = "Your Age"
+    //        };
+    //        cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(MyArgs.Age)), ageOption);
+    //        rootCommand.Add(ageOption);
 
-            var greetingOption = new Option<System.String>("--greeting")
-            {
-                Description = "Greeting message"
-            };
-            cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(MyArgs.Greeting)), greetingOption);
-            rootCommand.Add(greetingOption);
+    //        var greetingOption = new Option<System.String>("--greeting")
+    //        {
+    //            Description = "Greeting message"
+    //        };
+    //        cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(MyArgs.Greeting)), greetingOption);
+    //        rootCommand.Add(greetingOption);
 
-            rootCommand.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return 0; });
+    //        rootCommand.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return 0; });
 
-            cliDataProvider.RootCommand = rootCommand;
+    //        cliDataProvider.RootCommand = rootCommand;
 
-            return rootCommand;
-        }
+    //        return rootCommand;
+    //    }
 
-        private void InitializeDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs>? defaultDataProvider)
-        {
-            if (defaultDataProvider is null) return;
+    //    private void InitializeDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs>? defaultDataProvider)
+    //    {
+    //        if (defaultDataProvider is null) return;
 
-            // RegisterDefaults for attribute values and initialization
+    //        // RegisterDefaults for attribute values and initialization
 
-            RegisterCustomDefaults(builder, defaultDataProvider);
-        }
+    //        RegisterCustomDefaults(builder, defaultDataProvider);
+    //    }
 
-        protected override IEnumerable<ValidationFailure> CheckRequiredValues(DataValues dataValues)
-        {
-            if (dataValues is not MyArgsDataValues typedDataValues)
-            {
-                throw new InvalidOperationException("Internal error: passed incorrect data values");
-            }
+    //    protected override IEnumerable<Diagnostic> CheckRequiredValues(DataValues dataValues)
+    //    {
+    //        if (dataValues is not MyArgsDataValues typedDataValues)
+    //        {
+    //            throw new InvalidOperationException("Internal error: passed incorrect data values");
+    //        }
 
-            var requiredFailures = new List<ValidationFailure>();
-            AddRequiredFailureIfNeeded<string>(requiredFailures, !typedDataValues.Name.IsSet, nameof(typedDataValues.Name));
-            return requiredFailures
-                    .Where(x => x is not null)
-                    .Select(x => x!);
-        }
-    }
+    //        var requiredFailures = new List<Diagnostic>();
+    //        AddRequiredFailureIfNeeded<string>(requiredFailures, !typedDataValues.Name.IsSet, nameof(typedDataValues.Name));
+    //        return requiredFailures
+    //                .Where(x => x is not null)
+    //                .Select(x => x!);
+    //    }
+    //}
 
     // Generation Note: MyArgs in the class declaration is TArgs.
     public class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
     {
         // Generation Note: MyArgs in the following constructor is TArgs.
         public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-            : base(parentDataDefinition, rootDataDefinition)
+            : base(parentDataDefinition, rootDataDefinition, () => new MyArgsDataValues())
         {
             var argsType = typeof(MyArgs);
             Add(new OptionDataDefinition(argsType, nameof(Name))

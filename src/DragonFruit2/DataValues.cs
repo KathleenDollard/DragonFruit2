@@ -9,7 +9,7 @@ public abstract class DataValues
 public abstract class DataValues<TRootArgs> : DataValues
     where TRootArgs : ArgsRootBase<TRootArgs>
 {
-    public abstract void SetDataValues(DataProvider<TRootArgs> dataProvoder);
+    public abstract void SetDataValues(DataProvider<TRootArgs> dataProvider);
 
     protected internal abstract TRootArgs CreateInstance();
 }

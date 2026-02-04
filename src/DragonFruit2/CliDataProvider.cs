@@ -1,8 +1,7 @@
 ﻿using DragonFruit2.Validators;
 using System.CommandLine;
 using System.CommandLine.Parsing;
-using System.ComponentModel;
-using System.Xml.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DragonFruit2;
 
@@ -47,7 +46,18 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         set;
     }
 
-    public string[] _parseResultArgs;
+    private string[] _parseResultArgs;
+
+    /// <summary>
+    /// This is the System.CommandLine.ParseResult that is used internally.
+    /// </summary>
+    /// <remarks>
+    /// A single value is cached, which is used during a single run and if there is some reason another
+    /// call is made with the same command line args.
+    /// <br/>
+    /// Note that this cache is via the generic, if there are multiple root args, such as in an 
+    /// interactive or scripting scenario, they will be separately cached.
+    /// </remarks>
     public ParseResult? ParseResult
     {
         get
@@ -69,45 +79,42 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
 
     public override void Initialize(Builder<TRootArgs> builder, CommandDataDefinition<TRootArgs> commandDefinition)
     {
-        RootCommand = InitializeCommand(builder, commandDefinition);
+        RootCommand = new SclWrappers.RootCommand(commandDefinition);
+        InitializeCommand(RootCommand, builder, commandDefinition);
     }
 
-    private Command InitializeCommand(Builder<TRootArgs> builder, CommandDataDefinition commandDefinition)
+    private void InitializeCommand(System.CommandLine.Command command, Builder<TRootArgs> builder, CommandDataDefinition commandDefinition)
     {
-        var cmd = new System.CommandLine.RootCommand(commandDefinition.PosixName)
-        {
-        };
-
         foreach (var optionDefinition in commandDefinition.Options)
         {
-            var option = new Option<string>(optionDefinition.OptionName)
+            var option = new SclWrappers.Option<string>(optionDefinition)
             {
                 Description = null,
                 Required = optionDefinition.IsRequired,
                 Recursive = optionDefinition.Recursive,
             };
             AddNameLookup((commandDefinition.ArgsType, optionDefinition.Name), option);
-            cmd.Add(option);
+            command.Add(option);
         }
 
         foreach (var argumentDefinition in commandDefinition.Arguments.OrderBy(x => x.Position))
         {
-            var argument = new Argument<string>(argumentDefinition.Name)
+            var argument = new SclWrappers.Argument<string>(argumentDefinition)
             {
                 Description = null,
             };
             AddNameLookup((commandDefinition.ArgsType, argumentDefinition.Name), argument);
-            cmd.Add(argument);
+            command.Add(argument);
         }
 
         foreach (var subcommandDefinition in commandDefinition.Subcommands)
         {
-            var subCommand = InitializeCommand(builder, subcommandDefinition);
-            cmd.Add(subCommand);
+            var subCommand = new SclWrappers.Command(subcommandDefinition);
+            InitializeCommand(subCommand, builder, subcommandDefinition);
+            command.Add(subCommand);
         }
 
-        cmd.SetAction(p => _parseResult = p);
-        return cmd;
+        command.SetAction(p => _parseResult = p);
     }
 
 
@@ -174,8 +181,27 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         LookupSymbol[key] = symbol;
     }
 
-    public bool TryGetActiveArgsDefinition(out CommandDataDefinition<TRootArgs> args)
+    public bool TryGetActiveArgsDefinition([NotNullWhen(true)] out CommandDataDefinition<TRootArgs> activeCommandDefinition)
     {
-        throw new NotImplementedException();
+
+        if (ParseResult is null)
+        {
+            activeCommandDefinition = null!;
+            return false;
+        }
+        var commandResult = ParseResult.CommandResult;
+        var command = commandResult.Command;
+        switch (command)
+        {
+            case SclWrappers.Command sclCommand and IHasDataDefinition { DataDefinition: CommandDataDefinition<TRootArgs> dataDefinition }:
+                activeCommandDefinition = dataDefinition;
+                return true;
+            case SclWrappers.RootCommand sclRootCommand and IHasDataDefinition { DataDefinition: CommandDataDefinition<TRootArgs> dataDefinition }:
+                activeCommandDefinition = dataDefinition;
+                return true;
+            default:
+                activeCommandDefinition = null!;
+                return false;
+        };
     }
 }

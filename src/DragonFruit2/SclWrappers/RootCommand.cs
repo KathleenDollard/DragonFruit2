@@ -1,9 +1,9 @@
 ﻿namespace DragonFruit2.SclWrappers;
 
-public class Command : System.CommandLine.Command, IHasDataDefinition
+public class RootCommand : System.CommandLine.RootCommand, IHasDataDefinition
 {
-    public Command(CommandDataDefinition commandDefinition)
-        : base(commandDefinition.PosixName)
+    public RootCommand(CommandDataDefinition commandDefinition)
+        : base(string.Empty)
     {
         CommandDefinition = commandDefinition;
     }
@@ -11,5 +11,4 @@ public class Command : System.CommandLine.Command, IHasDataDefinition
     public CommandDataDefinition CommandDefinition { get; }
 
     public DataDefinition DataDefinition => CommandDefinition;
-
 }

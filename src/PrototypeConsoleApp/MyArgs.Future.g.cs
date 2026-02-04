@@ -5,6 +5,7 @@ using DragonFruit2;
 using DragonFruit2.Validators;
 using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 
 namespace SampleConsoleApp;
@@ -198,26 +199,13 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
             });
         }
 
-        public IEnumerable<TReturn>? CreateMembers<TReturn>(DataProvider dataProvider)
+        public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)
         {
-            return dataProvider switch
-            {
-                CliDataProvider<MyArgs> cliProvider => CreateCliMembers(cliProvider),
-                _ => null,
+            return new List<TReturn> {
+                dataProvider.CreateMember<string>(this, nameof(Name)),
+                dataProvider.CreateMember<int>(this,nameof(Age)),
+                dataProvider.CreateMember<string>(this,nameof(Greeting)),
             };
-
-            static IEnumerable<TReturn> CreateCliMembers(CliDataProvider<MyArgs> cliProvider)
-            {
-                if (typeof(TReturn) != typeof(Symbol) )
-                {
-                    throw new InvalidOperationException("Internal error: incorrect return type for CliDataProvider members");
-                }
-                var newMembers = new List<Symbol>();
-                newMembers.Add(new Option<string>(nameof(Name)));
-                newMembers.Add(new Option<int>(nameof(Age)));
-                newMembers.Add(new Option<string>(nameof(Greeting)));
-                return newMembers.OfType<TReturn>();
-            }
         }
     }
 

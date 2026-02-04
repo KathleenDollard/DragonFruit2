@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace DragonFruit2;
 
-public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsProvider<TRootArgs>
+public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsProvider<TRootArgs>, ICreatesMembers<Symbol>
     where TRootArgs : ArgsRootBase<TRootArgs>
 {
     public CliDataProvider(Builder<TRootArgs> builder)
@@ -85,28 +85,8 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
 
     private void InitializeCommand(System.CommandLine.Command command, Builder<TRootArgs> builder, CommandDataDefinition commandDefinition)
     {
-        foreach (var optionDefinition in commandDefinition.Options)
-        {
-            commandDefinition.InitializeMember(optionDefinition, MakeOption);
-            var option = new SclWrappers.Option<string>(optionDefinition)
-            {
-                Description = null,
-                Required = false, // handled later in pipeline after defaults are set
-                Recursive = optionDefinition.Recursive,
-            };
-            AddNameLookup((commandDefinition.ArgsType, optionDefinition.Name), option);
-            command.Add(option);
-        }
-
-        foreach (var argumentDefinition in commandDefinition.Arguments.OrderBy(x => x.Position))
-        {
-            var argument = new SclWrappers.Argument<string>(argumentDefinition)
-            {
-                Description = null,
-            };
-            AddNameLookup((commandDefinition.ArgsType, argumentDefinition.Name), argument);
-            command.Add(argument);
-        }
+        var memberSymbols = commandDefinition.CreateMembers(this);
+        command.AddRange(memberSymbols);
 
         foreach (var subcommandDefinition in commandDefinition.Subcommands)
         {
@@ -119,11 +99,18 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
 
     }
 
-    public Option MakeOption<T> (string optionName)
+    public Symbol CreateMember<TValue>(CommandDataDefinition commandDefinition, string name)
     {
-        return new Option<T>(optionName);
+        var memberDefinition = commandDefinition[name];
+        Symbol newMember = memberDefinition switch
+        {
+            OptionDataDefinition optionDefinition => new SclWrappers.Option<TValue>(optionDefinition),
+            ArgumentDataDefinition argumentDefinition => new SclWrappers.Argument<TValue>(argumentDefinition),
+            _ => throw new InvalidOperationException("Unsupported member definition type")
+        };
+        AddNameLookup((commandDefinition.ArgsType, name), newMember);
+        return newMember;
     }
-
 
     public override bool TryGetValue<TValue>((Type argsType, string propertyName) key, DataValue<TValue> dataValue)
     {
@@ -209,6 +196,9 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
             default:
                 activeCommandDefinition = null!;
                 return false;
-        };
+        }
+        ;
     }
+
+
 }

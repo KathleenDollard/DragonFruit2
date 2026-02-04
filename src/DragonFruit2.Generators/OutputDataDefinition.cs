@@ -1,4 +1,6 @@
-﻿namespace DragonFruit2.Generators;
+﻿using System.Xml;
+
+namespace DragonFruit2.Generators;
 
 public class OutputDataDefinition
 {
@@ -7,6 +9,7 @@ public class OutputDataDefinition
         OpenClass(commandInfo, sb);
 
         Constructor(sb, commandInfo);
+        CreateMembers(sb, commandInfo);
         sb.AppendLine();
 
         sb.CloseClass();
@@ -62,6 +65,17 @@ public class OutputDataDefinition
         }
     }
 
-
+    private static void CreateMembers(StringBuilderWrapper sb, CommandInfo commandInfo)
+    {
+        sb.OpenMethod("public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)");
+        sb.Return("new List<TReturn>", true);
+        sb.OpenCurly();
+        foreach (var option in commandInfo.Options.Concat(commandInfo.Arguments))
+        {
+            sb.AppendLine($"dataProvider.CreateMember<{option.TypeName}>(this, nameof({option.Name})),");
+        }
+        sb.CloseCurly(endStatement: true);
+        sb.CloseMethod();
+    }
 
 }

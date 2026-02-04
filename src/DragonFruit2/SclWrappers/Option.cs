@@ -6,6 +6,7 @@ public class Option<T> : System.CommandLine.Option<T>, IHasDataDefinition
         : base($"--{optionDefinition.PosixName}")
     {
         OptionDefinition = optionDefinition;
+        Recursive = optionDefinition.Recursive;
     }
 
     public OptionDataDefinition OptionDefinition { get; }

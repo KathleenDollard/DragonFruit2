@@ -1,15 +1,22 @@
-﻿namespace DragonFruit2;
+﻿using System.Xml.Linq;
+
+namespace DragonFruit2;
 
 
-public class CommandDataDefinition : DataDefinition
+public abstract class CommandDataDefinition : DataDefinition
 {
-    public CommandDataDefinition(CommandDataDefinition? parentDataDefinition,
+    public CommandDataDefinition(Type rootArgs, 
+                                 CommandDataDefinition? parentDataDefinition,
                                  CommandDataDefinition? rootDataDefinition)
-        : base()
+        : base(rootArgs.Name)
     {
         ParentDataDefinition = parentDataDefinition;
         RootDataDefinition = rootDataDefinition ?? this;
+        ArgsType = rootArgs;
     }
+
+    public Type ArgsType { get; }
+
     public CommandDataDefinition? ParentDataDefinition { get; }
     public CommandDataDefinition RootDataDefinition { get; }
 
@@ -36,7 +43,7 @@ public class CommandDataDefinition<TRootArgs> : CommandDataDefinition
     public CommandDataDefinition(CommandDataDefinition? parentDataDefinition,
                                  CommandDataDefinition? rootDataDefinition,
                                  Func<DataValues<TRootArgs>> getDataValues)
-        : base( parentDataDefinition, rootDataDefinition)
+        : base(typeof(TRootArgs), parentDataDefinition, rootDataDefinition)
     {
         _getDataValues = getDataValues;
     }

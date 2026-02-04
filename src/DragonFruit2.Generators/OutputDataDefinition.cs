@@ -55,7 +55,7 @@ public class OutputDataDefinition
 
         static void AddSubcommandInfo(StringBuilderWrapper sb, CommandInfo subcommandInfo)
         {
-            sb.AppendLine($"Add(new CommandDataDefinition(this, this.RootDataDefinition)");
+            sb.AppendLine($"Add(new {subcommandInfo.Name}.{subcommandInfo.Name}DataDefinition(this, this.RootDataDefinition)");
             sb.OpenCurly();
             sb.CloseCurly(closeParens: true, endStatement: true);
 

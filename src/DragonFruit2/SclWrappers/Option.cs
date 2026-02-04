@@ -3,7 +3,7 @@
 public class Option<T> : System.CommandLine.Option<T>, IHasDataDefinition
 {
     public Option(OptionDataDefinition optionDefinition)
-        : base(optionDefinition.PosixName)
+        : base($"--{optionDefinition.PosixName}")
     {
         OptionDefinition = optionDefinition;
     }

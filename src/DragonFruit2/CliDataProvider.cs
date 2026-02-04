@@ -90,7 +90,7 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
             var option = new SclWrappers.Option<string>(optionDefinition)
             {
                 Description = null,
-                Required = optionDefinition.IsRequired,
+                Required = false, // handled later in pipeline after defaults are set
                 Recursive = optionDefinition.Recursive,
             };
             AddNameLookup((commandDefinition.ArgsType, optionDefinition.Name), option);
@@ -115,6 +115,7 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         }
 
         command.SetAction(p => _parseResult = p);
+
     }
 
 

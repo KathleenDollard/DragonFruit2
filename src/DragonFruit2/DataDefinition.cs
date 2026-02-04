@@ -4,16 +4,11 @@ public class DataDefinition
 {
     public IEnumerable<string> ReusableDefinitionsUsed = new List<string>();
 
-    public DataDefinition(string? name = null)
+    public DataDefinition(string name)
     {
-        ArgsType = this.GetType();
-        name = name is null && this is ArgumentDataDefinition
-            ? ArgsType.Name
-            : name;
         Name = name ?? throw new ArgumentNullException(nameof(name));
     }
-
-    public Type ArgsType { get; }
+ 
     public string Name { get; } 
 
     public ObsoleteInfo? Obsolete { get; set; }

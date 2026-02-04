@@ -82,6 +82,10 @@ public class Builder<TRootArgs>
             result.DataValues.SetDataValues(dataProvider);
         }
 
+        // TODO: CheckRequired
+        var instance = result.DataValues.CreateInstance();
+        result.Args = instance;
+
         return result;
     }
 }

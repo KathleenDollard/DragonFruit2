@@ -87,6 +87,7 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
     {
         foreach (var optionDefinition in commandDefinition.Options)
         {
+            commandDefinition.InitializeMember(optionDefinition, MakeOption);
             var option = new SclWrappers.Option<string>(optionDefinition)
             {
                 Description = null,
@@ -116,6 +117,11 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
 
         command.SetAction(p => _parseResult = p);
 
+    }
+
+    public Option MakeOption<T> (string optionName)
+    {
+        return new Option<T>(optionName);
     }
 
 

@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.CommandLine;
+using System.Xml.Linq;
 
 namespace DragonFruit2;
 
@@ -34,6 +35,11 @@ public abstract class CommandDataDefinition : DataDefinition
     public void Add(OptionDataDefinition option) => _options.Add(option);
     public void Add(ArgumentDataDefinition argument) => _arguments.Add(argument);
     public void Add(CommandDataDefinition subcommand) => _subcommands.Add(subcommand);
+
+    internal void InitializeMember(OptionDataDefinition optionDefinition, Func<string, Option> makeOption)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public class CommandDataDefinition<TRootArgs> : CommandDataDefinition

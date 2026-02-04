@@ -186,7 +186,7 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
                 DataType = typeof(string),
                 IsRequired = true,
             });
-            Add(new OptionDataDefinition(argsType ,nameof(Age))
+            Add(new OptionDataDefinition(argsType, nameof(Age))
             {
                 DataType = typeof(int),
                 IsRequired = false,
@@ -196,6 +196,28 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
                 DataType = typeof(string),
                 IsRequired = false,
             });
+        }
+
+        public IEnumerable<TReturn>? CreateMembers<TReturn>(DataProvider dataProvider)
+        {
+            return dataProvider switch
+            {
+                CliDataProvider<MyArgs> cliProvider => CreateCliMembers(cliProvider),
+                _ => null,
+            };
+
+            static IEnumerable<TReturn> CreateCliMembers(CliDataProvider<MyArgs> cliProvider)
+            {
+                if (typeof(TReturn) != typeof(Symbol) )
+                {
+                    throw new InvalidOperationException("Internal error: incorrect return type for CliDataProvider members");
+                }
+                var newMembers = new List<Symbol>();
+                newMembers.Add(new Option<string>(nameof(Name)));
+                newMembers.Add(new Option<int>(nameof(Age)));
+                newMembers.Add(new Option<string>(nameof(Greeting)));
+                return newMembers.OfType<TReturn>();
+            }
         }
     }
 

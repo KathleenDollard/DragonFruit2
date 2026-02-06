@@ -24,22 +24,6 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
                     ArgsAccessibility = "public"
                 });
 
-        AddTheoryData("Empty args struct",
-           argsSource:
-                """
-                public partial struct MyArgs : ArgsRootBase<MyArgs>
-                { }
-                """,
-           consoleSource: TestHelpers.EmptyConsoleAppCode,
-           commandInfo:
-               new CommandInfo()
-               {
-                   Name = "MyArgs",
-                   RootName = "MyArgs",
-                   IsStruct = true,
-                   ArgsAccessibility = "public"
-               });
-
         AddTheoryData("Args w/ namespace (curly)",
            argsSource:
                 """

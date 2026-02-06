@@ -16,11 +16,10 @@ public static class CommandInfoHelpers
             // TODO: Add description from attribute if present or XML docs
             Name = typeSymbol.Name,
             NamespaceName = typeSymbol.GetNamespace(),
-            CliNamespaceName= cliNamespaceName,
+            CliNamespaceName = cliNamespaceName,
             ArgsAccessibility = typeSymbol.DeclaredAccessibility.ToCSharpString(),
             BaseName = baseTypeName,
             RootName = rootName,
-            IsStruct = typeSymbol.IsValueType,
         };
     }
 
@@ -129,7 +128,7 @@ public static class CommandInfoHelpers
         try
         {
             // These properties are commonly present; adjust names if your ValidatorInfo differs.
-            info.ConstructorArguments = ctorArgs.Select(x=>x.Trim()).ToList();
+            info.ConstructorArguments = ctorArgs.Select(x => x.Trim()).ToList();
             info.NamedArguments = namedArgs;
         }
         catch

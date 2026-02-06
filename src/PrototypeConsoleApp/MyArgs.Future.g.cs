@@ -5,6 +5,9 @@ using DragonFruit2;
 using DragonFruit2.Validators;
 using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Cache;
+using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 
 namespace SampleConsoleApp;
 
@@ -41,9 +44,9 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
         }
     }
 
-    public IEnumerable<ValidationFailure> Validate()
+    public override IEnumerable<Diagnostic> Validate()
     {
-        var failures = new List<ValidationFailure>();
+        var failures = new List<Diagnostic>();
         InitializeValidators();
 
         if (ageValidators is not null)
@@ -74,125 +77,114 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
 
     static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-    public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder)
+    //    private void InitializeDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs>? defaultDataProvider)
+    //    {
+    //        if (defaultDataProvider is null) return;
+
+    //        // RegisterDefaults for attribute values and initialization
+
+    //        RegisterCustomDefaults(builder, defaultDataProvider);
+    //    }
+
+    //    protected override IEnumerable<Diagnostic> CheckRequiredValues(DataValues dataValues)
+    //    {
+    //        if (dataValues is not MyArgsDataValues typedDataValues)
+    //        {
+    //            throw new InvalidOperationException("Internal error: passed incorrect data values");
+    //        }
+
+    //        var requiredFailures = new List<Diagnostic>();
+    //        AddRequiredFailureIfNeeded<string>(requiredFailures, !typedDataValues.Name.IsSet, nameof(typedDataValues.Name));
+    //        return requiredFailures
+    //                .Where(x => x is not null)
+    //                .Select(x => x!);
+    //    }
+    //}
+
+    // Generation Note: MyArgs in the class declaration is TArgs.
+    public partial class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
     {
-        return new MyArgs.MyArgsBuilder();
+        // Generation Note: MyArgs in the following constructor is TArgs.
+        public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+            : base(parentDataDefinition, rootDataDefinition)
+        {
+            GetDataValues = () => new MyArgsDataValues(this);
+
+            Name = new OptionDataDefinition<string>(this, nameof(Name))
+            {
+                DataType = typeof(string),
+                IsRequired = true,
+            };
+            Add(Name);
+            Age = new OptionDataDefinition<int>(this, nameof(Age))
+            {
+                DataType = typeof(int),
+                IsRequired = false,
+            };
+            Add(Age);
+            Greeting = new OptionDataDefinition<string>(this, nameof(Greeting))
+            {
+                DataType = typeof(string),
+                IsRequired = false,
+            };
+            Add(Greeting);
+
+            RegisterCustomizations();
+        }
+
+        public OptionDataDefinition<string> Name { get; }
+        public OptionDataDefinition<int> Age { get; }
+        public OptionDataDefinition<string> Greeting { get; }
+
+        public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)
+        {
+            return new List<TReturn> {
+                dataProvider.CreateMember<string>(this, nameof(Name)),
+                dataProvider.CreateMember<int>(this,nameof(Age)),
+                dataProvider.CreateMember<string>(this,nameof(Greeting)),
+            };
+        }
     }
-
-    /// <summary>
-    /// This static builder supplies the CLI declaration and filling the Result and 
-    /// return instance.
-    /// </summary>
-    /// <remarks>
-    /// The first type argument of the base is the Args type this builder creates, and the second is the root Args type. 
-    /// This means the two type arguments are the same for the root ArgsBuilder, but will differ for subcommand ArgsBuilders.
-    /// <br/>
-    /// Instances of this class are created in the <see IArgs.
-    /// </remarks>
-    internal class MyArgsBuilder : ArgsBuilder<MyArgs>
-    {
-        static MyArgsBuilder()
-        {
-            ArgsBuilderCache<MyArgs>.AddArgsBuilder<MyArgs>(new MyArgsBuilder());
-        }
-
-
-        public override void Initialize(Builder<MyArgs> builder)
-        {
-            // Generate for each data provider
-            InitializeCli(builder, builder.GetDataProvider<CliDataProvider<MyArgs>>());
-            InitializeDefaults(builder, builder.GetDataProvider<DefaultDataProvider<MyArgs>>());
-        }
-
-        public override Command InitializeCli(Builder<MyArgs> builder, CliDataProvider<MyArgs>? cliDataProvider)
-        {
-            if (cliDataProvider is null) throw new ArgumentNullException(nameof(cliDataProvider));
-
-            var rootCommand = new System.CommandLine.Command("Test")
-            {
-                Description = "This is a test command"
-            };
-            var nameOption = new Option<string>("--name")
-            {
-                Description = "Your name",
-                Required = true
-            };
-            cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(MyArgs.Name)), nameOption);
-            rootCommand.Add(nameOption);
-
-            var ageOption = new Option<System.Int32>("--age")
-            {
-                Description = "Your Age"
-            };
-            cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(MyArgs.Age)), ageOption);
-            rootCommand.Add(ageOption);
-
-            var greetingOption = new Option<System.String>("--greeting")
-            {
-                Description = "Greeting message"
-            };
-            cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(MyArgs.Greeting)), greetingOption);
-            rootCommand.Add(greetingOption);
-
-            rootCommand.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return 0; });
-
-            cliDataProvider.RootCommand = rootCommand;
-
-            return rootCommand;
-        }
-
-        private void InitializeDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs>? defaultDataProvider)
-        {
-            if (defaultDataProvider is null) return;
-
-            // RegisterDefaults for attribute values and initialization
-
-            RegisterCustomDefaults(builder, defaultDataProvider);
-        }
-
-        protected override MyArgs CreateInstance(DataValues dataValues)
-        {
-            if (dataValues is not MyArgsDataValues typedDataValues)
-            {
-                throw new InvalidOperationException("Internal error: passed incorrect data values");
-            }
-
-            return new MyArgs(typedDataValues.Name, typedDataValues.Age, typedDataValues.Greeting);
-        }
-
-        protected override IEnumerable<ValidationFailure> CheckRequiredValues(DataValues dataValues)
-        {
-            if (dataValues is not MyArgsDataValues typedDataValues)
-            {
-                throw new InvalidOperationException("Internal error: passed incorrect data values");
-            }
-
-            var requiredFailures = new List<ValidationFailure>();
-            AddRequiredFailureIfNeeded<string>(requiredFailures, !typedDataValues.Name.IsSet, nameof(typedDataValues.Name));
-            return requiredFailures
-                    .Where(x => x is not null)
-                    .Select(x => x!);
-        }
-
-        protected override DataValues<MyArgs> CreateDataValues()
-            => new MyArgsDataValues();
-    }
-
 
     // Generation Note: MyArgs in the following class is TRootArgs, except for the private srgsType.
     public class MyArgsDataValues : DataValues<MyArgs>
     {
-        public override void SetDataValues(DataProvider<MyArgs> dataProvider)
+        public MyArgsDataValues(MyArgsDataDefinition commandDefinition)
+            : base(commandDefinition)
         {
-            dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Name)), Name);
-            dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Age)), Age);
-            dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Greeting)), Greeting);
+            Name = DataValue<string>.Create(nameof(Name), argsType, commandDefinition.Name);
+            Add(Name);
+            Age = DataValue<int>.Create(nameof(Age), argsType, commandDefinition.Age);
+            Add(Age);
+            Greeting = DataValue<string>.Create(nameof(Greeting), argsType, commandDefinition.Greeting);
+            Add(Greeting);
+        }
+
+        public override void SetDataValues(DataProvider<MyArgs> dataProvider, Result<MyArgs> result)
+        {
+            if (Name is not null && !Name.IsSet)
+            {
+                dataProvider.TrySetDataValue(Name, result);
+            }
+            if (Age is not null && !Age.IsSet)
+            {
+                dataProvider.TrySetDataValue(Age, result);
+            }
+            if (Greeting is not null && !Greeting.IsSet)
+            {
+                dataProvider.TrySetDataValue(Greeting, result);
+            }
         }
 
         private Type argsType = typeof(MyArgs);
 
-        public DataValue<string> Name { get; } = DataValue<string>.Create(nameof(Name), typeof(MyArgs));
-        public DataValue<int> Age { get; } = DataValue<int>.Create(nameof(Age), typeof(int));
-        public DataValue<string> Greeting {  get; }= DataValue<string>.Create(nameof(Greeting), typeof(string));
+        public DataValue<string> Name { get; }
+        public DataValue<int> Age { get; }
+        public DataValue<string> Greeting { get; }
+
+        protected override MyArgs CreateInstance()
+        {
+            return new MyArgs(Name, Age, Greeting);
+        }
     }
 }

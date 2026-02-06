@@ -2,10 +2,10 @@
   {
     Name: MyArgs,
     NamespaceName: MyNamespace,
+    FullName: MyNamespace.MyArgs,
     ArgsAccessibility: public,
     RootName: MyArgs,
-    CliName: my,
-    IsStruct: false,
+    SimpleName: my,
     PropInfos: [],
     SelfAndAncestorPropInfos: [],
     AncestorPropInfos: []

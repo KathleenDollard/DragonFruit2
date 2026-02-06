@@ -1,10 +1,10 @@
 ﻿[
   {
     Name: MyArgs,
+    FullName: MyArgs,
     ArgsAccessibility: public,
     RootName: MyArgs,
-    CliName: my,
-    IsStruct: false,
+    SimpleName: my,
     PropInfos: [],
     SelfAndAncestorPropInfos: [],
     AncestorPropInfos: []

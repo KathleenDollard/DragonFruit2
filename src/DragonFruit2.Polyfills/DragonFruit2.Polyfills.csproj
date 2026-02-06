@@ -10,6 +10,7 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="DragonFruit2.GeneratorSupport" />
+		<InternalsVisibleTo Include="DragonFruit2" />
 	</ItemGroup>
 
 </Project>

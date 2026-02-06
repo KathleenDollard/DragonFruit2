@@ -10,7 +10,7 @@ public abstract class Validator
 {
     public static string ToValidationIdString(int id) => $"DR{id:000}";
 
-    public static string ToValidationIdString(ValidationId id) => ToValidationIdString((int)id);
+    public static string ToValidationIdString(DiagnosticId id) => ToValidationIdString((int)id);
 
     protected Validator(int id, string valueName)
     {
@@ -30,5 +30,5 @@ public abstract class Validator<TValue> : Validator
         : base(id, valueName)
     {  }
 
-    public abstract IEnumerable<ValidationFailure<TValue>> Validate( TValue value);
+    public abstract IEnumerable<Diagnostic<TValue>> Validate( TValue value);
 }

@@ -1,5 +1,7 @@
 ﻿using DragonFruit2;
+using DragonFruit2.Defaults;
 using DragonFruit2.Validators;
+using System.Net.Cache;
 
 namespace SampleConsoleApp;
 
@@ -22,7 +24,13 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
     /// <summary>
     /// "Greeting message"
     /// </summary>
-    public string Greeting { get; init; } = string.Empty;
+    public string Greeting { get; init; } = "Howdy";
 
-
+    partial class MyArgsDataDefinition
+    {
+        public override void RegisterCustomizations()
+        {
+            Age.RegisterDefault( 22);
+        }
+    }
 }

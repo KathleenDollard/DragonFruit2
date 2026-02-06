@@ -1,18 +1,18 @@
-﻿using DragonFruit2;
+﻿using DragonFruit2.Validators;
 
 namespace DragonFruit2;
 
 public class Builder<TRootArgs>
-    where TRootArgs :  ArgsRootBase<TRootArgs>
+    where TRootArgs : ArgsRootBase<TRootArgs>
 {
-    public ArgsBuilder<TRootArgs> RootArgsBuilder { get; }
+    public CommandDataDefinition<TRootArgs> RootCommandDefinition { get; }
 
-    public Builder(ArgsBuilder<TRootArgs> rootArgsBuilder, DragonFruit2Configuration? configuration = null)
+    public Builder(CommandDataDefinition<TRootArgs> rootCommandDefinition, DragonFruit2Configuration? configuration = null)
     {
         AddDataProvider(new CliDataProvider<TRootArgs>(this));
         AddDataProvider(new DefaultDataProvider<TRootArgs>(this));
         Configuration = configuration;
-        RootArgsBuilder = rootArgsBuilder;
+        RootCommandDefinition = rootCommandDefinition;
     }
 
     public string[]? CommandLineArguments { get; protected set; }
@@ -37,31 +37,56 @@ public class Builder<TRootArgs>
         }
     }
 
-    public void SetDataValue<TValue>((Type argsType, string propertyName) key, DataValue<TValue> dataValue)
-    {
-        foreach (var dataProvider in DataProviders)
-        {
-            if (dataProvider.TryGetValue(key, dataValue))
-            {
-                return;
-            }
-        }
-    }
+    //public void SetDataValue<TValue>( DataValue<TValue> dataValue, Result<TRootArgs> result)
+    //{
+    //    foreach (var dataProvider in DataProviders)
+    //    {
+    //        if (dataProvider.TryGetValue(dataValue, result))
+    //        {
+    //            return;
+    //        }
+    //    }
+    //}
 
     public Result<TRootArgs> ParseArgs(string[] args)
     {
         args ??= Environment.GetCommandLineArgs().Skip(1).ToArray();
         CommandLineArguments = args;
-        RootArgsBuilder.Initialize(this);
 
-        var cliDataProvider = DataProviders.OfType<IActiveArgsBuilderProvider<TRootArgs>>().FirstOrDefault()
-            ?? throw new InvalidOperationException("Internal error: CliDataProvider not found");
-        // Once you set the InputArgs, the provider can start parsing
-        var (failures, activeArgsBuilder) = cliDataProvider.GetActiveArgsBuilder();
+        // TODO Consider a desigg that does Initialize on every ParseArgs call
+        foreach (var dataProvider in DataProviders)
+        {
+            dataProvider.Initialize(this, RootCommandDefinition);
+        }
 
-        return activeArgsBuilder is null
-                    ? new Result<TRootArgs>(failures, null)
-                    : activeArgsBuilder.CreateArgs(this, failures);
+        var result = new Result<TRootArgs>(args);
+        foreach (var dataProvider in DataProviders.OfType<IActiveArgsProvider<TRootArgs>>())
+        {
+            if (dataProvider.TryGetActiveArgsDefinition(out var activeArgsDefinition))
+            {
+                result.ActiveCommandDefinition = activeArgsDefinition;
+                break;
+            }
+        }
+
+        if (result.ActiveCommandDefinition is null)
+        {
+            result.AddDiagnostic(new Diagnostic(DiagnosticId.NoActiveCommand.ToValidationIdString(), "No active command could be determined.", null, DiagnosticSeverity.Error));
+            return result;
+        }
+
+        result.DataValues = result.ActiveCommandDefinition.CreateDataValues();
+
+        foreach (var dataProvider in DataProviders)
+        {
+            result.DataValues.SetDataValues(dataProvider, result);
+        }
+
+        // TODO: CheckRequired
+        var instance = result.DataValues.CreateInstance();
+        result.Args = instance;
+
+        return result;
     }
 }
 

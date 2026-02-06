@@ -1,4 +1,6 @@
-﻿namespace DragonFruit2;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace DragonFruit2;
 
 public class DefaultDataProvider<TRootArgs> : DataProvider<TRootArgs>
      where TRootArgs : ArgsRootBase<TRootArgs>
@@ -11,17 +13,19 @@ public class DefaultDataProvider<TRootArgs> : DataProvider<TRootArgs>
 
     private readonly Dictionary<(Type argsType, string propertyName), object> defaultValues = new();
 
-    public override bool TryGetValue<TValue>((Type argsType, string propertyName) key, DataValue<TValue> dataValue)
+    public override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition,
+                                             Result<TRootArgs> result,
+                                             [NotNullWhen(true)] out TValue value)
     {
-        if (defaultValues.TryGetValue(key, out var value))
+        if (result.DataValues is DataValues<TRootArgs> dataValues)
         {
-            if (value is TValue retrievedValue)
+            if (memberDefinition.TryGetDefault(dataValues, out var outValue))
             {
-                dataValue.SetValue(retrievedValue, this);
+                value = outValue;
                 return true;
             }
-            throw new InvalidOperationException("Issue with the default values lookup.");
         }
+        value = default!;
         return false;
     }
 

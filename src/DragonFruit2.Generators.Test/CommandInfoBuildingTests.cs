@@ -22,26 +22,6 @@ public class CommandInfoBuildingTests
         var commandInfo = DragonFruit2Builder.GetRootCommandInfoFromInvocation( invocations.Single(), compilation.GetSemanticModel(programTree));
 
         Assert.Equal("MyArgs", commandInfo?.Name);
-        Assert.False(commandInfo?.IsStruct);
-    }
-
-    [Fact]
-    public async Task CommandInfoCreatedFromStruct()
-    {
-        var sourceText = """
-            public partial struct MyArgs
-            { }
-            """;
-
-        var compilation = TestHelpers.GetCompilation(sourceText, TestHelpers.EmptyConsoleAppCode);
-        var programTree = compilation.SyntaxTrees.Last();
-        var invocations = TestHelpers.GetParseArgsInvocations(programTree);
-        Assert.Single(invocations);
-
-        var commandInfo = DragonFruit2Builder.GetRootCommandInfoFromInvocation(invocations.Single(), compilation.GetSemanticModel(programTree));
-
-        Assert.Equal("MyArgs", commandInfo?.Name);
-        Assert.True(commandInfo?.IsStruct);
     }
 
     [Fact]

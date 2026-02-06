@@ -36,9 +36,9 @@ namespace MyNamespace
             }
         }
 
-        public IEnumerable<ValidationFailure> Validate()
+        public IEnumerable<Diagnostic> Validate()
         {
-            var failures = new List<ValidationFailure>();
+            var failures = new List<Diagnostic>();
             InitializeValidators();
 
 
@@ -51,99 +51,66 @@ namespace MyNamespace
 
         static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-        public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder)
-        {
-            return new MyArgs.MyArgsArgsBuilder();
-        }
-
-        /// <summary>
-        ///  This static builder supplies the CLI declaration and filling the Result and return instance.
-        /// </summary>
-        /// <remarks>
-        ///  The first type argument of the base is the Args type this builder creates, and the second is the root Args type. This means the two type arguments are the same for the root ArgsBuilder, but will differ for subcommand ArgsBuilders.
-        /// </remarks>
-        internal class MyArgsArgsBuilder : ArgsBuilder<MyArgs>
-        {
-
-            public override void Initialize(Builder<MyArgs> builder)
-            {
-                InitializeCli(builder, builder.GetDataProvider<CliDataProvider<MyArgs>>());
-                InitializeDefaults(builder, builder.GetDataProvider<DefaultDataProvider<MyArgs>>());
-            }
-
-            public override Command InitializeCli(Builder<MyArgs> builder, CliDataProvider<MyArgs>? cliDataProvider)
-            {
-                var cmd = new System.CommandLine.RootCommand("my")
-                {
-                    Description = null,
-                };
-
-                var nameOption = new Option<string>("--name")
-                {
-                    Description = null,
-                    Required = true,
-                    Recursive=true
-                };
-                cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(Name)), nameOption);
-                cmd.Add(nameOption);
-
-                var morningGreetingArgsCommand = MorningGreetingArgs.GetArgsBuilder(builder).InitializeCli(builder, cliDataProvider);
-                cmd.Add(morningGreetingArgsCommand);
-
-                var eveningGreetingArgsCommand = EveningGreetingArgs.GetArgsBuilder(builder).InitializeCli(builder, cliDataProvider);
-                cmd.Add(eveningGreetingArgsCommand);
-
-                cmd.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return ; });
-                cliDataProvider.RootCommand = cmd;
-                return cmd;
-            }
-
-            public void InitializeDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs>? defaultDataProvider)
-            {
-                if (defaultDataProvider is null) return;
-                // TODO: Register defaults based on attributes, initializer, and the RegisterDefault calls
-                RegisterCustomDefaults(builder, defaultDataProvider);
-            }
-
-
-            protected override IEnumerable<ValidationFailure> CheckRequiredValues(DataValues dataValues)
-            {
-                if (dataValues is not MyArgsDataValues typedDataValues)
-                {
-                    throw new InvalidOperationException("Internal error: passed incorrect data values");
-                }
-                var requiredFailures = new List<ValidationFailure?>();
-                AddRequiredFailureIfNeeded<string>(requiredFailures, !typedDataValues.Name.IsSet, nameof(Name));
-                return requiredFailures
-                          .Where(x => x is not null)
-                          .Select(x => x!);
-            }
-
-            protected override DataValues<MyArgs> CreateDataValues()
-            {
-                return new MyArgsDataValues();
-            }
-
-            protected override MyArgs CreateInstance(DataValues dataValues)
-            {
-                if (dataValues is not MyArgsDataValues typedDataValues)
-                {
-                    throw new InvalidOperationException("Internal error: passed incorrect data values");
-                }
-
-                return new MyArgs(typedDataValues.Name);            }
-        }
-
         public class MyArgsDataValues : DataValues<MyArgs>
         {
 
-            public override void SetDataValues(DataProvider<MyArgs> dataProvider)
+            public MyArgsDataValues(MyArgsDataDefinition commandDefinition)
+                : base(commandDefinition)
             {
-                dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Name)), Name);
+                Name = DataValue<string>.Create(nameof(Name), argsType, commandDefinition.Name);
+                Add(Name);
+            }
+
+            public override void SetDataValues(DataProvider<MyArgs> dataProvider, Result<MyArgs> result)
+            {
+                if (Name is not null && !Name.IsSet)
+                {
+                    dataProvider.TrySetDataValue(Name, result);
+                }
             }
 
             private Type argsType = typeof(MyArgs);
-            public DataValue<string> Name { get; } = DataValue<string>.Create(nameof(Name), typeof(MyArgs));
+            public DataValue<string> Name { get; }
+
+            protected override MyArgs CreateInstance()
+            {
+                return new MyArgs(Name);            }
+        }
+
+        /// <summary>
+        ///  The data definition is available to data providers and are used for initialization.
+        /// </summary>
+        public partial class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
+        {
+
+            public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+                : base(parentDataDefinition, rootDataDefinition)
+            {
+                GetDataValues = () => new MyArgsDataValues(this);
+                Name = new OptionDataDefinition<string>(this, nameof(Name))
+                {
+                    DataType = typeof(string), 
+                    IsRequired = true, 
+                };
+                Add(Name);
+                Add(new MorningGreetingArgs.MorningGreetingArgsDataDefinition(this, this.RootDataDefinition)
+                {
+                });
+                Add(new EveningGreetingArgs.EveningGreetingArgsDataDefinition(this, this.RootDataDefinition)
+                {
+                });
+                RegisterCustomizations();
+            }
+            public OptionDataDefinition<string> Name { get; }
+
+            public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)
+            {
+                return new List<TReturn>
+                {
+                    dataProvider.CreateMember<string>(this, nameof(Name)),
+                };
+            }
+
         }
     }
 }

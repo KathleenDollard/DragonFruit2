@@ -28,9 +28,9 @@ public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
         }
     }
 
-    public IEnumerable<ValidationFailure> Validate()
+    public IEnumerable<Diagnostic> Validate()
     {
-        var failures = new List<ValidationFailure>();
+        var failures = new List<Diagnostic>();
         InitializeValidators();
 
 
@@ -43,64 +43,15 @@ public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
 
     static partial void RegisterCustomDefaults(Builder<MyOtherArgs> builder, DefaultDataProvider<MyOtherArgs> defaultDataProvider);
 
-    public static ArgsBuilder<MyOtherArgs> GetArgsBuilder(Builder<MyOtherArgs> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-    {
-        return new MyOtherArgs.MyOtherArgsArgsBuilder(parentDataDefinition, rootDataDefinition);
-    }
-
-    /// <summary>
-    ///  This static builder supplies the CLI declaration and filling the Result and return instance.
-    /// </summary>
-    internal class MyOtherArgsArgsBuilder : ArgsBuilder<MyOtherArgs>
-    {
-
-        public MyOtherArgsArgsBuilder(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-            : base(new MyOtherArgsDataDefinition(parentDataDefinition, rootDataDefinition), () => new MyOtherArgsDataValues())
-        {
-        }
-
-        public override void Initialize(Builder<MyOtherArgs> builder)
-        {
-            InitializeCli(builder, builder.GetDataProvider<CliDataProvider<MyOtherArgs>>());
-            InitializeDefaults(builder, builder.GetDataProvider<DefaultDataProvider<MyOtherArgs>>());
-        }
-
-        public override Command InitializeCli(Builder<MyOtherArgs> builder, CliDataProvider<MyOtherArgs>? cliDataProvider)
-        {
-            var cmd = new System.CommandLine.RootCommand("my-other")
-            {
-            };
-
-            cmd.SetAction(p => { ArgsBuilderCache<MyOtherArgs>.ActiveArgsBuilder = this; return ; });
-            cliDataProvider.RootCommand = cmd;
-            return cmd;
-        }
-
-        public void InitializeDefaults(Builder<MyOtherArgs> builder, DefaultDataProvider<MyOtherArgs>? defaultDataProvider)
-        {
-            if (defaultDataProvider is null) return;
-            // TODO: Register defaults based on attributes, initializer, and the RegisterDefault calls
-            RegisterCustomDefaults(builder, defaultDataProvider);
-        }
-
-
-        protected override IEnumerable<ValidationFailure> CheckRequiredValues(DataValues dataValues)
-        {
-            if (dataValues is not MyOtherArgsDataValues typedDataValues)
-            {
-                throw new InvalidOperationException("Internal error: passed incorrect data values");
-            }
-            var requiredFailures = new List<ValidationFailure?>();
-            return requiredFailures
-                      .Where(x => x is not null)
-                      .Select(x => x!);
-        }
-    }
-
     public class MyOtherArgsDataValues : DataValues<MyOtherArgs>
     {
 
-        public override void SetDataValues(DataProvider<MyOtherArgs> dataProvider)
+        public MyOtherArgsDataValues(MyOtherArgsDataDefinition commandDefinition)
+            : base(commandDefinition)
+        {
+        }
+
+        public override void SetDataValues(DataProvider<MyOtherArgs> dataProvider, Result<MyOtherArgs> result)
         {
         }
 
@@ -114,13 +65,21 @@ public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
     /// <summary>
     ///  The data definition is available to data providers and are used for initialization.
     /// </summary>
-    internal class MyOtherArgsDataDefinition : CommandDataDefinition<MyOtherArgs>
+    public partial class MyOtherArgsDataDefinition : CommandDataDefinition<MyOtherArgs>
     {
 
         public MyOtherArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
             : base(parentDataDefinition, rootDataDefinition)
         {
-            var argsType = typeof(MyOtherArgs);
+            GetDataValues = () => new MyOtherArgsDataValues(this);
+            RegisterCustomizations();
+        }
+
+        public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)
+        {
+            return new List<TReturn>
+            {
+            };
         }
 
     }

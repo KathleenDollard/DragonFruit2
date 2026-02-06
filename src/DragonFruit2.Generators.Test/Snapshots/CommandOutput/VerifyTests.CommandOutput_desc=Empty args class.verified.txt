@@ -27,9 +27,9 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
         }
     }
 
-    public IEnumerable<ValidationFailure> Validate()
+    public IEnumerable<Diagnostic> Validate()
     {
-        var failures = new List<ValidationFailure>();
+        var failures = new List<Diagnostic>();
         InitializeValidators();
 
 
@@ -42,64 +42,15 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
 
     static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-    public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-    {
-        return new MyArgs.MyArgsArgsBuilder(parentDataDefinition, rootDataDefinition);
-    }
-
-    /// <summary>
-    ///  This static builder supplies the CLI declaration and filling the Result and return instance.
-    /// </summary>
-    internal class MyArgsArgsBuilder : ArgsBuilder<MyArgs>
-    {
-
-        public MyArgsArgsBuilder(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-            : base(new MyArgsDataDefinition(parentDataDefinition, rootDataDefinition), () => new MyArgsDataValues())
-        {
-        }
-
-        public override void Initialize(Builder<MyArgs> builder)
-        {
-            InitializeCli(builder, builder.GetDataProvider<CliDataProvider<MyArgs>>());
-            InitializeDefaults(builder, builder.GetDataProvider<DefaultDataProvider<MyArgs>>());
-        }
-
-        public override Command InitializeCli(Builder<MyArgs> builder, CliDataProvider<MyArgs>? cliDataProvider)
-        {
-            var cmd = new System.CommandLine.RootCommand("my")
-            {
-            };
-
-            cmd.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return ; });
-            cliDataProvider.RootCommand = cmd;
-            return cmd;
-        }
-
-        public void InitializeDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs>? defaultDataProvider)
-        {
-            if (defaultDataProvider is null) return;
-            // TODO: Register defaults based on attributes, initializer, and the RegisterDefault calls
-            RegisterCustomDefaults(builder, defaultDataProvider);
-        }
-
-
-        protected override IEnumerable<ValidationFailure> CheckRequiredValues(DataValues dataValues)
-        {
-            if (dataValues is not MyArgsDataValues typedDataValues)
-            {
-                throw new InvalidOperationException("Internal error: passed incorrect data values");
-            }
-            var requiredFailures = new List<ValidationFailure?>();
-            return requiredFailures
-                      .Where(x => x is not null)
-                      .Select(x => x!);
-        }
-    }
-
     public class MyArgsDataValues : DataValues<MyArgs>
     {
 
-        public override void SetDataValues(DataProvider<MyArgs> dataProvider)
+        public MyArgsDataValues(MyArgsDataDefinition commandDefinition)
+            : base(commandDefinition)
+        {
+        }
+
+        public override void SetDataValues(DataProvider<MyArgs> dataProvider, Result<MyArgs> result)
         {
         }
 
@@ -113,13 +64,21 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
     /// <summary>
     ///  The data definition is available to data providers and are used for initialization.
     /// </summary>
-    internal class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
+    public partial class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
     {
 
         public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
             : base(parentDataDefinition, rootDataDefinition)
         {
-            var argsType = typeof(MyArgs);
+            GetDataValues = () => new MyArgsDataValues(this);
+            RegisterCustomizations();
+        }
+
+        public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)
+        {
+            return new List<TReturn>
+            {
+            };
         }
 
     }

@@ -31,9 +31,9 @@ namespace MyNamespace
             }
         }
 
-        public IEnumerable<ValidationFailure> Validate()
+        public IEnumerable<Diagnostic> Validate()
         {
-            var failures = new List<ValidationFailure>();
+            var failures = new List<Diagnostic>();
             InitializeValidators();
 
 
@@ -46,69 +46,24 @@ namespace MyNamespace
 
         static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-        public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-        {
-            return new MorningGreetingArgs.MorningGreetingArgsArgsBuilder(parentDataDefinition, rootDataDefinition);
-        }
-
-        /// <summary>
-        ///  This static builder supplies the CLI declaration and filling the Result and return instance.
-        /// </summary>
-        internal class MorningGreetingArgsArgsBuilder : ArgsBuilder<MyArgs>
-        {
-
-            public MorningGreetingArgsArgsBuilder(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-                : base(new MorningGreetingArgsDataDefinition(parentDataDefinition, rootDataDefinition), () => new MorningGreetingArgsDataValues())
-            {
-            }
-
-            public override void Initialize(Builder<MyArgs> builder)
-            {
-                InitializeCli(builder, builder.GetDataProvider<CliDataProvider<MyArgs>>());
-                InitializeDefaults(builder, builder.GetDataProvider<DefaultDataProvider<MyArgs>>());
-            }
-
-            public override Command InitializeCli(Builder<MyArgs> builder, CliDataProvider<MyArgs>? cliDataProvider)
-            {
-                var cmd = new System.CommandLine.Command("morning-greeting")
-                {
-                };
-
-                cmd.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return 25; });
-                return cmd;
-            }
-
-            public void InitializeDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs>? defaultDataProvider)
-            {
-                if (defaultDataProvider is null) return;
-                // TODO: Register defaults based on attributes, initializer, and the RegisterDefault calls
-                RegisterCustomDefaults(builder, defaultDataProvider);
-            }
-
-
-            protected override IEnumerable<ValidationFailure> CheckRequiredValues(DataValues dataValues)
-            {
-                if (dataValues is not MorningGreetingArgsDataValues typedDataValues)
-                {
-                    throw new InvalidOperationException("Internal error: passed incorrect data values");
-                }
-                var requiredFailures = new List<ValidationFailure?>();
-                return requiredFailures
-                          .Where(x => x is not null)
-                          .Select(x => x!);
-            }
-        }
-
         public class MorningGreetingArgsDataValues : DataValues<MyArgs>
         {
 
-            public override void SetDataValues(DataProvider<MyArgs> dataProvider)
+            public MorningGreetingArgsDataValues(MorningGreetingArgsDataDefinition commandDefinition)
+                : base(commandDefinition)
             {
-                dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Name)), Name);
+            }
+
+            public override void SetDataValues(DataProvider<MyArgs> dataProvider, Result<MyArgs> result)
+            {
+                if (Name is not null && !Name.IsSet)
+                {
+                    dataProvider.TrySetDataValue(Name, result);
+                }
             }
 
             private Type argsType = typeof(MorningGreetingArgs);
-            public DataValue<string> Name { get; } = DataValue<string>.Create(nameof(Name), typeof(MorningGreetingArgs));
+            public DataValue<string> Name { get; }
 
             protected override MorningGreetingArgs CreateInstance()
             {
@@ -118,13 +73,21 @@ namespace MyNamespace
         /// <summary>
         ///  The data definition is available to data providers and are used for initialization.
         /// </summary>
-        internal class MorningGreetingArgsDataDefinition : CommandDataDefinition<MorningGreetingArgs>
+        public partial class MorningGreetingArgsDataDefinition : CommandDataDefinition<MyArgs>
         {
 
             public MorningGreetingArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
                 : base(parentDataDefinition, rootDataDefinition)
             {
-                var argsType = typeof(MyNamespace.MorningGreetingArgs);
+                GetDataValues = () => new MorningGreetingArgsDataValues(this);
+                RegisterCustomizations();
+            }
+
+            public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)
+            {
+                return new List<TReturn>
+                {
+                };
             }
 
         }

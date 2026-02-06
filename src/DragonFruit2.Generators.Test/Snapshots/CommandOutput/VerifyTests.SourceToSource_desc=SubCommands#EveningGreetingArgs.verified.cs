@@ -37,9 +37,9 @@ namespace MyNamespace
             }
         }
 
-        public IEnumerable<ValidationFailure> Validate()
+        public IEnumerable<Diagnostic> Validate()
         {
-            var failures = new List<ValidationFailure>();
+            var failures = new List<Diagnostic>();
             InitializeValidators();
 
             if (ageValidators is not null)
@@ -62,80 +62,31 @@ namespace MyNamespace
 
         static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-        public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-        {
-            return new EveningGreetingArgs.EveningGreetingArgsArgsBuilder(parentDataDefinition, rootDataDefinition);
-        }
-
-        /// <summary>
-        ///  This static builder supplies the CLI declaration and filling the Result and return instance.
-        /// </summary>
-        internal class EveningGreetingArgsArgsBuilder : ArgsBuilder<MyArgs>
-        {
-
-            public EveningGreetingArgsArgsBuilder(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-                : base(new EveningGreetingArgsDataDefinition(parentDataDefinition, rootDataDefinition), () => new EveningGreetingArgsDataValues())
-            {
-            }
-
-            public override void Initialize(Builder<MyArgs> builder)
-            {
-                InitializeCli(builder, builder.GetDataProvider<CliDataProvider<MyArgs>>());
-                InitializeDefaults(builder, builder.GetDataProvider<DefaultDataProvider<MyArgs>>());
-            }
-
-            public override Command InitializeCli(Builder<MyArgs> builder, CliDataProvider<MyArgs>? cliDataProvider)
-            {
-                var cmd = new System.CommandLine.Command("evening-greeting")
-                {
-                };
-
-                var ageOption = new Option<int>("--age")
-                {
-                    Description = null,
-                    Required = false,
-                    Recursive=true
-                };
-                cliDataProvider.AddNameLookup((typeof(EveningGreetingArgs), nameof(Age)), ageOption);
-                cmd.Add(ageOption);
-
-                cmd.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return 25; });
-                return cmd;
-            }
-
-            public void InitializeDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs>? defaultDataProvider)
-            {
-                if (defaultDataProvider is null) return;
-                // TODO: Register defaults based on attributes, initializer, and the RegisterDefault calls
-                RegisterCustomDefaults(builder, defaultDataProvider);
-            }
-
-
-            protected override IEnumerable<ValidationFailure> CheckRequiredValues(DataValues dataValues)
-            {
-                if (dataValues is not EveningGreetingArgsDataValues typedDataValues)
-                {
-                    throw new InvalidOperationException("Internal error: passed incorrect data values");
-                }
-                var requiredFailures = new List<ValidationFailure?>();
-                return requiredFailures
-                          .Where(x => x is not null)
-                          .Select(x => x!);
-            }
-        }
-
         public class EveningGreetingArgsDataValues : DataValues<MyArgs>
         {
 
-            public override void SetDataValues(DataProvider<MyArgs> dataProvider)
+            public EveningGreetingArgsDataValues(EveningGreetingArgsDataDefinition commandDefinition)
+                : base(commandDefinition)
             {
-                dataProvider.TrySetDataValue((typeof(EveningGreetingArgs), nameof(Age)), Age);
-                dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Name)), Name);
+                Age = DataValue<int>.Create(nameof(Age), argsType, commandDefinition.Age);
+                Add(Age);
+            }
+
+            public override void SetDataValues(DataProvider<MyArgs> dataProvider, Result<MyArgs> result)
+            {
+                if (Age is not null && !Age.IsSet)
+                {
+                    dataProvider.TrySetDataValue(Age, result);
+                }
+                if (Name is not null && !Name.IsSet)
+                {
+                    dataProvider.TrySetDataValue(Name, result);
+                }
             }
 
             private Type argsType = typeof(EveningGreetingArgs);
-            public DataValue<int> Age { get; } = DataValue<int>.Create(nameof(Age), typeof(EveningGreetingArgs));
-            public DataValue<string> Name { get; } = DataValue<string>.Create(nameof(Name), typeof(EveningGreetingArgs));
+            public DataValue<int> Age { get; }
+            public DataValue<string> Name { get; }
 
             protected override EveningGreetingArgs CreateInstance()
             {
@@ -145,18 +96,29 @@ namespace MyNamespace
         /// <summary>
         ///  The data definition is available to data providers and are used for initialization.
         /// </summary>
-        internal class EveningGreetingArgsDataDefinition : CommandDataDefinition<EveningGreetingArgs>
+        public partial class EveningGreetingArgsDataDefinition : CommandDataDefinition<MyArgs>
         {
 
             public EveningGreetingArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
                 : base(parentDataDefinition, rootDataDefinition)
             {
-                var argsType = typeof(MyNamespace.EveningGreetingArgs);
-                Add(new OptionDataDefinition(argsType, nameof(Age))
+                GetDataValues = () => new EveningGreetingArgsDataValues(this);
+                Age = new OptionDataDefinition<int>(this, nameof(Age))
                 {
                     DataType = typeof(int), 
                     IsRequired = false, 
-                });
+                };
+                Add(Age);
+                RegisterCustomizations();
+            }
+            public OptionDataDefinition<int> Age { get; }
+
+            public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)
+            {
+                return new List<TReturn>
+                {
+                    dataProvider.CreateMember<int>(this, nameof(Age)),
+                };
             }
 
         }

@@ -104,8 +104,8 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         var memberDefinition = commandDefinition[name];
         Symbol newMember = memberDefinition switch
         {
-            OptionDataDefinition optionDefinition => new SclWrappers.Option<TValue>(optionDefinition),
-            ArgumentDataDefinition argumentDefinition => new SclWrappers.Argument<TValue>(argumentDefinition),
+            OptionDataDefinition<TValue> optionDefinition => new SclWrappers.Option<TValue>(optionDefinition),
+            ArgumentDataDefinition<TValue> argumentDefinition => new SclWrappers.Argument<TValue>(argumentDefinition),
             _ => throw new InvalidOperationException("Unsupported member definition type")
         };
         AddNameLookup((commandDefinition.ArgsType, name), newMember);

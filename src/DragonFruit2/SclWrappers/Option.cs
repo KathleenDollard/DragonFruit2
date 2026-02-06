@@ -1,15 +1,15 @@
 ﻿namespace DragonFruit2.SclWrappers;
 
-public class Option<T> : System.CommandLine.Option<T>, IHasDataDefinition
+public class Option<TValue> : System.CommandLine.Option<TValue>, IHasDataDefinition
 {
-    public Option(OptionDataDefinition optionDefinition)
+    public Option(OptionDataDefinition<TValue> optionDefinition)
         : base($"--{optionDefinition.PosixName}")
     {
         OptionDefinition = optionDefinition;
         Recursive = optionDefinition.Recursive;
     }
 
-    public OptionDataDefinition OptionDefinition { get; }
+    public OptionDataDefinition<TValue> OptionDefinition { get; }
     public DataDefinition DataDefinition => OptionDefinition;
 
 }

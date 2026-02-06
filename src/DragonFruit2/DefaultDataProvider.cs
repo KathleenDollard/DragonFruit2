@@ -13,16 +13,12 @@ public class DefaultDataProvider<TRootArgs> : DataProvider<TRootArgs>
 
     public override bool TryGetValue<TValue>((Type argsType, string propertyName) key, DataValue<TValue> dataValue)
     {
-        if (defaultValues.TryGetValue(key, out var value))
-        {
-            if (value is TValue retrievedValue)
-            {
-                dataValue.SetValue(retrievedValue, this);
-                return true;
-            }
-            throw new InvalidOperationException("Issue with the default values lookup.");
-        }
-        return false;
+        var memberDefinition = dataValue.MemberDefinition;
+
+        var defaultValues = memberDefinition.TryGetDefault(dataValues);
+
+
+
     }
 
     public void RegisterDefault<TValue>(Type argsType, string propertyName, TValue value)
@@ -31,10 +27,5 @@ public class DefaultDataProvider<TRootArgs> : DataProvider<TRootArgs>
         {
             defaultValues[(argsType, propertyName)] = value;
         }
-    }
-
-    public override void Initialize(Builder<TRootArgs> builder, CommandDataDefinition<TRootArgs> commandDefinition)
-    {
-        //throw new NotImplementedException();
     }
 }

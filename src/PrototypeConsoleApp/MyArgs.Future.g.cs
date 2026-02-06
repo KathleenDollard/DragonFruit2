@@ -5,6 +5,7 @@ using DragonFruit2;
 using DragonFruit2.Validators;
 using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Cache;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 
@@ -76,80 +77,6 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
 
     static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-    //public static ArgsBuilder<MyArgs> GetArgsBuilder(Builder<MyArgs> builder,
-    //                            CommandDataDefinition? parentCommandDataDefinition,
-    //                            CommandDataDefinition? rootDataDefinition)
-    //{
-    //    return new MyArgs.MyArgsBuilder(parentCommandDataDefinition, rootDataDefinition);
-    //}
-
-    ///// <summary>
-    ///// This static builder supplies the CLI declaration and filling the Result and 
-    ///// return instance.
-    ///// </summary>
-    ///// <remarks>
-    ///// The first type argument of the base is the Args type this builder creates, and the second is the root Args type. 
-    ///// This means the two type arguments are the same for the root ArgsBuilder, but will differ for subcommand ArgsBuilders.
-    ///// <br/>
-    ///// Instances of this class are created in the <see IArgs.
-    ///// </remarks>
-    //internal class MyArgsBuilder : ArgsBuilder<MyArgs>
-    //{
-    //    //static MyArgsBuilder()
-    //    //{
-    //    //    ArgsBuilderCache<MyArgs>.AddArgsBuilder<MyArgs>(new MyArgsBuilder());
-    //    //}
-
-    //    public MyArgsBuilder(CommandDataDefinition? parentDataDefinition,
-    //                         CommandDataDefinition? rootDataDefinition)
-    //        : base(new MyArgsDataDefinition(parentDataDefinition, rootDataDefinition), () => new MyArgsDataValues())
-    //    {
-    //    }
-
-    //    public override void Initialize(Builder<MyArgs> builder)
-    //    {
-    //        // Generate for each data provider
-    //        InitializeCli(builder, builder.GetDataProvider<CliDataProvider<MyArgs>>());
-    //        InitializeDefaults(builder, builder.GetDataProvider<DefaultDataProvider<MyArgs>>());
-    //    }
-
-    //    public override Command InitializeCli(Builder<MyArgs> builder, CliDataProvider<MyArgs>? cliDataProvider)
-    //    {
-    //        if (cliDataProvider is null) throw new ArgumentNullException(nameof(cliDataProvider));
-
-    //        var rootCommand = new System.CommandLine.Command("Test")
-    //        {
-    //            Description = "This is a test command"
-    //        };
-    //        var nameOption = new Option<string>("--name")
-    //        {
-    //            Description = "Your name",
-    //            Required = true
-    //        };
-    //        cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(MyArgs.Name)), nameOption);
-    //        rootCommand.Add(nameOption);
-
-    //        var ageOption = new Option<System.Int32>("--age")
-    //        {
-    //            Description = "Your Age"
-    //        };
-    //        cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(MyArgs.Age)), ageOption);
-    //        rootCommand.Add(ageOption);
-
-    //        var greetingOption = new Option<System.String>("--greeting")
-    //        {
-    //            Description = "Greeting message"
-    //        };
-    //        cliDataProvider.AddNameLookup((typeof(MyArgs), nameof(MyArgs.Greeting)), greetingOption);
-    //        rootCommand.Add(greetingOption);
-
-    //        rootCommand.SetAction(p => { ArgsBuilderCache<MyArgs>.ActiveArgsBuilder = this; return 0; });
-
-    //        cliDataProvider.RootCommand = rootCommand;
-
-    //        return rootCommand;
-    //    }
-
     //    private void InitializeDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs>? defaultDataProvider)
     //    {
     //        if (defaultDataProvider is null) return;
@@ -175,29 +102,40 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
     //}
 
     // Generation Note: MyArgs in the class declaration is TArgs.
-    public class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
+    public partial class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
     {
         // Generation Note: MyArgs in the following constructor is TArgs.
         public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-            : base(parentDataDefinition, rootDataDefinition, () => new MyArgsDataValues())
+            : base(parentDataDefinition, rootDataDefinition)
         {
+            GetDataValues = () => new MyArgsDataValues(this);
             var argsType = typeof(MyArgs);
-            Add(new OptionDataDefinition(argsType, nameof(Name))
+
+            Name = new OptionDataDefinition<string>(argsType, nameof(Name))
             {
                 DataType = typeof(string),
                 IsRequired = true,
-            });
-            Add(new OptionDataDefinition(argsType, nameof(Age))
+            };
+            Add(Name);
+            Age = new OptionDataDefinition<int>(argsType, nameof(Age))
             {
                 DataType = typeof(int),
                 IsRequired = false,
-            });
-            Add(new OptionDataDefinition(argsType, nameof(Greeting))
+            };
+            Add(Age);
+            Greeting = new OptionDataDefinition<string>(argsType, nameof(Greeting))
             {
                 DataType = typeof(string),
                 IsRequired = false,
-            });
+            };
+            Add(Greeting);
+
+            RegisterCustomizations();
         }
+
+        public OptionDataDefinition<string> Name { get; }
+        public OptionDataDefinition<int> Age { get; }
+        public OptionDataDefinition<string> Greeting { get; }
 
         public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)
         {
@@ -212,18 +150,37 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
     // Generation Note: MyArgs in the following class is TRootArgs, except for the private srgsType.
     public class MyArgsDataValues : DataValues<MyArgs>
     {
+        public MyArgsDataValues(MyArgsDataDefinition commandDefinition)
+        {
+            Name = DataValue<string>.Create(nameof(Name), argsType, commandDefinition.Name);
+            Add(Name);
+            Age = DataValue<int>.Create(nameof(Age), argsType, commandDefinition.Age);
+            Add(Age);
+            Greeting = DataValue<string>.Create(nameof(Greeting), argsType, commandDefinition.Greeting);
+            Add(Greeting);
+        }
+
         public override void SetDataValues(DataProvider<MyArgs> dataProvider)
         {
-            dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Name)), Name);
-            dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Age)), Age);
-            dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Greeting)), Greeting);
+            if (Name is not null && !Name.IsSet)
+            {
+                dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Name)), Name);
+            }
+            if (Age is not null && !Age.IsSet)
+            {
+                dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Age)), Age);
+            }
+            if (Greeting is not null && !Greeting.IsSet)
+            {
+                dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Greeting)), Greeting);
+            }
         }
 
         private Type argsType = typeof(MyArgs);
 
-        public DataValue<string> Name { get; } = DataValue<string>.Create(nameof(Name), typeof(MyArgs));
-        public DataValue<int> Age { get; } = DataValue<int>.Create(nameof(Age), typeof(int));
-        public DataValue<string> Greeting { get; } = DataValue<string>.Create(nameof(Greeting), typeof(string));
+        public DataValue<string> Name { get; }
+        public DataValue<int> Age { get; }
+        public DataValue<string> Greeting { get; }
 
         protected override MyArgs CreateInstance()
         {

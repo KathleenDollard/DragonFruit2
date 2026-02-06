@@ -6,10 +6,10 @@ public class DataDefinition
 
     public DataDefinition(string name)
     {
-        Name = name ?? throw new ArgumentNullException(nameof(name));
+        DefinitionName = name ?? throw new ArgumentNullException(nameof(name));
     }
  
-    public string Name { get; } 
+    public string DefinitionName { get; } 
 
     public ObsoleteInfo? Obsolete { get; set; }
     public bool HiddenInCli { get; set; }
@@ -17,22 +17,22 @@ public class DataDefinition
 
     public string PosixName
         => field is null
-            ? Name.ToPosixName()
+            ? DefinitionName.ToPosixName()
             : field;
     public string JsonName
         => field is null
-            ? Name.ToJsonName()
+            ? DefinitionName.ToJsonName()
             : field;
     public string XmlName
     => field is null
-        ? Name.ToXmlName()
+        ? DefinitionName.ToXmlName()
         : field;
     public string ConstantName
         => field is null
-            ? Name.ToConstantName()
+            ? DefinitionName.ToConstantName()
             : field;
     public string ConfigName
         => field is null
-            ? Name.ToConfigName()
+            ? DefinitionName.ToConfigName()
             : field;
 }

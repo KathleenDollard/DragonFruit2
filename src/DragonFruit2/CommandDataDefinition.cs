@@ -1,4 +1,8 @@
-﻿using System.CommandLine;
+﻿using DragonFruit2.Defaults;
+using DragonFruit2.Validators;
+using System.CommandLine;
+using System.Diagnostics;
+using System.Net.Http.Headers;
 
 namespace DragonFruit2;
 
@@ -9,8 +13,10 @@ public abstract class CommandDataDefinition : DataDefinition
 
     private readonly Dictionary<string, MemberDataDefinition> _members = [];
     private readonly List<CommandDataDefinition> _subcommands = [];
+    private readonly Dictionary<string, DefaultDefinition> _defaultDefinitions = [];
+    private readonly Dictionary<string, Validator> _validators = [];
 
-    public CommandDataDefinition(Type rootArgs, 
+    public CommandDataDefinition(Type rootArgs,
                                  CommandDataDefinition? parentDataDefinition,
                                  CommandDataDefinition? rootDataDefinition)
         : base(rootArgs.Name)
@@ -33,34 +39,51 @@ public abstract class CommandDataDefinition : DataDefinition
     // IsOptionStyle is not yet implemented, and will indicate whether the option performs an action, thus behaving like a command
     public bool IsOptionStyle { get; set; }
 
-    public IEnumerable<OptionDataDefinition> Options => _members.Values.OfType<OptionDataDefinition>();
-    public IEnumerable<ArgumentDataDefinition> Arguments => _members.Values.OfType<ArgumentDataDefinition>();
+    public IEnumerable<MemberDataDefinition> Members => _members.Values;
     public IEnumerable<CommandDataDefinition> Subcommands => _subcommands;
 
-    public void Add(OptionDataDefinition option) => _members.Add(option.Name, option);
-    public void Add(ArgumentDataDefinition argument) => _members.Add(argument.Name, argument);
+    public void Add<TValue>(OptionDataDefinition<TValue> option) => _members.Add(option.DefinitionName, option);
+    public void Add<TValue>(ArgumentDataDefinition<TValue> argument) => _members.Add(argument.DefinitionName, argument);
     public void Add(CommandDataDefinition subcommand) => _subcommands.Add(subcommand);
 
-    internal void InitializeMember(OptionDataDefinition optionDefinition, Func<string, Option> makeOption)
+    public virtual void RegisterCustomizations()
     {
-        throw new NotImplementedException();
+        // no op
+    }
+
+    //public void RegisterDefault<T>(MemberDataDefinition<T> member, DefaultDefinition<T> defaultDefinition)
+    //{
+    //    member.Defaults.Add_defaultDefinitions.Add(name, defaultDefinition);
+    //}
+    //public void RegisterDefault<T>(MemberDataDefinition<T> member, T value)
+    //{
+    //    _defaultDefinitions.Add(member.DefinitionName, DefaultConstant<T>.Create(value));
+    //}
+
+    public void RegisterValidator(string name, Validator validator)
+    {
+
+        _validators.Add(name, validator);
     }
 }
 
 public abstract class CommandDataDefinition<TRootArgs> : CommandDataDefinition
     where TRootArgs : ArgsRootBase<TRootArgs>
 {
-    private Func<DataValues<TRootArgs>> _getDataValues;
     public CommandDataDefinition(CommandDataDefinition? parentDataDefinition,
-                                 CommandDataDefinition? rootDataDefinition,
-                                 Func<DataValues<TRootArgs>> getDataValues)
+                                 CommandDataDefinition? rootDataDefinition)
         : base(typeof(TRootArgs), parentDataDefinition, rootDataDefinition)
-    {
-        _getDataValues = getDataValues;
-    }
+    {    }
+
+    public Func<DataValues<TRootArgs>>? GetDataValues { get; protected set; }
 
     internal DataValues<TRootArgs> CreateDataValues()
     {
-        return _getDataValues();
+        if (GetDataValues is null)
+        {
+            throw new InvalidOperationException($"Generation may not have run, try rebuilding. GetDataValues is not set.");
+        }
+        return GetDataValues();
     }
+
 }

@@ -79,7 +79,7 @@ public class Builder<TRootArgs>
 
         foreach (var dataProvider in DataProviders)
         {
-            result.DataValues.SetDataValues(dataProvider);
+            result.DataValues.SetDataValues(dataProvider, result);
         }
 
         // TODO: CheckRequired

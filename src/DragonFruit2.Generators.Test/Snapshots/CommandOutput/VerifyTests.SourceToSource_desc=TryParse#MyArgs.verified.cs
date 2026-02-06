@@ -75,7 +75,7 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
             RegisterCustomizations();
         }
 
-        public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)
+        public override IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider)
         {
             return new List<TReturn>
             {

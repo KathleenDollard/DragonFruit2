@@ -103,11 +103,11 @@ namespace MyNamespace
             }
             public OptionDataDefinition<string> Name { get; }
 
-            public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)
+            public override IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider)
             {
                 return new List<TReturn>
                 {
-                    dataProvider.CreateMember<string>(this, nameof(Name)),
+                    dataProvider.CreateFromMember<string>(this, nameof(Name)),
                 };
             }
 

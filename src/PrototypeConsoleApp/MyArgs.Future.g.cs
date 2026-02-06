@@ -77,30 +77,6 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
 
     static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
 
-    //    private void InitializeDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs>? defaultDataProvider)
-    //    {
-    //        if (defaultDataProvider is null) return;
-
-    //        // RegisterDefaults for attribute values and initialization
-
-    //        RegisterCustomDefaults(builder, defaultDataProvider);
-    //    }
-
-    //    protected override IEnumerable<Diagnostic> CheckRequiredValues(DataValues dataValues)
-    //    {
-    //        if (dataValues is not MyArgsDataValues typedDataValues)
-    //        {
-    //            throw new InvalidOperationException("Internal error: passed incorrect data values");
-    //        }
-
-    //        var requiredFailures = new List<Diagnostic>();
-    //        AddRequiredFailureIfNeeded<string>(requiredFailures, !typedDataValues.Name.IsSet, nameof(typedDataValues.Name));
-    //        return requiredFailures
-    //                .Where(x => x is not null)
-    //                .Select(x => x!);
-    //    }
-    //}
-
     // Generation Note: MyArgs in the class declaration is TArgs.
     public partial class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
     {
@@ -136,12 +112,12 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
         public OptionDataDefinition<int> Age { get; }
         public OptionDataDefinition<string> Greeting { get; }
 
-        public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)
+        public override IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider)
         {
             return new List<TReturn> {
-                dataProvider.CreateMember<string>(this, nameof(Name)),
-                dataProvider.CreateMember<int>(this,nameof(Age)),
-                dataProvider.CreateMember<string>(this,nameof(Greeting)),
+                dataProvider.CreateFromMember<string>(this, nameof(Name)),
+                dataProvider.CreateFromMember<int>(this,nameof(Age)),
+                dataProvider.CreateFromMember<string>(this,nameof(Greeting)),
             };
         }
     }

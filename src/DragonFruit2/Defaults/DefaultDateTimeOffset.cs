@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace DragonFruit2.Defaults;
 
@@ -71,7 +70,7 @@ public class DefaultDateTimeOffset : DefaultDefinition<DateTime>
 
         if (dependentName is not null)
         {
-            // TODO: The following code, and all the dependent value code, probably does not handle nullable ValueTypes correctly
+            // TODO: The following code, and all the dependent value code, may not handle nullable ValueTypes correctly
             if (dataValues.TryGetValue<T>(dependentName, out var current))
             {
                 return current.Value;

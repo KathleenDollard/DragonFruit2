@@ -1,5 +1,4 @@
-﻿using DragonFruit2;
-using SampleConsoleApp;
+﻿using SampleConsoleApp;
 
 var myArgsDataValues = Cli.ParseArgs<MyArgs>(args);
 Console.WriteLine("Welcome to the Sample Console App!") ;

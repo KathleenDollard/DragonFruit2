@@ -2,7 +2,7 @@
 
 namespace DragonFruit2;
 
-public static class CommandExtensions
+public static class SystemCommandLineExtensions
 {
 
     extension(Command command)
@@ -31,6 +31,31 @@ public static class CommandExtensions
             {
                 command.Add(member);
             }
+        }
+
+        public System.CommandLine.Command AddRange(IEnumerable<Option> options)
+        {
+            foreach (var option in options)
+            {
+                command.Add(option);
+            }
+            return command;
+        }
+        public System.CommandLine.Command AddRange(IEnumerable<Argument> arguments)
+        {
+            foreach (var argument in arguments)
+            {
+                command.Add(argument);
+            }
+            return command;
+        }
+        public System.CommandLine.Command AddRange(IEnumerable<System.CommandLine.Command> commands)
+        {
+            foreach (var childCommand in commands)
+            {
+                command.Add(childCommand);
+            }
+            return command;
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Text;
 
 namespace DragonFruit2.Generators;
-
+// TODO: Replace all use of this class with DragonFruit2.Common.StringExtensions
 public static class Extensions
 {
     extension(ISymbol symbol)

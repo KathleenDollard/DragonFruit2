@@ -113,11 +113,11 @@ namespace MyNamespace
             }
             public OptionDataDefinition<int> Age { get; }
 
-            public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)
+            public override IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider)
             {
                 return new List<TReturn>
                 {
-                    dataProvider.CreateMember<int>(this, nameof(Age)),
+                    dataProvider.CreateFromMember<int>(this, nameof(Age)),
                 };
             }
 

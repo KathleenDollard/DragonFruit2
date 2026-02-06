@@ -8,7 +8,7 @@ public record class CommandInfo
 {
     private string? simpleName;
 
-    // TODO: Make these required and use init scope. That will remove warning, but needs some downlevel magic
+    // TODO: Make these required and use init scope. The generator is expected to run in modern C# (only the code generated for the user needs to be C# 7.3
     public required string Name { get; init; }
     public string? NamespaceName { get; init; }
     public string FullName

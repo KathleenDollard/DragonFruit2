@@ -1,7 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Xml.Linq;
-
-namespace DragonFruit2.Generators;
+﻿namespace DragonFruit2.Generators;
 
 internal class OutputDataValues
 {

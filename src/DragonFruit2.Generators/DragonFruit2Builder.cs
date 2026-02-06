@@ -1,8 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Net;
 
 namespace DragonFruit2.Generators;
 

@@ -1,6 +1,4 @@
-﻿using System.CommandLine;
-
-namespace DragonFruit2.SclWrappers;
+﻿namespace DragonFruit2.SclWrappers;
 
 public class Command : System.CommandLine.Command, IHasDataDefinition
 {

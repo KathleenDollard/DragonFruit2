@@ -1,5 +1,4 @@
-﻿using DragonFruit2;
-using SampleConsoleApp;
+﻿using SampleConsoleApp;
 
 var subcommandArgsDataValues = Cli.ParseArgs<SubCommandArgs>(args);
 Console.WriteLine("Welcome to the SubCommand sample app");

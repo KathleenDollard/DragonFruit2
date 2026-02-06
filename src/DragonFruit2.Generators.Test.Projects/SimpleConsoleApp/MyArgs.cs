@@ -23,8 +23,11 @@ public partial class MyArgs
     /// </summary>
     public string Greeting { get; set; } = "Greetings!";
 
-    //static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider)
-    //{
-    //    defaultDataProvider.RegisterDefault(typeof(MyArgs), nameof(Greeting), "Hi there!");
-    //}
+    partial class MyArgsDataDefinition
+    {
+        public override void RegisterCustomizations()
+        {
+            Greeting.RegisterDefault("Hi there!");
+        }
+    }
 }

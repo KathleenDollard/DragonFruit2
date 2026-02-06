@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace DragonFruit2.Defaults;
 

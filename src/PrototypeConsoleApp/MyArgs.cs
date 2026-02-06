@@ -1,7 +1,5 @@
 ﻿using DragonFruit2;
-using DragonFruit2.Defaults;
 using DragonFruit2.Validators;
-using System.Net.Cache;
 
 namespace SampleConsoleApp;
 

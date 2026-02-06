@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using Xunit;
 
 namespace DragonFruit2.Generators.Test;
 

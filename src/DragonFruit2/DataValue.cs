@@ -4,7 +4,6 @@ public record class DataValue { }
 
 public record class DataValue<TValue> : DataValue
 {
-    // TODO: Replace `argsType` with `key`
     public static DataValue<TValue> Create(string name, Type argsType, MemberDataDefinition<TValue> memberDefinition)
         => new(name, argsType, memberDefinition);
 

@@ -1,15 +1,12 @@
 ﻿using DragonFruit2.Defaults;
 using DragonFruit2.Validators;
-using System.CommandLine;
-using System.Diagnostics;
-using System.Net.Http.Headers;
 
 namespace DragonFruit2;
 
 
 public abstract class CommandDataDefinition : DataDefinition
 {
-    public abstract IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider);
+    public abstract IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider);
 
     private readonly Dictionary<string, MemberDataDefinition> _members = [];
     private readonly List<CommandDataDefinition> _subcommands = [];
@@ -50,15 +47,6 @@ public abstract class CommandDataDefinition : DataDefinition
     {
         // no op
     }
-
-    //public void RegisterDefault<T>(MemberDataDefinition<T> member, DefaultDefinition<T> defaultDefinition)
-    //{
-    //    member.Defaults.Add_defaultDefinitions.Add(name, defaultDefinition);
-    //}
-    //public void RegisterDefault<T>(MemberDataDefinition<T> member, T value)
-    //{
-    //    _defaultDefinitions.Add(member.DefinitionName, DefaultConstant<T>.Create(value));
-    //}
 
     public void RegisterValidator(string name, Validator validator)
     {

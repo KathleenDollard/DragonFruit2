@@ -65,7 +65,7 @@ public static class DefaultOffsetNumeric
 
             if (dependentName is not null)
             {
-                // TODO: The following code, and all the dependent value code, probably does not handle nullable ValueTypes correctly
+                // TODO: The following code, and all the dependent value code, may not handle nullable ValueTypes correctly
                 if (dataValues.TryGetValue<TValue>(dependentName, out var current))
                 {
                     return current.Value;

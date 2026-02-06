@@ -37,17 +37,6 @@ public class Builder<TRootArgs>
         }
     }
 
-    //public void SetDataValue<TValue>( DataValue<TValue> dataValue, Result<TRootArgs> result)
-    //{
-    //    foreach (var dataProvider in DataProviders)
-    //    {
-    //        if (dataProvider.TryGetValue(dataValue, result))
-    //        {
-    //            return;
-    //        }
-    //    }
-    //}
-
     public Result<TRootArgs> ParseArgs(string[] args)
     {
         args ??= Environment.GetCommandLineArgs().Skip(1).ToArray();

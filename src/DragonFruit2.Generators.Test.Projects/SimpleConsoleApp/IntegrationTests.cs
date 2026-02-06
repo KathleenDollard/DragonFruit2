@@ -69,19 +69,4 @@ public class IntegrationTests
         Assert.True(result.IsValid);
         Assert.Equal(greeting, result.Args?.Greeting);
     }
-
-    //[Theory]
-    //[ClassData(typeof(ExecuteOutput))]
-    //public void TestGeneratedCodeViaHappyPaths(string cliInput, string consoleOutput)
-    //{
-    //    try
-    //    {
-    //        SetConsoleOut();
-    //        var result = Cli.ParseArgs<MyArgs>();
-    //    }
-    //    finally
-    //    {
-    //        ResetConsoleOut();
-    //    }
-    //}
 }

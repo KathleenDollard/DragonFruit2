@@ -1,8 +1,4 @@
-﻿using System.ComponentModel;
-using System.Reflection;
-using System.Xml;
-
-namespace DragonFruit2.Generators;
+﻿namespace DragonFruit2.Generators;
 
 public class OutputDataDefinition
 {
@@ -85,12 +81,12 @@ public class OutputDataDefinition
 
     private static void CreateMembers(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenMethod("public override IEnumerable<TReturn> CreateMembers<TReturn>(ICreatesMembers<TReturn> dataProvider)");
+        sb.OpenMethod("public override IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider)");
         sb.Return("new List<TReturn>", true);
         sb.OpenCurly();
         foreach (var option in commandInfo.Options.Concat(commandInfo.Arguments))
         {
-            sb.AppendLine($"dataProvider.CreateMember<{option.TypeName}>(this, nameof({option.Name})),");
+            sb.AppendLine($"dataProvider.CreateFromMember<{option.TypeName}>(this, nameof({option.Name})),");
         }
         sb.CloseCurly(endStatement: true);
         sb.CloseMethod();

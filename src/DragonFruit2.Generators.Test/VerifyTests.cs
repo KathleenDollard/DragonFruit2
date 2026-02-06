@@ -1,6 +1,4 @@
-﻿using VerifyTests;
-
-namespace DragonFruit2.Generators.Test;
+﻿namespace DragonFruit2.Generators.Test;
 
 public class VerifyTests
 {
@@ -60,23 +58,4 @@ public class VerifyTests
         verifySettings.UseDirectory("Snapshots/CommandOutput");
         return Verify(driver, verifySettings).UseParameters(desc);
     }
-
-
-    //[Fact()]
-    //public Task SammpleAppIntegration()
-    //{
-    //    var projectName = "SampleApp";
-    //    var projectFileName = $"""..\..\..\DragonFruit2.Generation.Test.Projects\{projectName}\{projectName}.csproj""";
-
-    //}
-    //[Theory]
-    //[ClassData(typeof(CommandInfoTheoryData))]
-    // public Task Generation(string desc, string argsSource, string consoleSource, CommandInfo _, string __)
-    // {
-    //     var driver = VerifyHelpers.GetDriver(argsSource, consoleSource);
-
-    //     var verifySettings = new VerifySettings();
-    //     verifySettings.UseDirectory($"Snapshots/GeneratedOutput/{desc}");
-    //     return Verify(driver, verifySettings).UseParameters(desc);
-    // }
 }

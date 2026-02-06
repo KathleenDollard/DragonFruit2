@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-namespace DragonFruit2.Generators;
+﻿namespace DragonFruit2.Generators;
 
 internal static class OutputArgsBuilder
 {

@@ -112,8 +112,9 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         return newMember;
     }
 
-    public override bool TryGetValue<TValue>((Type argsType, string propertyName) key, DataValue<TValue> dataValue)
+    public override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition, Result<TRootArgs> result, out TValue value)
     {
+        var key = (memberDefinition.CommandDefinition.ArgsType, memberDefinition.DefinitionName);
         var symbol = LookupSymbol[key];
         if (symbol is not null)
         {
@@ -121,23 +122,29 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
             if (symbolResult is not null)
             {
                 // Symbol was found, value may or may not have been provided
-                return SetDataValueIfProvided(ParseResult, symbol, this, dataValue);
+                if (TryGetParsedValue(ParseResult, symbol, out value))
+                {
+                    return true;
+                }
             }
         }
-        dataValue = null;
+        value = default!;
         return false;
 
-        static bool SetDataValueIfProvided(ParseResult parseResult, Symbol symbol, DataProvider<TRootArgs> dataProvider, DataValue<TValue> dataValue)
+
+
+        static bool TryGetParsedValue(ParseResult parseResult, Symbol symbol, [NotNullWhen(true)] out TValue outValue)
         {
             var symbolResult = parseResult.GetResult(symbol);
-            if (symbolResult is null) return false;
-
-            var resultFound = false;
+            if (symbolResult is null)
+            {
+                outValue = default!;
+                return false;
+            }
 
             if (symbolResult.Tokens.Any())
             {
                 // Except for Boolean switches, do not use default values, but only those specified via tokens
-                resultFound = true;
                 TValue? value = symbol switch
                 {
                     Argument argument => parseResult.GetValue<TValue>(argument.Name),
@@ -146,7 +153,7 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
                 };
                 if (value is not null)
                 {
-                    dataValue.SetValue(value, dataProvider);
+                    outValue = value;
                     return true;
                 }
             }
@@ -154,18 +161,24 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
                    && symbolResult is OptionResult optionResult
                    && optionResult.Option.ValueType == typeof(bool))
             {
-                // If the user specified the option, use the default value, which is provided by GetValue
-                if (optionResult.IdentifierTokenCount > 0)
+                if (optionResult.IdentifierToken is null)
                 {
-                    var defaultValueAsObject = optionResult.Option.GetDefaultValue();
-                    // Had to cast to TValue to avoid compiler errors
-                    if (defaultValueAsObject is bool && defaultValueAsObject is TValue defaultValue)
-                    {
-                        dataValue.SetValue(defaultValue, dataProvider);
-                        return true;
-                    }
+                    outValue = default!;
+                    return false;
                 }
+                ;
+                bool value = optionResult.Tokens.Any()
+                   ? parseResult.GetValue<bool>(symbol.Name)
+                   : true;
+                if (value is TValue castValue)
+                {
+                    outValue = castValue;
+                    return true;
+                }
+                // We should not be able to get here sinde this else block checks the TValue type. 
+                // We might be able to clean up the messy generics here.
             }
+            outValue = default!;
             return false;
         }
     }
@@ -199,6 +212,4 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         }
         ;
     }
-
-
 }

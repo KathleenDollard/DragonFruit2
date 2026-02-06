@@ -7,6 +7,13 @@ public abstract class DataValues
 {
     Dictionary<string, DataValue> values = [];
 
+    protected DataValues(CommandDataDefinition commandDefinition)
+    {
+        CommandDefinition = commandDefinition;
+    }
+
+    public CommandDataDefinition CommandDefinition { get; }
+
     protected void Add<TValue>(DataValue<TValue> value)
     {
         values[value.Name] = value;
@@ -27,6 +34,10 @@ public abstract class DataValues
 public abstract class DataValues<TRootArgs> : DataValues
     where TRootArgs : ArgsRootBase<TRootArgs>
 {
+    protected DataValues(CommandDataDefinition commandDefinition)
+        :base (commandDefinition)
+    {  }
+
     public abstract void SetDataValues(DataProvider<TRootArgs> dataProvider, Result<TRootArgs> result);
 
     protected internal abstract TRootArgs CreateInstance();

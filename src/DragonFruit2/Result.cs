@@ -3,8 +3,7 @@ using System.Xml.Schema;
 
 namespace DragonFruit2;
 
-public class Result<TRootArgs>
-    where TRootArgs : ArgsRootBase<TRootArgs>
+public class Result
 {
     private readonly List<Diagnostic> diagnostics = new();
 
@@ -13,12 +12,10 @@ public class Result<TRootArgs>
         CommandLineArguments = commandLineArguments;
     }
 
-    public TRootArgs? Args { get; internal set; }
+    public DragonFruit2Configuration Configuration { get; } = new();
     public IEnumerable<Diagnostic> ValidationFailures => diagnostics;
-    public string[] CommandLineArguments { get;  }
+    public string[] CommandLineArguments { get; }
     public bool IsValid => !ValidationFailures.Any();
-    public CommandDataDefinition<TRootArgs>? ActiveCommandDefinition { get; internal set; }
-    public DataValues<TRootArgs>? DataValues { get; internal set; }
     public int SuggestedReturnValue => throw new NotImplementedException();
 
     public void AddDiagnostic(Diagnostic failure)
@@ -38,4 +35,18 @@ public class Result<TRootArgs>
             Console.WriteLine();
         }
     }
+
+}
+
+public class Result<TRootArgs> : Result
+    where TRootArgs : ArgsRootBase<TRootArgs>
+{
+    public Result(string[] commandLineArguments) : base(commandLineArguments)
+    {
+    }
+
+    public TRootArgs? Args { get; internal set; }
+
+    public CommandDataDefinition<TRootArgs>? ActiveCommandDefinition { get; internal set; }
+    public DataValues<TRootArgs>? DataValues { get; internal set; }
 }

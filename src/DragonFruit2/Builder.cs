@@ -37,16 +37,16 @@ public class Builder<TRootArgs>
         }
     }
 
-    public void SetDataValue<TValue>((Type argsType, string propertyName) key, DataValue<TValue> dataValue)
-    {
-        foreach (var dataProvider in DataProviders)
-        {
-            if (dataProvider.TryGetValue(key, dataValue))
-            {
-                return;
-            }
-        }
-    }
+    //public void SetDataValue<TValue>( DataValue<TValue> dataValue, Result<TRootArgs> result)
+    //{
+    //    foreach (var dataProvider in DataProviders)
+    //    {
+    //        if (dataProvider.TryGetValue(dataValue, result))
+    //        {
+    //            return;
+    //        }
+    //    }
+    //}
 
     public Result<TRootArgs> ParseArgs(string[] args)
     {

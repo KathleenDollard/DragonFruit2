@@ -27,7 +27,8 @@ internal class OutputDataValues
 
     private static void Constructor(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenConstructor($"public {commandInfo.Name}DataValues({commandInfo.Name}DataDefinition commandDefinition)");
+        sb.OpenConstructor($"public {commandInfo.Name}DataValues({commandInfo.Name}DataDefinition commandDefinition)",
+            "base(commandDefinition)");
         foreach (var propInfo in commandInfo.PropInfos)
         {
             sb.AppendLine($"{propInfo.Name} = DataValue<{propInfo.TypeName}>.Create(nameof({propInfo.Name}), argsType, commandDefinition.{propInfo.Name});");
@@ -38,11 +39,11 @@ internal class OutputDataValues
 
     private static void SetDataValues(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenMethod($"public override void SetDataValues(DataProvider<{commandInfo.RootName}> dataProvider)");
+        sb.OpenMethod($"public override void SetDataValues(DataProvider<{commandInfo.RootName}> dataProvider, Result<{commandInfo.RootName}> result)");
         foreach (var propInfo in commandInfo.SelfAndAncestorPropInfos)
         {
             sb.OpenIf($"{propInfo.Name} is not null && !{propInfo.Name}.IsSet");
-            sb.AppendLine($"dataProvider.TrySetDataValue((typeof({propInfo.ContainingTypeName}), nameof({propInfo.Name})), {propInfo.Name});");
+            sb.AppendLine($"dataProvider.TrySetDataValue({propInfo.Name}, result);");
             sb.CloseIf();
         }
         sb.CloseMethod();

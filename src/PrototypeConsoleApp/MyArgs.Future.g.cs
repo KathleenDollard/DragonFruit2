@@ -109,21 +109,20 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
             : base(parentDataDefinition, rootDataDefinition)
         {
             GetDataValues = () => new MyArgsDataValues(this);
-            var argsType = typeof(MyArgs);
 
-            Name = new OptionDataDefinition<string>(argsType, nameof(Name))
+            Name = new OptionDataDefinition<string>(this, nameof(Name))
             {
                 DataType = typeof(string),
                 IsRequired = true,
             };
             Add(Name);
-            Age = new OptionDataDefinition<int>(argsType, nameof(Age))
+            Age = new OptionDataDefinition<int>(this, nameof(Age))
             {
                 DataType = typeof(int),
                 IsRequired = false,
             };
             Add(Age);
-            Greeting = new OptionDataDefinition<string>(argsType, nameof(Greeting))
+            Greeting = new OptionDataDefinition<string>(this, nameof(Greeting))
             {
                 DataType = typeof(string),
                 IsRequired = false,
@@ -151,6 +150,7 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
     public class MyArgsDataValues : DataValues<MyArgs>
     {
         public MyArgsDataValues(MyArgsDataDefinition commandDefinition)
+            : base(commandDefinition)
         {
             Name = DataValue<string>.Create(nameof(Name), argsType, commandDefinition.Name);
             Add(Name);
@@ -160,19 +160,19 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
             Add(Greeting);
         }
 
-        public override void SetDataValues(DataProvider<MyArgs> dataProvider)
+        public override void SetDataValues(DataProvider<MyArgs> dataProvider, Result<MyArgs> result)
         {
             if (Name is not null && !Name.IsSet)
             {
-                dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Name)), Name);
+                dataProvider.TrySetDataValue(Name, result);
             }
             if (Age is not null && !Age.IsSet)
             {
-                dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Age)), Age);
+                dataProvider.TrySetDataValue(Age, result);
             }
             if (Greeting is not null && !Greeting.IsSet)
             {
-                dataProvider.TrySetDataValue((typeof(MyArgs), nameof(Greeting)), Greeting);
+                dataProvider.TrySetDataValue(Greeting, result);
             }
         }
 

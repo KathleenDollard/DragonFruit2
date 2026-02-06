@@ -2,8 +2,8 @@
 {
     public class OptionDataDefinition<TValue> : MemberDataDefinition<TValue>
     {
-        public OptionDataDefinition(Type argsType, string name)
-            : base(argsType, name, true)
+        public OptionDataDefinition(CommandDataDefinition commandDefinition, string name)
+            : base(commandDefinition, name, true)
         {
         }
 

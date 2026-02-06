@@ -2,8 +2,8 @@
 
 public class ArgumentDataDefinition<TValue> : MemberDataDefinition<TValue>
 {
-    public ArgumentDataDefinition(Type argsType, string name) 
-        : base(argsType, name, false)
+    public ArgumentDataDefinition(CommandDataDefinition commandDefinition, string name) 
+        : base(commandDefinition, name, false)
     {
     }
 

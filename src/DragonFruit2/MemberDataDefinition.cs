@@ -13,12 +13,14 @@ namespace DragonFruit2;
 public class MemberDataDefinition : DataDefinition
 {
 
-    public MemberDataDefinition(Type argsType, string name, bool isOption)
+    public MemberDataDefinition(CommandDataDefinition commandDefinition, string name, bool isOption)
         : base(name)
     {
+        CommandDefinition = commandDefinition;
         IsOption = isOption;
     }
 
+    public CommandDataDefinition CommandDefinition { get; }
     public required Type DataType { get; set; }
     public bool IsRequired { get; set; }
     public bool IsOption { get; }
@@ -28,8 +30,8 @@ public class MemberDataDefinition<TValue> : MemberDataDefinition
 {
     private readonly List<DefaultDefinition<TValue>> _defaultDefinitions = [];
 
-    public MemberDataDefinition(Type argsType, string name, bool isOption)
-        : base(argsType, name, isOption)
+    public MemberDataDefinition(CommandDataDefinition commandDefinition, string name, bool isOption)
+        : base(commandDefinition, name, isOption)
     { }
 
     public IEnumerable<DefaultDefinition<TValue>> Defaults => _defaultDefinitions;
@@ -48,7 +50,7 @@ public class MemberDataDefinition<TValue> : MemberDataDefinition
         foreach (var defaultDefinition in Defaults)
         {
             if (defaultDefinition.TryGetDefaultValue(dataValues, out value))
-            {  return true; }
+            { return true; }
         }
         value = default!;
         return false;

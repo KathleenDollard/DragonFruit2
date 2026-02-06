@@ -31,10 +31,10 @@ public class OutputDataDefinition
               $"base(parentDataDefinition, rootDataDefinition)");
 
         sb.AppendLine($"GetDataValues = () => new {commandInfo.Name}DataValues(this);");
-        sb.AppendLine($"var argsType = typeof({commandInfo.FullName});");
+
         foreach (var optionInfo in commandInfo.Options)
         {
-            sb.AppendLine($"{optionInfo.Name} = new OptionDataDefinition<{optionInfo.TypeName}>(argsType, nameof({optionInfo.Name}))");
+            sb.AppendLine($"{optionInfo.Name} = new OptionDataDefinition<{optionInfo.TypeName}>(this, nameof({optionInfo.Name}))");
             sb.OpenCurly();
             AddMemberInfo(sb, optionInfo);
             sb.CloseCurly(endStatement: true);
@@ -43,7 +43,7 @@ public class OutputDataDefinition
 
         foreach (var argumentInfo in commandInfo.Arguments)
         {
-            sb.AppendLine($"{argumentInfo.Name} = new ArgumentDataDefinition<{argumentInfo.TypeName}>(argsType, nameof({argumentInfo.Name}))");
+            sb.AppendLine($"{argumentInfo.Name} = new ArgumentDataDefinition<{argumentInfo.TypeName}>(this, nameof({argumentInfo.Name}))");
             sb.OpenCurly();
             AddMemberInfo(sb, argumentInfo);
             sb.CloseCurly(endStatement: true);

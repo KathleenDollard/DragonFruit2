@@ -14,12 +14,17 @@ public abstract class DataProvider<TRootArgs> : DataProvider
 
     public Builder<TRootArgs> Builder { get; }
 
-    public abstract bool TryGetValue<TValue>((Type argsType, string propertyName) key, DataValue<TValue> value);
+    public abstract bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition, Result<TRootArgs> result, out TValue Value);
 
-    public bool TrySetDataValue<TValue>((Type argsType, string propertyName) key, DataValue<TValue> dataValue)
+    public bool TrySetDataValue<TValue>(DataValue<TValue> dataValue, Result<TRootArgs> result)
     {
-        if (TryGetValue(key, dataValue))
+        if (dataValue.IsSet)
         {
+            return false;
+        }
+        if (TryGetValue(dataValue.MemberDefinition, result, out TValue value))
+        {
+            dataValue.SetValue(value, this);
             return true;
         }
         return false;

@@ -4,7 +4,7 @@ DragonFruit2 is intended as the next generation of the DragonFruit portion of Sy
 
 ## Notes on docs
 
-Unfortunately, the docs are not up to date as the system is evolving relatively rapidly. (The overview)[docs/__Overview.md] gives an idea of project thinking and [this design document](docs/DesignOverview.md) gives a view of what the individual pieces are intended to do. 
+Unfortunately, the docs are not up to date as the system is evolving relatively rapidly. (The overview)[docs/__Overview.md] gives an idea of project thinking and [this design document](docs/DesignOverview.md) gives a view of what the individual pieces are intended to do. The [sequence diagram](docs/DesignGraphs.md/#sequence-diagram) will probably be helpful in understanding how the system fits together.
 
 This `ReadMe.md` file is also being kept up to date.
 

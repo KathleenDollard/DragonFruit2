@@ -28,7 +28,9 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
     {
         public override void RegisterCustomizations()
         {
-            Age.RegisterDefault( 22);
+            Age.Default(22);
+            Age.ValidateGreaterThan(0);
+            Age.RegisterAsRequired();
         }
     }
 }

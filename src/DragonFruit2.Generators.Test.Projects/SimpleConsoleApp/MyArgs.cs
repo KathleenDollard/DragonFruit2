@@ -27,7 +27,7 @@ public partial class MyArgs
     {
         public override void RegisterCustomizations()
         {
-            Greeting.RegisterDefault("Hi there!");
+            Greeting.Default("Hi there!");
         }
     }
 }

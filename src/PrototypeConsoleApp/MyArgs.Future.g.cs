@@ -24,15 +24,15 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
     }
 
     [SetsRequiredMembers()]
-    private MyArgs(DataValue<string>? nameDataValue, DataValue<Int32>? ageDataValue, DataValue<string>? greetingDataValue)
+    private MyArgs(DataValue<string> nameDataValue, DataValue<Int32> ageDataValue, DataValue<string> greetingDataValue)
         : this()
     {
-        // TODO: Resolve nullable warning when changing to tstrongly yped DataValue
+        // TODO: Resolve nullable warning when changing to tstrongly yped DataValue.
         if (ValueIsAvailable<string>(nameDataValue)) Name = nameDataValue.Value;
         if (ValueIsAvailable<int>(ageDataValue)) Age = ageDataValue.Value;
         if (ValueIsAvailable<string>(greetingDataValue)) Greeting = greetingDataValue.Value;
 
-
+        // This is generated because it should not be used outside the constructor.
         static bool ValueIsAvailable<T>([NotNullWhen(true)] DataValue<T>? dataValue)
         {
             return dataValue switch
@@ -42,37 +42,6 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
                 _ => false
             };
         }
-    }
-
-    public override IEnumerable<Diagnostic> Validate()
-    {
-        var failures = new List<Diagnostic>();
-        InitializeValidators();
-
-        if (ageValidators is not null)
-        {
-            foreach (var validator in ageValidators)
-            {
-                failures.AddRange(validator.Validate(Age));
-            }
-        }
-
-        return failures;
-    }
-
-    /// <summary>
-    /// Initializes the collection of age validators with default validation rules.
-    /// </summary>
-    /// <remarks>
-    /// This is a separate method because it will also be called by future code that 
-    /// reports valdiation for extended help.
-    /// </remarks>
-    public void InitializeValidators()
-    {
-        ageValidators ??= new List<Validator<int>>();
-        ageValidators.Add(new GreaterThanValidator<int>("Age", 0));
-
-        // Other properties do not have validation, so their validators remain null.
     }
 
     static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
@@ -128,11 +97,11 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
         public MyArgsDataValues(MyArgsDataDefinition commandDefinition)
             : base(commandDefinition)
         {
-            Name = DataValue<string>.Create(nameof(Name), argsType, commandDefinition.Name);
+            Name = DataValue<string>.Create(nameof(Name), argsType, this, commandDefinition.Name);
             Add(Name);
-            Age = DataValue<int>.Create(nameof(Age), argsType, commandDefinition.Age);
+            Age = DataValue<int>.Create(nameof(Age), argsType, this, commandDefinition.Age);
             Add(Age);
-            Greeting = DataValue<string>.Create(nameof(Greeting), argsType, commandDefinition.Greeting);
+            Greeting = DataValue<string>.Create(nameof(Greeting), argsType, this, commandDefinition.Greeting);
             Add(Greeting);
         }
 
@@ -162,5 +131,6 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
         {
             return new MyArgs(Name, Age, Greeting);
         }
+
     }
 }

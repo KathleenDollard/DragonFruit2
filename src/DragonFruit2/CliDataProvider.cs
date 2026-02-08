@@ -23,9 +23,9 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
 
         static Diagnostic CreateValidationFailure(ParseError error)
             => new(DiagnosticId.SystemCommandLine.ToValidationIdString(),
-                   error.Message,
+                   DiagnosticSeverity.Error,
                    string.Empty,
-                   DiagnosticSeverity.Error);
+                   error.Message);
     }
 
     public Command? RootCommand
@@ -173,7 +173,7 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         LookupSymbol[key] = symbol;
     }
 
-    public bool TryGetActiveArgsDefinition([NotNullWhen(true)] out CommandDataDefinition<TRootArgs> activeCommandDefinition)
+    public bool TryGetActiveArgsDefinition(Result<TRootArgs> result, [NotNullWhen(true)] out CommandDataDefinition<TRootArgs> activeCommandDefinition)
     {
 
         if (ParseResult is null)

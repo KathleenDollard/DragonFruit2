@@ -20,13 +20,14 @@ namespace MyNamespace
         {
         }
         [SetsRequiredMembers()]
-        protected MyArgs(DataValue<string>? nameDataValue)
+        protected MyArgs(DataValue<string> nameDataValue)
             : this()
         {
             if (ValueIsAvailable(nameDataValue)) Name = nameDataValue.Value;
 
             static bool ValueIsAvailable<T>([NotNullWhen(true)] DataValue<T>? dataValue)
             {
+                // This is generated because it should not be used outside the constructor.
                 return dataValue switch
                 {
                     null => false,
@@ -34,15 +35,6 @@ namespace MyNamespace
                     _ => false
                 };
             }
-        }
-
-        public IEnumerable<Diagnostic> Validate()
-        {
-            var failures = new List<Diagnostic>();
-            InitializeValidators();
-
-
-            return failures;
         }
 
         private void InitializeValidators()
@@ -57,7 +49,7 @@ namespace MyNamespace
             public MyArgsDataValues(MyArgsDataDefinition commandDefinition)
                 : base(commandDefinition)
             {
-                Name = DataValue<string>.Create(nameof(Name), argsType, commandDefinition.Name);
+                Name = DataValue<string>.Create(nameof(Name), argsType, this, commandDefinition.Name);
                 Add(Name);
             }
 

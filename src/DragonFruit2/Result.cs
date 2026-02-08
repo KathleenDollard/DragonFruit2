@@ -1,7 +1,8 @@
 ﻿namespace DragonFruit2;
 
-public class Result
+public abstract class Result
 {
+    public abstract IEnumerable<Diagnostic> Diagnostics { get; }
     private readonly List<Diagnostic> diagnostics = new();
 
     public Result(string[] commandLineArguments)
@@ -10,9 +11,10 @@ public class Result
     }
 
     public DragonFruit2Configuration Configuration { get; } = new();
-    public IEnumerable<Diagnostic> ValidationFailures => diagnostics;
+    protected IEnumerable<Diagnostic> CommandDiagnostics => diagnostics;
+
     public string[] CommandLineArguments { get; }
-    public bool IsValid => !ValidationFailures.Any();
+    public bool IsValid => !Diagnostics.Any();
     public int SuggestedReturnValue => throw new NotImplementedException();
 
     public void AddDiagnostic(Diagnostic failure)
@@ -22,10 +24,10 @@ public class Result
 
     public void ReportErrorsToConsole()
     {
-        if (ValidationFailures.Any())
+        if (Diagnostics.Any())
         {
             Console.WriteLine("The input was not valid. Problems included:");
-            foreach (Diagnostic failure in ValidationFailures)
+            foreach (Diagnostic failure in Diagnostics)
             {
                 Console.WriteLine($"* {failure.Message}");
             }
@@ -44,6 +46,28 @@ public class Result<TRootArgs> : Result
 
     public TRootArgs? Args { get; internal set; }
 
-    public CommandDataDefinition<TRootArgs>? ActiveCommandDefinition { get; internal set; }
+    public CommandDataDefinition<TRootArgs>? ActiveCommandDefinition
+    {
+        get;
+        internal set
+        {
+            if (value is null)
+            { throw new ArgumentNullException(nameof(value)); }
+            field = value;
+            DataValues = field.CreateDataValues();
+        }
+    }
     public DataValues<TRootArgs>? DataValues { get; internal set; }
+
+    public override IEnumerable<Diagnostic> Diagnostics
+    {
+        get
+        {
+            // TODO: Check if we need the null check in the following LINQ.
+            var memberDiagnostics = DataValues
+                                        .Where(d=>d.Diagnostics is not null && d.Diagnostics.Any())
+                                        .SelectMany(d=> d.Diagnostics);
+            return CommandDiagnostics.Concat(memberDiagnostics);
+        }
+    }
 }

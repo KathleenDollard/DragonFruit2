@@ -30,5 +30,5 @@ public abstract class Validator<TValue> : Validator
         : base(id, valueName)
     {  }
 
-    public abstract IEnumerable<Diagnostic<TValue>> Validate( TValue value);
+    public abstract IEnumerable<Diagnostic<TValue>> Validate( DataValue<TValue> value);
 }

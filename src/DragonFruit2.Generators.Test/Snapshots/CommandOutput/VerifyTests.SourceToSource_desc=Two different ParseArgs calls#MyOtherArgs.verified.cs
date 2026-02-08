@@ -19,6 +19,7 @@ public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
 
         static bool ValueIsAvailable<T>([NotNullWhen(true)] DataValue<T>? dataValue)
         {
+            // This is generated because it should not be used outside the constructor.
             return dataValue switch
             {
                 null => false,
@@ -26,15 +27,6 @@ public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
                 _ => false
             };
         }
-    }
-
-    public IEnumerable<Diagnostic> Validate()
-    {
-        var failures = new List<Diagnostic>();
-        InitializeValidators();
-
-
-        return failures;
     }
 
     private void InitializeValidators()

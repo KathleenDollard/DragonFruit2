@@ -21,13 +21,14 @@ namespace MyNamespace
         {
         }
         [SetsRequiredMembers()]
-        protected EveningGreetingArgs(DataValue<int>? ageDataValue, DataValue<string>? nameDataValue)
+        protected EveningGreetingArgs(DataValue<int> ageDataValue, DataValue<string> nameDataValue)
             : base(nameDataValue)
         {
             if (ValueIsAvailable(ageDataValue)) Age = ageDataValue.Value;
 
             static bool ValueIsAvailable<T>([NotNullWhen(true)] DataValue<T>? dataValue)
             {
+                // This is generated because it should not be used outside the constructor.
                 return dataValue switch
                 {
                     null => false,
@@ -35,22 +36,6 @@ namespace MyNamespace
                     _ => false
                 };
             }
-        }
-
-        public IEnumerable<Diagnostic> Validate()
-        {
-            var failures = new List<Diagnostic>();
-            InitializeValidators();
-
-            if (ageValidators is not null)
-            {
-                foreach (var validator in ageValidators)
-                {
-                    failures.AddRange(validator.Validate(Age));
-                }
-            }
-
-            return failures;
         }
 
         private void InitializeValidators()
@@ -68,7 +53,7 @@ namespace MyNamespace
             public EveningGreetingArgsDataValues(EveningGreetingArgsDataDefinition commandDefinition)
                 : base(commandDefinition)
             {
-                Age = DataValue<int>.Create(nameof(Age), argsType, commandDefinition.Age);
+                Age = DataValue<int>.Create(nameof(Age), argsType, this, commandDefinition.Age);
                 Add(Age);
             }
 

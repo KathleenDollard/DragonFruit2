@@ -2,6 +2,7 @@
   <Folder Name="/docs/">
     <File Path="../docs/DataProviders.md" />
     <File Path="../docs/DataValues.md" />
+    <File Path="../docs/DesignGraphs.md" />
     <File Path="../docs/DesignOverview.md" />
     <File Path="../docs/Execution.md" />
     <File Path="../docs/Failures.md" />
@@ -9,6 +10,7 @@
     <File Path="../docs/Transforms.md" />
     <File Path="../docs/Validation.md" />
     <File Path="../docs/_Overview.md" />
+    <File Path="../docs/__Overview.md" />
     <File Path="TestingStrategy.md" />
   </Folder>
   <Folder Name="/DragonFruit2.Generation.Test.Projects/">

@@ -3,5 +3,5 @@
 internal interface IActiveArgsProvider<TRootArgs>
         where TRootArgs : ArgsRootBase<TRootArgs>
 {
-    bool TryGetActiveArgsDefinition(out CommandDataDefinition<TRootArgs> args);
+    bool TryGetActiveArgsDefinition(Result<TRootArgs> result, out CommandDataDefinition<TRootArgs> activeCommandDefition);
 }

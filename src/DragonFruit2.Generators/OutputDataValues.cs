@@ -28,7 +28,7 @@ internal class OutputDataValues
             "base(commandDefinition)");
         foreach (var propInfo in commandInfo.PropInfos)
         {
-            sb.AppendLine($"{propInfo.Name} = DataValue<{propInfo.TypeName}>.Create(nameof({propInfo.Name}), argsType, commandDefinition.{propInfo.Name});");
+            sb.AppendLine($"{propInfo.Name} = DataValue<{propInfo.TypeName}>.Create(nameof({propInfo.Name}), argsType, this, commandDefinition.{propInfo.Name});");
             sb.AppendLine($"Add({propInfo.Name});");
         }
         sb.CloseConstructor();

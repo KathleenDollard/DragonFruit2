@@ -1,4 +1,5 @@
 ﻿using DragonFruit2.Validators;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DragonFruit2;
 
@@ -37,45 +38,95 @@ public class Builder<TRootArgs>
         }
     }
 
-    public Result<TRootArgs> ParseArgs(string[] args)
+    public Result<TRootArgs> ParseArgs(string[]? commandLineArguments)
     {
-        args ??= Environment.GetCommandLineArgs().Skip(1).ToArray();
-        CommandLineArguments = args;
+        commandLineArguments ??= Environment.GetCommandLineArgs().Skip(1).ToArray();
+        CommandLineArguments = commandLineArguments;
 
-        // TODO Consider a desigg that does Initialize on every ParseArgs call
-        foreach (var dataProvider in DataProviders)
+        InitializeDataProviders();
+        var result = new Result<TRootArgs>(commandLineArguments);
+        if (!TryGetActiveCommandDefinition(result, out var activeCommandDefinition))
         {
-            dataProvider.Initialize(this, RootCommandDefinition);
-        }
-
-        var result = new Result<TRootArgs>(args);
-        foreach (var dataProvider in DataProviders.OfType<IActiveArgsProvider<TRootArgs>>())
-        {
-            if (dataProvider.TryGetActiveArgsDefinition(out var activeArgsDefinition))
-            {
-                result.ActiveCommandDefinition = activeArgsDefinition;
-                break;
-            }
-        }
-
-        if (result.ActiveCommandDefinition is null)
-        {
-            result.AddDiagnostic(new Diagnostic(DiagnosticId.NoActiveCommand.ToValidationIdString(), "No active command could be determined.", null, DiagnosticSeverity.Error));
+            result.AddDiagnostic(new Diagnostic(DiagnosticId.NoActiveCommand.ToValidationIdString(), DiagnosticSeverity.Error, null, "No active command could be determined."));
             return result;
         }
+        result.ActiveCommandDefinition = activeCommandDefinition;
+        if (result.DataValues is null) throw new InvalidOperationException("DataValues should not be null after ActiveCommandDefinition is set");
 
+        GatherDataValues(result);
+        if (CheckRequired(result) && Validate(result))
+        {
+            var instance = result.DataValues.CreateInstance();
+            result.Args = instance;
+
+            Validate(result);
+        }
+        return result;
+    }
+
+    private bool CheckRequired(Result<TRootArgs> result)
+    {
+        if (result.ActiveCommandDefinition is null) throw new ArgumentNullException(nameof(result.ActiveCommandDefinition));
+        if (result.DataValues is null) throw new ArgumentNullException(nameof(result.DataValues));
+
+        foreach (var dataValue in result.DataValues)
+        {
+            if (dataValue.MemberDefinition.IsRequired && !dataValue.IsSet)
+            {
+                result.AddDiagnostic(new Diagnostic(DiagnosticId.Required.ToValidationIdString(), DiagnosticSeverity.Error, dataValue.MemberDefinition.DefinitionName));
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private bool Validate(Result<TRootArgs> result)
+    {
+        if (result.ActiveCommandDefinition is null) throw new ArgumentNullException(nameof(result.ActiveCommandDefinition));
+        if (result.DataValues is null) throw new ArgumentNullException(nameof(result.DataValues));
+
+        var isValid = true;
+        foreach (var dataValue in result.DataValues)
+        {
+            if (! dataValue.Validate())
+            { isValid = false; }
+        }
+        return isValid;
+    }
+
+    private void GatherDataValues(Result<TRootArgs> result)
+    {
+        if (result.ActiveCommandDefinition is null)
+        {
+            throw new ArgumentNullException(nameof(result.ActiveCommandDefinition));
+        }
+        // TPDO: This is called after a null check on result.DataValues. Are we setting DataValues twice?
         result.DataValues = result.ActiveCommandDefinition.CreateDataValues();
-
         foreach (var dataProvider in DataProviders)
         {
             result.DataValues.SetDataValues(dataProvider, result);
         }
+    }
 
-        // TODO: CheckRequired
-        var instance = result.DataValues.CreateInstance();
-        result.Args = instance;
+    private bool TryGetActiveCommandDefinition(Result<TRootArgs> result, [NotNullWhen(true)] out CommandDataDefinition<TRootArgs> activeCommandDefinition)
+    {
+        foreach (var dataProvider in DataProviders.OfType<IActiveArgsProvider<TRootArgs>>())
+        {
+            if (dataProvider.TryGetActiveArgsDefinition(result, out activeCommandDefinition))
+            {
+                return true;
+            }
+        }
+        activeCommandDefinition = null!;
+        return false;
+    }
 
-        return result;
+    private void InitializeDataProviders()
+    {
+        foreach (var dataProvider in DataProviders)
+        {
+            dataProvider.Initialize(this, RootCommandDefinition);
+        }
     }
 }
 

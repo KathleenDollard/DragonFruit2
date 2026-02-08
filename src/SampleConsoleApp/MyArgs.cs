@@ -28,7 +28,8 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
     {
         public override void RegisterCustomizations()
         {
-            Greeting.RegisterDefault("Hi there!");
+            Greeting.Default("Hi there!");
+            Age.ValidateGreaterThan(0);
         }
     }
 }

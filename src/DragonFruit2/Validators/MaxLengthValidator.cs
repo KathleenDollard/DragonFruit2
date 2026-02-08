@@ -11,12 +11,17 @@ public class MaxLengthValidator : Validator<string>
     public override string Description => $"The string {ValueName} must be longer than {MaxLengthValue}";
     public int MaxLengthValue { get; }
 
-    public override IEnumerable<Diagnostic<string>> Validate(string value)
+    public override IEnumerable<Diagnostic<string>> Validate(DataValue<string> dataValue)
     {
-        if (value.Length < MaxLengthValue)
+        // TODO: Confirm that this is correct null behavior
+        if (dataValue.Value is null)
         {
-            var message = $"The value of {ValueName} must be greater than {MaxLengthValue}, and {value} is not.";
-            return [new Diagnostic<string>(Id, message, ValueName, DiagnosticSeverity.Error, value)];
+            return Enumerable.Empty<Diagnostic<string>>();
+        }
+        if (dataValue.Value.Length < MaxLengthValue)
+        {
+            var message = $"The value of {ValueName} must be greater than {MaxLengthValue}, and {dataValue.Value} is not.";
+            return [new Diagnostic<string>(Id, DiagnosticSeverity.Error, ValueName, dataValue.Value, message)];
         }
         return [];
     }

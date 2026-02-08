@@ -12,12 +12,16 @@ public class GreaterThanValidator<TValue> : Validator<TValue>
     public override string Description => $"The value of {ValueName} must be greater than {CompareWithValue}";
     public TValue CompareWithValue { get; }
 
-    public override IEnumerable<Diagnostic<TValue>> Validate(TValue value)
+    public override IEnumerable<Diagnostic<TValue>> Validate(DataValue<TValue> dataValue)
     {
-        if (value.CompareTo(CompareWithValue) <= 0)
+        if (!typeof(TValue).IsValueType && dataValue.Value == null)
         {
-            var message = $"The value of {ValueName} must be greater than {CompareWithValue}, and {value} is not.";
-            return [new Diagnostic<TValue>(Id, message, ValueName, DiagnosticSeverity.Error, value)];
+            return Enumerable.Empty<Diagnostic<TValue>>();
+        }
+        if (dataValue.Value!.CompareTo(CompareWithValue) <= 0)
+        {
+            var message = $"The value of {ValueName} must be greater than {CompareWithValue}, and {dataValue.Value} is not.";
+            return [new Diagnostic<TValue>(Id, DiagnosticSeverity.Error, ValueName, dataValue.Value, message)];
         }
         return [];
     }

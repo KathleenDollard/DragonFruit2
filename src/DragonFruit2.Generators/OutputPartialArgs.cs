@@ -13,12 +13,10 @@ internal class OutputPartialArgs
         FieldsAndProperties(sb, commandInfo);
         sb.AppendLine();
         Constructors(sb, commandInfo);
-        ValidateMethod(sb, commandInfo);
+        //ValidateMethod(sb, commandInfo);
         InitializeValidatorsMethod(sb, commandInfo);
         RegisterCustomDefaultsPartialMethod(sb, commandInfo);
-        //GetArgsBuilder(sb, commandInfo);
 
-        //OutputArgsBuilder.GetClass(sb, commandInfo);
         OutputDataValues.GetClass(sb, commandInfo);
         OutputDataDefinition.GetClass(sb, commandInfo);
 
@@ -86,6 +84,7 @@ internal class OutputPartialArgs
         }
 
         sb.OpenMethod("static bool ValueIsAvailable<T>([NotNullWhen(true)] DataValue<T>? dataValue)");
+        sb.Comment("This is generated because it should not be used outside the constructor.");
         sb.AppendLine("return dataValue switch");
         sb.OpenCurly();
         sb.AppendLine("null => false,");
@@ -97,7 +96,7 @@ internal class OutputPartialArgs
         sb.CloseConstructor();
 
         static string CtorParameter(PropInfo p)
-            => $"DataValue<{p.TypeName}>? {p.Name.ToCamelCase()}DataValue";
+            => $"DataValue<{p.TypeName}> {p.Name.ToCamelCase()}DataValue";
     }
 
     internal static void ValidateMethod(StringBuilderWrapper sb, CommandInfo commandInfo)

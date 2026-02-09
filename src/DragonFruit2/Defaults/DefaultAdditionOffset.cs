@@ -28,12 +28,14 @@ public static class DefaultOffsetNumeric
             : base($"offset from {start} by {offset}.")
         {
             _start = start;
+            _offset = offset;
             _valueGetter = valueGetter;
         }
-        protected DefaultOffset(string dependentValueName, int offset, Func<TValue, TValue, TValue> valueGetter)
+        protected DefaultOffset(string dependentValueName, TValue offset, Func<TValue, TValue, TValue> valueGetter)
             : base($"offset from {dependentValueName} by {offset}.")
         {
             _dependentStart = dependentValueName;
+            _offset = offset;
             _valueGetter = valueGetter;
         }
 

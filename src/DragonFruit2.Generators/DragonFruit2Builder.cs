@@ -6,9 +6,6 @@ namespace DragonFruit2.Generators;
 
 public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
 {
-    private static readonly int indentSize = 4;
-    private static string indent = "";
-
     private enum CliSymbolType
     {
         Option,
@@ -64,17 +61,17 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         return OutputCli.GetSource(commandInfos);
     }
 
-    internal static CommandInfo? GetRootCommandInfoFromInvocation(InvocationExpressionSyntax invocationSyntax, SemanticModel semanticModel)
+    internal static CommandInfo? GetRootCommandInfoFromInvocation(InvocationExpressionSyntax invocationSyntax,
+                                                                  SemanticModel semanticModel)
     {
-        var invocationSymbol = semanticModel.GetSymbolInfo(invocationSyntax).Symbol as IMethodSymbol;
-        var invocationNamespace = invocationSymbol?.ContainingNamespace.Name;
+        var cliNamespaceName = invocationSyntax.GetNamespace();
 
         var rootArgsTypeArgSymbol = GetArgsTypeSymbol(invocationSyntax, semanticModel);
         if (rootArgsTypeArgSymbol is null)
             return null; // This occurs when the root arg type does not yet exist
         var rootCommandInfo = CreateCommandInfo(rootArgsTypeArgSymbol,
                                                 rootArgsTypeArgSymbol.Name,
-                                                invocationNamespace,
+                                                cliNamespaceName,
                                                 semanticModel);
         return rootCommandInfo;
     }
@@ -85,7 +82,6 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
                                                  SemanticModel semanticModel)
     {
         var commandInfo = CommandInfoHelpers.CreateCommandInfo(typeSymbol, rootName, cliNamespaceName);
-
         // future: Check perf here (semanticModel is captured, etc)
         var props = typeSymbol.GetMembers()
                               .OfType<IPropertySymbol>()
@@ -104,7 +100,7 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         var derivedTypes = GetChildTypes(typeSymbol);
         foreach (var derivedType in derivedTypes)
         {
-            var childCommandInfo = CreateCommandInfo(derivedType, rootName, cliNamespaceName,semanticModel);
+            var childCommandInfo = CreateCommandInfo(derivedType, rootName, cliNamespaceName, semanticModel);
             commandInfo.SubCommands.Add(childCommandInfo);
         }
 

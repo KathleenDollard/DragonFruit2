@@ -22,7 +22,7 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
     /// <summary>
     /// "Greeting message"
     /// </summary>
-    public string Greeting { get; init; } = "Howdy";
+    public required string Greeting { get; init; } = "Howdy";
 
     partial class MyArgsDataDefinition
     {

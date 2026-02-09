@@ -12,7 +12,6 @@ public enum CasingStyle
 public static class StringExtensions
 {
 
-
     private static string InsertDelimiter(this string input, char delimiter, CasingStyle casing)
     {
         if (string.IsNullOrEmpty(input))

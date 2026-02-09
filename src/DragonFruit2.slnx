@@ -25,12 +25,8 @@
     <File Path="Directory.Build.props" />
     <File Path="DragonFruit2.Generators/CommandInfo.cs" />
   </Folder>
-  <Project Path="DragonFruit2.Common.Test/DragonFruit2.Common.Test.csproj">
-    <Build Solution="Debug|*" Project="false" />
-  </Project>
-  <Project Path="DragonFruit2.Common/DragonFruit2.Common.csproj" Id="4ee6eacd-d3b4-4213-8e16-d9f7eaec2c38">
-    <Build Solution="Debug|*" Project="false" />
-  </Project>
+  <Project Path="DragonFruit2.Common.Test/DragonFruit2.Common.Test.csproj" />
+  <Project Path="DragonFruit2.Common/DragonFruit2.Common.csproj" Id="4ee6eacd-d3b4-4213-8e16-d9f7eaec2c38" />
   <Project Path="DragonFruit2.Generators.Test/DragonFruit2.Generators.Test.csproj" Id="513239eb-873d-4d57-b95d-43eff3f81bbd" />
   <Project Path="DragonFruit2.Generators/DragonFruit2.Generators.csproj" />
   <Project Path="DragonFruit2.Polyfills/DragonFruit2.Polyfills.csproj" Id="9ca1ff61-3e17-40b6-9e71-a654d4d3a5c6" />

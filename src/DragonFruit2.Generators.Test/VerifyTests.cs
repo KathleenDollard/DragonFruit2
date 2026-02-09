@@ -1,4 +1,5 @@
 ﻿namespace DragonFruit2.Generators.Test;
+#pragma warning disable xUnit1026 // Theory is reused in several tests that use different properties/parameters
 
 public class VerifyTests
 {

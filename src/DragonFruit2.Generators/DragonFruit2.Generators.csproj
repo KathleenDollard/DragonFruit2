@@ -17,6 +17,16 @@
 
 	</PropertyGroup>
 
+	<!-- Include either the string extensions link OR the Common project reference, not both -->
+	<ItemGroup>
+	  <Compile Include="..\DragonFruit2.Common\StringExtensions.cs" Link="StringExtensions.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<!--<ProjectReference Include="..\DragonFruit2.Common\DragonFruit2.Common.csproj" />-->
+		<ProjectReference Include="..\DragonFruit2.Polyfills\DragonFruit2.Polyfills.csproj" PrivateAssets="All" IncludeAssets="runtime" />
+	</ItemGroup>
+
+
 	<ItemGroup>
 		<InternalsVisibleTo Include="DragonFruit2.Generators.Test" />
 	</ItemGroup>
@@ -24,11 +34,6 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\DragonFruit2.Common\DragonFruit2.Common.csproj" />
-		<ProjectReference Include="..\DragonFruit2.Polyfills\DragonFruit2.Polyfills.csproj" PrivateAssets="All" IncludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup>

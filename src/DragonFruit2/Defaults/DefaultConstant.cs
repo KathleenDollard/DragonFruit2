@@ -4,7 +4,7 @@ namespace DragonFruit2.Defaults;
 
 public class DefaultConstant<TValue> : DefaultDefinition<TValue>
 {
-    private TValue _value;
+    private TValue _defaultValue;
 
     public static DefaultConstant<TValue> Create(TValue value)
     { return new DefaultConstant<TValue>(value); }
@@ -12,17 +12,21 @@ public class DefaultConstant<TValue> : DefaultDefinition<TValue>
     public DefaultConstant(TValue value)
         : base($"value")
     {
-        _value = value;
+        _defaultValue = value;
     }
 
+    /// <summary>
+    /// </summary>
+    /// <remarks>
+    /// This method currently allows setting a default value to default.
+    /// </remarks>
+    /// <param name="dataValues"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
     public override bool TryGetDefaultValue(DataValues dataValues, [NotNullWhen(true)] out TValue value)
     {
-        if (EqualityComparer<TValue>.Default.Equals(_value, default))
-        {
-            value = default!;
-            return true;
-        }
-        value = _value!;
+        value = _defaultValue!;
         return true;
     }
 }

@@ -10,11 +10,7 @@ internal class OutputPartialArgs
 
         OpenClass(commandInfo, sb);
 
-        FieldsAndProperties(sb, commandInfo);
-        sb.AppendLine();
         Constructors(sb, commandInfo);
-        //ValidateMethod(sb, commandInfo);
-        InitializeValidatorsMethod(sb, commandInfo);
         RegisterCustomDefaultsPartialMethod(sb, commandInfo);
 
         OutputDataValues.GetClass(sb, commandInfo);
@@ -46,15 +42,6 @@ internal class OutputPartialArgs
         sb.OpenClass($"{commandInfo.ArgsAccessibility} partial class {commandInfo.Name} : {baseType}");
     }
 
-    internal static void FieldsAndProperties(StringBuilderWrapper sb, CommandInfo commandInfo)
-    {
-        foreach (var prop in commandInfo.Options.Concat(commandInfo.Arguments))
-        {
-            if (prop.Validators is not null && prop.Validators.Any())
-            { sb.AppendLine($"""private List<Validator<{prop.TypeName}>>? {OutputHelpers.GetLocalSymbolName(prop.Name)}Validators;"""); }
-        }
-    }
-
     private static void Constructors(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
         // TODO: Can we allow both base setting of properties and respect for a user-created parameterles ctor? Maybe not.
@@ -64,6 +51,7 @@ internal class OutputPartialArgs
             sb.OpenMethod($"public {commandInfo.Name}()");
             sb.CloseMethod();
         }
+        sb.AppendLine();
 
         sb.Append("[SetsRequiredMembers()]");
         var parameters = string.Join(", ", commandInfo.SelfAndAncestorPropInfos
@@ -83,15 +71,18 @@ internal class OutputPartialArgs
             sb.AppendLine($"""if (ValueIsAvailable({dataValueName})) {propInfo.Name} = {dataValueName}.Value;""");
         }
 
-        sb.OpenMethod("static bool ValueIsAvailable<T>([NotNullWhen(true)] DataValue<T>? dataValue)");
-        sb.Comment("This is generated because it should not be used outside the constructor.");
-        sb.AppendLine("return dataValue switch");
-        sb.OpenCurly();
-        sb.AppendLine("null => false,");
-        sb.AppendLine("{ IsSet: true } => true,");
-        sb.AppendLine("_ => false");
-        sb.CloseCurly(endStatement: true);
-        sb.CloseMethod();
+        if (commandInfo.PropInfos.Any())
+        {
+            sb.OpenMethod("static bool ValueIsAvailable<T>([NotNullWhen(true)] DataValue<T>? dataValue)");
+            sb.Comment("This is generated because it should not be used outside the constructor.");
+            sb.AppendLine("return dataValue switch");
+            sb.OpenCurly();
+            sb.AppendLine("null => false,");
+            sb.AppendLine("{ IsSet: true } => true,");
+            sb.AppendLine("_ => false");
+            sb.CloseCurly(endStatement: true);
+            sb.CloseMethod();
+        }
 
         sb.CloseConstructor();
 

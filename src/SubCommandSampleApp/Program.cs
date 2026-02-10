@@ -12,23 +12,19 @@ if (subcommandArgsDataValues.IsValid)
         EveningArgs eveningArgs => EveningGreetingArgs(eveningArgs),
 
         _ => UnknownGreeting()
-    }
-;
+    };
 }
 else
 {
     subcommandArgsDataValues.ReportErrorsToConsole();
+    return 1;
 }
 
-return 1;
-
-int UnknownGreeting()
+static int UnknownGreeting()
 {
     Console.WriteLine("What the heck?");
     return 1;
 }
-
-Console.WriteLine();
 
 static int MorningGreeting(MorningArgs morningArgs)
 {
@@ -39,11 +35,10 @@ static int MorningGreeting(MorningArgs morningArgs)
 
 static int EveningGreetingArgs(EveningArgs eveningArgs)
 {
-        var drink = ", would you like some wine?.";
-        var noDrink = ".";
-        Console.WriteLine($"{eveningArgs.Greeting} {eveningArgs.Name}{(eveningArgs.Age >= 18 ? drink : noDrink)}");
+    var drink = ", would you like some wine?.";
+    var noDrink = ".";
+    Console.WriteLine($"{eveningArgs.Greeting} {eveningArgs.Name}{(eveningArgs.Age >= 18 ? drink : noDrink)}");
     return 0;
 }
 
-Console.WriteLine("Goodbye from the Sample Console App!");
 

@@ -6,9 +6,6 @@ namespace DragonFruit2.Generators;
 
 public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
 {
-    private static readonly int indentSize = 4;
-    private static string indent = "";
-
     private enum CliSymbolType
     {
         Option,
@@ -24,15 +21,22 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
     /// <returns>true if the node is an invocation of 'ParseArgs' with a single type argument; otherwise, false.</returns>
     public override bool InitialFilter(SyntaxNode node)
     {
-        return (node is InvocationExpressionSyntax inv) &&
-            inv.Expression switch
-            {
-                MemberAccessExpressionSyntax ma when ma.Name is GenericNameSyntax gns
-                    => IsMethodNameOfInterest(gns.Identifier.ValueText) && gns.TypeArgumentList.Arguments.Count == 1,
-                GenericNameSyntax gns2
-                    => IsMethodNameOfInterest(gns2.Identifier.ValueText) && gns2.TypeArgumentList.Arguments.Count == 1,
-                _ => false,
-            };
+        try
+        {
+            return (node is InvocationExpressionSyntax inv) &&
+                inv.Expression switch
+                {
+                    MemberAccessExpressionSyntax ma when ma.Name is GenericNameSyntax gns
+                        => IsMethodNameOfInterest(gns.Identifier.ValueText) && gns.TypeArgumentList.Arguments.Count == 1,
+                    GenericNameSyntax gns2
+                        => IsMethodNameOfInterest(gns2.Identifier.ValueText) && gns2.TypeArgumentList.Arguments.Count == 1,
+                    _ => false,
+                };
+        }
+        catch
+        {
+            throw;
+        }
     }
 
     internal static bool IsMethodNameOfInterest(string valueText)
@@ -41,22 +45,45 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
     }
 
     public override CommandInfo? Transform(GeneratorSyntaxContext context)
+    {
+        try
+        {
             // We only get here for ParseArg invocations with a single generic type argument
-            => context.Node switch
+            return context.Node switch
             {
                 InvocationExpressionSyntax invocationSyntax
                        => GetRootCommandInfoFromInvocation(invocationSyntax, context.SemanticModel),
                 _ => null,
             };
+        }
+        catch
+        {
+            throw;
+        }
+    }
 
     public override void OutputSource(SourceProductionContext context, CommandInfo commandInfo)
     {
-        context.AddSource(commandInfo.Name, GetSourceForCommandInfo(commandInfo));
+        try
+        {
+            context.AddSource(commandInfo.Name, GetSourceForCommandInfo(commandInfo));
+        }
+        catch
+        {
+            throw;
+        }
     }
 
     public void OutputCliSource(SourceProductionContext context, IEnumerable<CommandInfo> commandInfos)
     {
-        context.AddSource("Cli", GetSourceForCli(commandInfos));
+        try
+        {
+            context.AddSource("Cli", GetSourceForCli(commandInfos));
+        }
+        catch
+        {
+            throw;
+        }
     }
 
     private string GetSourceForCli(IEnumerable<CommandInfo> commandInfos)
@@ -64,17 +91,17 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         return OutputCli.GetSource(commandInfos);
     }
 
-    internal static CommandInfo? GetRootCommandInfoFromInvocation(InvocationExpressionSyntax invocationSyntax, SemanticModel semanticModel)
+    internal static CommandInfo? GetRootCommandInfoFromInvocation(InvocationExpressionSyntax invocationSyntax,
+                                                                  SemanticModel semanticModel)
     {
-        var invocationSymbol = semanticModel.GetSymbolInfo(invocationSyntax).Symbol as IMethodSymbol;
-        var invocationNamespace = invocationSymbol?.ContainingNamespace.Name;
+        var cliNamespaceName = invocationSyntax.GetNamespace();
 
         var rootArgsTypeArgSymbol = GetArgsTypeSymbol(invocationSyntax, semanticModel);
         if (rootArgsTypeArgSymbol is null)
             return null; // This occurs when the root arg type does not yet exist
         var rootCommandInfo = CreateCommandInfo(rootArgsTypeArgSymbol,
                                                 rootArgsTypeArgSymbol.Name,
-                                                invocationNamespace,
+                                                cliNamespaceName,
                                                 semanticModel);
         return rootCommandInfo;
     }
@@ -85,7 +112,6 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
                                                  SemanticModel semanticModel)
     {
         var commandInfo = CommandInfoHelpers.CreateCommandInfo(typeSymbol, rootName, cliNamespaceName);
-
         // future: Check perf here (semanticModel is captured, etc)
         var props = typeSymbol.GetMembers()
                               .OfType<IPropertySymbol>()
@@ -104,7 +130,7 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         var derivedTypes = GetChildTypes(typeSymbol);
         foreach (var derivedType in derivedTypes)
         {
-            var childCommandInfo = CreateCommandInfo(derivedType, rootName, cliNamespaceName,semanticModel);
+            var childCommandInfo = CreateCommandInfo(derivedType, rootName, cliNamespaceName, semanticModel);
             commandInfo.SubCommands.Add(childCommandInfo);
         }
 
@@ -168,20 +194,27 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
 
     internal ImmutableArray<CommandInfo> BindParentsAndRemoveDuplicates(ImmutableArray<CommandInfo> commandInfos)
     {
-        commandInfos = commandInfos.Distinct(new CommandInfoEqualityComparer()).ToImmutableArray();
-        foreach (var commandInfo in commandInfos)
+        try
         {
-            BindParentsRecursive(commandInfo);
-        }
-        return commandInfos;
-
-        static void BindParentsRecursive(CommandInfo commandInfo)
-        {
-            foreach (var sub in commandInfo.SubCommands)
+            commandInfos = commandInfos.Distinct(new CommandInfoEqualityComparer()).ToImmutableArray();
+            foreach (var commandInfo in commandInfos)
             {
-                sub.ParentCommandInfo = commandInfo;
-                BindParentsRecursive(sub);
+                BindParentsRecursive(commandInfo);
             }
+            return commandInfos;
+
+            static void BindParentsRecursive(CommandInfo commandInfo)
+            {
+                foreach (var sub in commandInfo.SubCommands)
+                {
+                    sub.ParentCommandInfo = commandInfo;
+                    BindParentsRecursive(sub);
+                }
+            }
+        }
+        catch
+        {
+            throw;
         }
     }
 }

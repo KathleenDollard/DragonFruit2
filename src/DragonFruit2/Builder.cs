@@ -6,7 +6,11 @@ namespace DragonFruit2;
 public class Builder<TRootArgs>
     where TRootArgs : ArgsRootBase<TRootArgs>
 {
-    public CommandDataDefinition<TRootArgs> RootCommandDefinition { get; }
+
+    public static string[] GetArgsFromEnvironment()
+    {
+        return [.. Environment.GetCommandLineArgs().Skip(1)];
+    }
 
     public Builder(CommandDataDefinition<TRootArgs> rootCommandDefinition, DragonFruit2Configuration? configuration = null)
     {
@@ -15,6 +19,8 @@ public class Builder<TRootArgs>
         Configuration = configuration;
         RootCommandDefinition = rootCommandDefinition;
     }
+
+    public CommandDataDefinition<TRootArgs> RootCommandDefinition { get; }
 
     public string[]? CommandLineArguments { get; protected set; }
 
@@ -40,7 +46,7 @@ public class Builder<TRootArgs>
 
     public Result<TRootArgs> ParseArgs(string[]? commandLineArguments)
     {
-        commandLineArguments ??= Environment.GetCommandLineArgs().Skip(1).ToArray();
+        commandLineArguments ??= GetArgsFromEnvironment();
         CommandLineArguments = commandLineArguments;
 
         InitializeDataProviders();

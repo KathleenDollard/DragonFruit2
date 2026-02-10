@@ -12,11 +12,14 @@ public enum DiagnosticId
     // System.CommandLine integration
     SystemCommandLine = 100,
     UnknownParsingFailure = 101,
-    MinLength = 102,
+    // TODO: Do we need the next two
+    MinLength = 102, 
     MaxLength = 103,
 
     // DragonFruit core
     NoActiveCommand = 200,
+    // Message for CouldNotFindBuilder should include "Generation may not have run"
+    CouldNotFindBuilder = 201,
 
 }
 

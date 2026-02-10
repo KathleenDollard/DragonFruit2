@@ -34,7 +34,7 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         set;
     }
 
-    private string[] _parseResultArgs;
+    private string[]? _parseResultArgs;
 
     /// <summary>
     /// This is the System.CommandLine.ParseResult that is used internally.
@@ -103,6 +103,7 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
     public override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition, Result<TRootArgs> result, out TValue value)
     {
         var key = (memberDefinition.CommandDefinition.ArgsType, memberDefinition.DefinitionName);
+        var _ = ParseResult ?? throw new InvalidOperationException("Attempt to retrieve value before parsign complete.");
         var symbol = LookupSymbol[key];
         if (symbol is not null)
         {

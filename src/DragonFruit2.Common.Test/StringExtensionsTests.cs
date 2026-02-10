@@ -1,11 +1,12 @@
 using Xunit;
 
-namespace DragonFruit2.Test;
+namespace DragonFruit2.Common.Test;
 
 public class StringExtensionsTests
 {
     #region ToKebabCase
 
+#pragma warning disable xUnit1012 // don't pass null to string
     [Theory]
     [InlineData("MyString", "my-string")]
     [InlineData("myString", "my-string")]
@@ -18,6 +19,7 @@ public class StringExtensionsTests
         var result = input.ToKebabCase();
         Assert.Equal(expected, result);
     }
+#pragma warning restore xUnit1012
 
     [Theory]
     [InlineData("XMLParser", "xml-parser")]
@@ -73,6 +75,7 @@ public class StringExtensionsTests
 
     #region ToPascalCase
 
+#pragma warning disable xUnit1012
     [Theory]
     [InlineData("my-variable", "MyVariable")]
     [InlineData("my_variable_name", "MyVariableName")]
@@ -86,6 +89,7 @@ public class StringExtensionsTests
         var result = input.ToPascalCase();
         Assert.Equal(expected, result);
     }
+#pragma warning restore xUnit1012
 
     [Theory]
     [InlineData("http-server", "HttpServer")]
@@ -363,7 +367,7 @@ public class StringExtensionsTests
     public void AllMethods_HandleNullInput()
     {
         string? nullInput = null;
-
+#pragma warning disable CS8604
         Assert.Null(nullInput.ToKebabCase());
         Assert.Null(nullInput.ToSnakeCase());
         Assert.Null(nullInput.ToPascalCase());
@@ -376,6 +380,7 @@ public class StringExtensionsTests
         Assert.Null(nullInput.ToJsonName());
         Assert.Null(nullInput.ToConstantName());
         Assert.Null(nullInput.ToPosixName());
+#pragma warning restore CS8604
     }
 
     [Fact]

@@ -1,4 +1,5 @@
 ﻿namespace DragonFruit2.Generators.Test;
+#pragma warning disable xUnit1026 // Theory is reused in several tests that use different properties/parameters
 
 public class VerifyTests
 {
@@ -53,6 +54,8 @@ public class VerifyTests
     public Task SourceToSource(string desc, string argsSource, string consoleSource, CommandInfo _)
     {
         var driver = VerifyHelpers.GetDriver(argsSource, consoleSource);
+
+        var runResult = driver.GetRunResult();
 
         var verifySettings = new VerifySettings();
         verifySettings.UseDirectory("Snapshots/CommandOutput");

@@ -4,6 +4,6 @@
 
 		<UseArtifactPath>true</UseArtifactPath>
 		<ArtifactsPath>$(MSBuildThisFileDirectory)..\artifacts</ArtifactsPath>
-
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	</PropertyGroup>
 </Project>

@@ -3,7 +3,7 @@
 public abstract class Result
 {
     public abstract IEnumerable<Diagnostic> Diagnostics { get; }
-    private readonly List<Diagnostic> diagnostics = new();
+    private readonly List<Diagnostic> diagnostics = [];
 
     public Result(string[] commandLineArguments)
     {

@@ -21,15 +21,22 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
     /// <returns>true if the node is an invocation of 'ParseArgs' with a single type argument; otherwise, false.</returns>
     public override bool InitialFilter(SyntaxNode node)
     {
-        return (node is InvocationExpressionSyntax inv) &&
-            inv.Expression switch
-            {
-                MemberAccessExpressionSyntax ma when ma.Name is GenericNameSyntax gns
-                    => IsMethodNameOfInterest(gns.Identifier.ValueText) && gns.TypeArgumentList.Arguments.Count == 1,
-                GenericNameSyntax gns2
-                    => IsMethodNameOfInterest(gns2.Identifier.ValueText) && gns2.TypeArgumentList.Arguments.Count == 1,
-                _ => false,
-            };
+        try
+        {
+            return (node is InvocationExpressionSyntax inv) &&
+                inv.Expression switch
+                {
+                    MemberAccessExpressionSyntax ma when ma.Name is GenericNameSyntax gns
+                        => IsMethodNameOfInterest(gns.Identifier.ValueText) && gns.TypeArgumentList.Arguments.Count == 1,
+                    GenericNameSyntax gns2
+                        => IsMethodNameOfInterest(gns2.Identifier.ValueText) && gns2.TypeArgumentList.Arguments.Count == 1,
+                    _ => false,
+                };
+        }
+        catch
+        {
+            throw;
+        }
     }
 
     internal static bool IsMethodNameOfInterest(string valueText)
@@ -38,22 +45,45 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
     }
 
     public override CommandInfo? Transform(GeneratorSyntaxContext context)
+    {
+        try
+        {
             // We only get here for ParseArg invocations with a single generic type argument
-            => context.Node switch
+            return context.Node switch
             {
                 InvocationExpressionSyntax invocationSyntax
                        => GetRootCommandInfoFromInvocation(invocationSyntax, context.SemanticModel),
                 _ => null,
             };
+        }
+        catch
+        {
+            throw;
+        }
+    }
 
     public override void OutputSource(SourceProductionContext context, CommandInfo commandInfo)
     {
-        context.AddSource(commandInfo.Name, GetSourceForCommandInfo(commandInfo));
+        try
+        {
+            context.AddSource(commandInfo.Name, GetSourceForCommandInfo(commandInfo));
+        }
+        catch
+        {
+            throw;
+        }
     }
 
     public void OutputCliSource(SourceProductionContext context, IEnumerable<CommandInfo> commandInfos)
     {
-        context.AddSource("Cli", GetSourceForCli(commandInfos));
+        try
+        {
+            context.AddSource("Cli", GetSourceForCli(commandInfos));
+        }
+        catch
+        {
+            throw;
+        }
     }
 
     private string GetSourceForCli(IEnumerable<CommandInfo> commandInfos)
@@ -164,20 +194,27 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
 
     internal ImmutableArray<CommandInfo> BindParentsAndRemoveDuplicates(ImmutableArray<CommandInfo> commandInfos)
     {
-        commandInfos = commandInfos.Distinct(new CommandInfoEqualityComparer()).ToImmutableArray();
-        foreach (var commandInfo in commandInfos)
+        try
         {
-            BindParentsRecursive(commandInfo);
-        }
-        return commandInfos;
-
-        static void BindParentsRecursive(CommandInfo commandInfo)
-        {
-            foreach (var sub in commandInfo.SubCommands)
+            commandInfos = commandInfos.Distinct(new CommandInfoEqualityComparer()).ToImmutableArray();
+            foreach (var commandInfo in commandInfos)
             {
-                sub.ParentCommandInfo = commandInfo;
-                BindParentsRecursive(sub);
+                BindParentsRecursive(commandInfo);
             }
+            return commandInfos;
+
+            static void BindParentsRecursive(CommandInfo commandInfo)
+            {
+                foreach (var sub in commandInfo.SubCommands)
+                {
+                    sub.ParentCommandInfo = commandInfo;
+                    BindParentsRecursive(sub);
+                }
+            }
+        }
+        catch
+        {
+            throw;
         }
     }
 }

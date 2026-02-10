@@ -7,15 +7,21 @@
 		<LangVersion>14.0</LangVersion>
 		<Nullable>enable</Nullable>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-		<OutputPath>../../artifacts/bin/DragonFruit2/release</OutputPath>
+		<!--<OutputPath>../../artifacts/bin/DragonFruit2/release</OutputPath>-->
 
 		<!-- Roslyn analyzer metadata -->
 		<IsRoslynComponent>true</IsRoslynComponent>
 		<OutputItemType>Analyzer</OutputItemType>
-		
-		<Version>0.1.0-beta</Version>
 
+		<Version>0.1.0-beta</Version>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="..\DragonFruit2.Common\StringExtensions.cs" Link="StringExtensions.cs" />
+		<!--<ProjectReference Include="..\DragonFruit2.Common\DragonFruit2.Common.csproj">
+			<Private>true</Private>
+		</ProjectReference>-->
+	</ItemGroup>
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="DragonFruit2.Generators.Test" />
@@ -27,7 +33,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\DragonFruit2.Common\DragonFruit2.Common.csproj" />
 		<ProjectReference Include="..\DragonFruit2.Polyfills\DragonFruit2.Polyfills.csproj" PrivateAssets="All" IncludeAssets="runtime" />
 	</ItemGroup>
 

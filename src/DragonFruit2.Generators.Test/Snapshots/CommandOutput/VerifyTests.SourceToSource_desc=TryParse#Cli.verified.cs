@@ -3,6 +3,7 @@
 # nullable enable
 
 using DragonFruit2;
+using DragonFruit2.Validators;
 
 /// <summary>
 /// Auto-generated partial class that supplies the root ArgsBuilder type.
@@ -21,7 +22,7 @@ public class Cli
     /// </remarks>
     /// <typeparam name="TRootArgs">The type containing the CLI definition, the root command if there are subcommands.</typeparam>
 
-    public static Builder<TRootArgs> CreateBuilder<TRootArgs>()
+    public static Builder<TRootArgs>? CreateBuilder<TRootArgs>()
           where TRootArgs : ArgsRootBase<TRootArgs>
     {
         if (typeof(TRootArgs) == typeof(MyArgs))
@@ -46,7 +47,14 @@ public class Cli
     public static Result<TRootArgs> ParseArgs<TRootArgs>(string[]? args = null)
           where TRootArgs : ArgsRootBase<TRootArgs>
     {
-        return CreateBuilder<TRootArgs>().ParseArgs(args);
+        var builder = CreateBuilder<TRootArgs>();
+        if (builder is null)
+        {
+            var result = new Result<TRootArgs>(Builder<TRootArgs>.GetArgsFromEnvironment());
+            result.AddDiagnostic(new Diagnostic(DiagnosticId.CouldNotFindBuilder.ToValidationIdString(), DiagnosticSeverity.Error));
+            return result;
+        }
+        return builder.ParseArgs(args);
     }
 
     /// <summary>

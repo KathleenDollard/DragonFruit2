@@ -8,7 +8,8 @@ public class OutputDataDefinition
 
         Constructor(sb, commandInfo);
         Properties(sb, commandInfo);
-        CreateMembers(sb, commandInfo);
+        GetMemberDefinition(sb, commandInfo);
+        Operate(sb, commandInfo)    ;
         sb.AppendLine();
 
         sb.CloseClass();
@@ -34,7 +35,6 @@ public class OutputDataDefinition
             sb.OpenCurly();
             AddMemberInfo(sb, optionInfo);
             sb.CloseCurly(endStatement: true);
-            sb.AppendLine($"Add({optionInfo.Name});");
         }
 
         foreach (var argumentInfo in commandInfo.Arguments)
@@ -43,7 +43,6 @@ public class OutputDataDefinition
             sb.OpenCurly();
             AddMemberInfo(sb, argumentInfo);
             sb.CloseCurly(endStatement: true);
-            sb.AppendLine($"Add({argumentInfo.Name});");
         }
 
         foreach (var subcommandInfo in commandInfo.SubCommands)
@@ -78,18 +77,36 @@ public class OutputDataDefinition
 
         }
     }
-
-    private static void CreateMembers(StringBuilderWrapper sb, CommandInfo commandInfo)
+   
+    private static void GetMemberDefinition(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenMethod("public override IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider)");
-        sb.Return("new List<TReturn>", true);
+        sb.OpenMethod("protected override MemberDataDefinition? GetMemberDefinition(string memberName)");
+
+        sb.AppendLine("return memberName switch");
         sb.OpenCurly();
-        foreach (var option in commandInfo.Options.Concat(commandInfo.Arguments))
+        foreach (var propInfo in commandInfo.PropInfos)
         {
-            sb.AppendLine($"dataProvider.CreateFromMember<{option.TypeName}>(this, nameof({option.Name})),");
+            sb.AppendLine($"nameof({propInfo.Name}) => {propInfo.Name},");
         }
         sb.CloseCurly(endStatement: true);
+
         sb.CloseMethod();
     }
 
+
+    private static void Operate(StringBuilderWrapper sb, CommandInfo commandInfo)
+    {
+        sb.OpenMethod("public override IEnumerable<TReturn> Operate<TReturn> (IOperationOnMemberDefinition<TReturn> operationContainer)");
+        sb.AppendLine($"var retValues = new TReturn[{commandInfo.PropInfos.Count()}];");
+
+        var i = 0;
+        foreach (var propInfo in commandInfo.PropInfos)
+        {
+            sb.AppendLine($"retValues[{i}] = operationContainer.Operate({propInfo.Name});");
+            i++;
+        }
+
+        sb.Return("retValues");
+        sb.CloseMethod();
+    }
 }

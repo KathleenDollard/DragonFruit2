@@ -6,9 +6,9 @@ namespace DragonFruit2;
 
 public abstract class CommandDataDefinition : DataDefinition
 {
-    public abstract IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider);
+    protected abstract MemberDataDefinition? GetMemberDefinition(string memberName);
+    public abstract IEnumerable<TReturn> Operate<TReturn>(IOperationOnMemberDefinition<TReturn> operationContainer);
 
-    private readonly Dictionary<string, MemberDataDefinition> _members = [];
     private readonly List<CommandDataDefinition> _subcommands = [];
     private readonly Dictionary<string, DefaultDefinition> _defaultDefinitions = [];
     private readonly Dictionary<string, Validator> _validators = [];
@@ -23,10 +23,6 @@ public abstract class CommandDataDefinition : DataDefinition
         ArgsType = rootArgs;
     }
 
-    public MemberDataDefinition this[string memberName]
-    {
-        get => _members[memberName];
-    }
 
     public Type ArgsType { get; }
 
@@ -36,11 +32,9 @@ public abstract class CommandDataDefinition : DataDefinition
     // IsOptionStyle is not yet implemented, and will indicate whether the option performs an action, thus behaving like a command
     public bool IsOptionStyle { get; set; }
 
-    public IEnumerable<MemberDataDefinition> Members => _members.Values;
+    //public IEnumerable<MemberDataDefinition> Members => _members.Values;
     public IEnumerable<CommandDataDefinition> Subcommands => _subcommands;
 
-    public void Add<TValue>(OptionDataDefinition<TValue> option) => _members.Add(option.DefinitionName, option);
-    public void Add<TValue>(ArgumentDataDefinition<TValue> argument) => _members.Add(argument.DefinitionName, argument);
     public void Add(CommandDataDefinition subcommand) => _subcommands.Add(subcommand);
 
     public virtual void RegisterCustomizations()

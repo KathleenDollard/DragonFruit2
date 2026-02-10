@@ -19,24 +19,37 @@ namespace MyNamespace
         protected MorningGreetingArgs(DataValue<string> nameDataValue)
             : base(nameDataValue)
         {
-
-            static bool ValueIsAvailable<T>([NotNullWhen(true)] DataValue<T>? dataValue)
-            {
-                // This is generated because it should not be used outside the constructor.
-                return dataValue switch
-                {
-                    null => false,
-                    { IsSet: true } => true,
-                    _ => false
-                };
-            }
-        }
-
-        private void InitializeValidators()
-        {
         }
 
         static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
+
+        /// <summary>
+        ///  The data definition is available to data providers and are used for initialization.
+        /// </summary>
+        public partial class MorningGreetingArgsDataDefinition : CommandDataDefinition<MyArgs>
+        {
+
+            public MorningGreetingArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+                : base(parentDataDefinition, rootDataDefinition)
+            {
+                GetDataValues = () => new MorningGreetingArgsDataValues(this);
+                RegisterCustomizations();
+            }
+
+            protected override MemberDataDefinition? GetMemberDefinition(string memberName)
+            {
+                return memberName switch
+                {
+                };
+            }
+
+            public override IEnumerable<TReturn> Operate<TReturn> (IOperationOnMemberDefinition<TReturn> operationContainer)
+            {
+                var retValues = new TReturn[0];
+                return retValues;
+            }
+
+        }
 
         public class MorningGreetingArgsDataValues : DataValues<MyArgs>
         {
@@ -60,28 +73,6 @@ namespace MyNamespace
             protected override MorningGreetingArgs CreateInstance()
             {
                 return new MorningGreetingArgs(Name);            }
-        }
-
-        /// <summary>
-        ///  The data definition is available to data providers and are used for initialization.
-        /// </summary>
-        public partial class MorningGreetingArgsDataDefinition : CommandDataDefinition<MyArgs>
-        {
-
-            public MorningGreetingArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-                : base(parentDataDefinition, rootDataDefinition)
-            {
-                GetDataValues = () => new MorningGreetingArgsDataValues(this);
-                RegisterCustomizations();
-            }
-
-            public override IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider)
-            {
-                return new List<TReturn>
-                {
-                };
-            }
-
         }
     }
 }

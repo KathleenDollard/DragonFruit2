@@ -15,10 +15,10 @@ namespace MyNamespace
     public partial class EveningGreetingArgs : MyArgs
     {
 
-
         public EveningGreetingArgs()
         {
         }
+
         [SetsRequiredMembers()]
         protected EveningGreetingArgs(DataValue<int> ageDataValue, DataValue<string> nameDataValue)
             : base(nameDataValue)
@@ -37,11 +37,46 @@ namespace MyNamespace
             }
         }
 
-        private void InitializeValidators()
-        {
-        }
-
         static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
+
+        /// <summary>
+        ///  The data definition is available to data providers and are used for initialization.
+        /// </summary>
+        public partial class EveningGreetingArgsDataDefinition : CommandDataDefinition<MyArgs>
+        {
+
+            public EveningGreetingArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+                : base(parentDataDefinition, rootDataDefinition)
+            {
+                GetDataValues = () => new EveningGreetingArgsDataValues(this);
+                Age = new OptionDataDefinition<int>(this, nameof(Age))
+                {
+                    DataType = typeof(int), 
+                    IsRequired = false, 
+                };
+                Add(new Bar.BarDataDefinition(this, this.RootDataDefinition)
+                {
+                });
+                RegisterCustomizations();
+            }
+            public OptionDataDefinition<int> Age { get; }
+
+            protected override MemberDataDefinition? GetMemberDefinition(string memberName)
+            {
+                return memberName switch
+                {
+                    nameof(Age) => Age,
+                };
+            }
+
+            public override IEnumerable<TReturn> Operate<TReturn> (IOperationOnMemberDefinition<TReturn> operationContainer)
+            {
+                var retValues = new TReturn[1];
+                retValues[0] = operationContainer.Operate(Age);
+                return retValues;
+            }
+
+        }
 
         public class EveningGreetingArgsDataValues : DataValues<MyArgs>
         {
@@ -72,39 +107,6 @@ namespace MyNamespace
             protected override EveningGreetingArgs CreateInstance()
             {
                 return new EveningGreetingArgs(Age, Name);            }
-        }
-
-        /// <summary>
-        ///  The data definition is available to data providers and are used for initialization.
-        /// </summary>
-        public partial class EveningGreetingArgsDataDefinition : CommandDataDefinition<MyArgs>
-        {
-
-            public EveningGreetingArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-                : base(parentDataDefinition, rootDataDefinition)
-            {
-                GetDataValues = () => new EveningGreetingArgsDataValues(this);
-                Age = new OptionDataDefinition<int>(this, nameof(Age))
-                {
-                    DataType = typeof(int), 
-                    IsRequired = false, 
-                };
-                Add(Age);
-                Add(new Bar.BarDataDefinition(this, this.RootDataDefinition)
-                {
-                });
-                RegisterCustomizations();
-            }
-            public OptionDataDefinition<int> Age { get; }
-
-            public override IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider)
-            {
-                return new List<TReturn>
-                {
-                    dataProvider.CreateFromMember<int>(this, nameof(Age)),
-                };
-            }
-
         }
     }
 }

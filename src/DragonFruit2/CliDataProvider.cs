@@ -2,10 +2,11 @@
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
+using System.Xml.Linq;
 
 namespace DragonFruit2;
 
-public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsProvider<TRootArgs>, ICreatesFromMembers<Symbol>
+public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsProvider<TRootArgs>
     where TRootArgs : ArgsRootBase<TRootArgs>
 {
     public CliDataProvider(Builder<TRootArgs> builder)
@@ -73,7 +74,7 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
 
     private void InitializeCommand(System.CommandLine.Command command, Builder<TRootArgs> builder, CommandDataDefinition commandDefinition)
     {
-        var memberSymbols = commandDefinition.CreateFromMembers(this);
+        var memberSymbols = commandDefinition.Operate(new CreateFromMembersOperation(this));
         command.AddRange(memberSymbols);
 
         foreach (var subcommandDefinition in commandDefinition.Subcommands)
@@ -82,22 +83,27 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
             InitializeCommand(subCommand, builder, subcommandDefinition);
             command.Add(subCommand);
         }
-
         command.SetAction(p => _parseResult = p);
-
     }
 
-    public Symbol CreateFromMember<TValue>(CommandDataDefinition commandDefinition, string name)
+    public struct CreateFromMembersOperation : IOperationOnMemberDefinition<Symbol>
     {
-        var memberDefinition = commandDefinition[name];
-        Symbol newMember = memberDefinition switch
+        private CliDataProvider<TRootArgs> _dataProvider;
+        public CreateFromMembersOperation(CliDataProvider<TRootArgs> dataProvider)
         {
-            OptionDataDefinition<TValue> optionDefinition => new SclWrappers.Option<TValue>(optionDefinition),
-            ArgumentDataDefinition<TValue> argumentDefinition => new SclWrappers.Argument<TValue>(argumentDefinition),
-            _ => throw new InvalidOperationException("Unsupported member definition type")
-        };
-        AddNameLookup((commandDefinition.ArgsType, name), newMember);
-        return newMember;
+            _dataProvider = dataProvider;
+        }
+        public Symbol Operate<TValue>(MemberDataDefinition<TValue> memberDefinition)
+        {
+            Symbol newMember = memberDefinition switch
+            {
+                OptionDataDefinition<TValue> optionDefinition => new SclWrappers.Option<TValue>(optionDefinition),
+                ArgumentDataDefinition<TValue> argumentDefinition => new SclWrappers.Argument<TValue>(argumentDefinition),
+                _ => throw new InvalidOperationException("Unsupported member definition type")
+            };
+            _dataProvider.AddNameLookup((memberDefinition.CommandDefinition.ArgsType, memberDefinition.DefinitionName), newMember);
+            return newMember;
+        }
     }
 
     public override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition, Result<TRootArgs> result, out TValue value)

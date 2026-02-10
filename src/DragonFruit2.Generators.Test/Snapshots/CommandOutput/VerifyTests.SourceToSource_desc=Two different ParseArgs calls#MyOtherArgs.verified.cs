@@ -16,24 +16,37 @@ public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
     [SetsRequiredMembers()]
     protected MyOtherArgs()
     {
-
-        static bool ValueIsAvailable<T>([NotNullWhen(true)] DataValue<T>? dataValue)
-        {
-            // This is generated because it should not be used outside the constructor.
-            return dataValue switch
-            {
-                null => false,
-                { IsSet: true } => true,
-                _ => false
-            };
-        }
-    }
-
-    private void InitializeValidators()
-    {
     }
 
     static partial void RegisterCustomDefaults(Builder<MyOtherArgs> builder, DefaultDataProvider<MyOtherArgs> defaultDataProvider);
+
+    /// <summary>
+    ///  The data definition is available to data providers and are used for initialization.
+    /// </summary>
+    public partial class MyOtherArgsDataDefinition : CommandDataDefinition<MyOtherArgs>
+    {
+
+        public MyOtherArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+            : base(parentDataDefinition, rootDataDefinition)
+        {
+            GetDataValues = () => new MyOtherArgsDataValues(this);
+            RegisterCustomizations();
+        }
+
+        protected override MemberDataDefinition? GetMemberDefinition(string memberName)
+        {
+            return memberName switch
+            {
+            };
+        }
+
+        public override IEnumerable<TReturn> Operate<TReturn> (IOperationOnMemberDefinition<TReturn> operationContainer)
+        {
+            var retValues = new TReturn[0];
+            return retValues;
+        }
+
+    }
 
     public class MyOtherArgsDataValues : DataValues<MyOtherArgs>
     {
@@ -52,27 +65,5 @@ public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
         protected override MyOtherArgs CreateInstance()
         {
             return new MyOtherArgs();        }
-    }
-
-    /// <summary>
-    ///  The data definition is available to data providers and are used for initialization.
-    /// </summary>
-    public partial class MyOtherArgsDataDefinition : CommandDataDefinition<MyOtherArgs>
-    {
-
-        public MyOtherArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-            : base(parentDataDefinition, rootDataDefinition)
-        {
-            GetDataValues = () => new MyOtherArgsDataValues(this);
-            RegisterCustomizations();
-        }
-
-        public override IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider)
-        {
-            return new List<TReturn>
-            {
-            };
-        }
-
     }
 }

@@ -15,10 +15,10 @@ namespace MyNamespace
     public partial class MyArgs : ArgsRootBase<MyArgs>
     {
 
-
         public MyArgs()
         {
         }
+
         [SetsRequiredMembers()]
         protected MyArgs(DataValue<string> nameDataValue)
             : this()
@@ -37,11 +37,49 @@ namespace MyNamespace
             }
         }
 
-        private void InitializeValidators()
-        {
-        }
-
         static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
+
+        /// <summary>
+        ///  The data definition is available to data providers and are used for initialization.
+        /// </summary>
+        public partial class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
+        {
+
+            public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+                : base(parentDataDefinition, rootDataDefinition)
+            {
+                GetDataValues = () => new MyArgsDataValues(this);
+                Name = new OptionDataDefinition<string>(this, nameof(Name))
+                {
+                    DataType = typeof(string), 
+                    IsRequired = true, 
+                };
+                Add(new MorningGreetingArgs.MorningGreetingArgsDataDefinition(this, this.RootDataDefinition)
+                {
+                });
+                Add(new EveningGreetingArgs.EveningGreetingArgsDataDefinition(this, this.RootDataDefinition)
+                {
+                });
+                RegisterCustomizations();
+            }
+            public OptionDataDefinition<string> Name { get; }
+
+            protected override MemberDataDefinition? GetMemberDefinition(string memberName)
+            {
+                return memberName switch
+                {
+                    nameof(Name) => Name,
+                };
+            }
+
+            public override IEnumerable<TReturn> Operate<TReturn> (IOperationOnMemberDefinition<TReturn> operationContainer)
+            {
+                var retValues = new TReturn[1];
+                retValues[0] = operationContainer.Operate(Name);
+                return retValues;
+            }
+
+        }
 
         public class MyArgsDataValues : DataValues<MyArgs>
         {
@@ -67,42 +105,6 @@ namespace MyNamespace
             protected override MyArgs CreateInstance()
             {
                 return new MyArgs(Name);            }
-        }
-
-        /// <summary>
-        ///  The data definition is available to data providers and are used for initialization.
-        /// </summary>
-        public partial class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
-        {
-
-            public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-                : base(parentDataDefinition, rootDataDefinition)
-            {
-                GetDataValues = () => new MyArgsDataValues(this);
-                Name = new OptionDataDefinition<string>(this, nameof(Name))
-                {
-                    DataType = typeof(string), 
-                    IsRequired = true, 
-                };
-                Add(Name);
-                Add(new MorningGreetingArgs.MorningGreetingArgsDataDefinition(this, this.RootDataDefinition)
-                {
-                });
-                Add(new EveningGreetingArgs.EveningGreetingArgsDataDefinition(this, this.RootDataDefinition)
-                {
-                });
-                RegisterCustomizations();
-            }
-            public OptionDataDefinition<string> Name { get; }
-
-            public override IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider)
-            {
-                return new List<TReturn>
-                {
-                    dataProvider.CreateFromMember<string>(this, nameof(Name)),
-                };
-            }
-
         }
     }
 }

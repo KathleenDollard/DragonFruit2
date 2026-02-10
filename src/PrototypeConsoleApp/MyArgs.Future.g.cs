@@ -58,19 +58,16 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
                 DataType = typeof(string),
                 IsRequired = true,
             };
-            Add(Name);
             Age = new OptionDataDefinition<int>(this, nameof(Age))
             {
                 DataType = typeof(int),
                 IsRequired = false,
             };
-            Add(Age);
             Greeting = new OptionDataDefinition<string>(this, nameof(Greeting))
             {
                 DataType = typeof(string),
                 IsRequired = false,
             };
-            Add(Greeting);
 
             RegisterCustomizations();
         }
@@ -79,13 +76,24 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
         public OptionDataDefinition<int> Age { get; }
         public OptionDataDefinition<string> Greeting { get; }
 
-        public override IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider)
+        protected override MemberDataDefinition? GetMemberDefinition(string memberName)
         {
-            return new List<TReturn> {
-                dataProvider.CreateFromMember<string>(this, nameof(Name)),
-                dataProvider.CreateFromMember<int>(this,nameof(Age)),
-                dataProvider.CreateFromMember<string>(this,nameof(Greeting)),
+            return memberName switch
+            {
+                nameof(Name) => Name,
+                nameof(Age) => Name,
+                nameof(Greeting) => Name,
+                _ => null
             };
+        }
+
+        public override IEnumerable<TReturn> Operate<TReturn>(IOperationOnMemberDefinition<TReturn> operationContainer)
+        {
+            var retValues = new TReturn[3];
+            retValues[0] = operationContainer.Operate(Name);
+            retValues[1] = operationContainer.Operate(Age);
+            retValues[2] = operationContainer.Operate(Greeting);
+            return retValues;
         }
     }
 

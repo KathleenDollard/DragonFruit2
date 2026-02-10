@@ -59,39 +59,11 @@ In order to support the identified cohorts:
 
 - Supporting `struct` arg types. Supporting `struct` arg classes will be desirable if it happens, but we will not off trade simplicity for the programmer using DragonFruit2. This will result in a very small number of allocations, and even complex CLIs such as the .NET CLI have only 50-75 classes and may not stay in memory long enough for GC to occur.
 
-## Syntax
+## Syntax 
 
-For a simple project:
+See [ReadMe](..\readme.md)
 
-```C#
-using DragonFruit2;
-
-// The available syntax will be one or more of the following (TBD). Devs will pick one
-
-// This approach requires C# 7+ (? which) so cuts out Full Framework
-// This is due to use of static interface methods
-var args = Cli.ParseArgs<MyArgs>();     // uses System.Environment.CommandLine
-var args = Cli.ParseArgs<MyArgs>(args); // provides better normalization in some cases
-// All other variations can take args or use System.Environment.CommandLine
-
-// This variation rquires a base class
-var args = MyArgs.ParseArgs() ;
-
-// All variations provide a fully hydrated and validated args object
-DoStuff(args)
-
-// The args class, which can, of course, have any name is a normal C# class
-// Details of this structure, such as whether `struct` is allowed, will depend on calling syntax
-internal partial class MyClass
-{
-    public required string Name { get; set; }
-    public int Age { get; set; } = 0;
-    public string Greeting { get; set; } = string.Empty;
-}
-// The args class could be a record, and primary ctors have not been explored
-```
-
-In this simplest form, on failures the DragonFruit2 will report errors and hard exit. Generation should be altered to throw if the ParseArgs call is within a `Try/Catch`.
+In this simplest form, on failures the DragonFruit2 will report errors and exit.
 
 ## Goals and scenarios
 

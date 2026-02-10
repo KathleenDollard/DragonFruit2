@@ -18,24 +18,37 @@ namespace MyNamespace
         [SetsRequiredMembers()]
         protected MyArgs()
         {
-
-            static bool ValueIsAvailable<T>([NotNullWhen(true)] DataValue<T>? dataValue)
-            {
-                // This is generated because it should not be used outside the constructor.
-                return dataValue switch
-                {
-                    null => false,
-                    { IsSet: true } => true,
-                    _ => false
-                };
-            }
-        }
-
-        private void InitializeValidators()
-        {
         }
 
         static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
+
+        /// <summary>
+        ///  The data definition is available to data providers and are used for initialization.
+        /// </summary>
+        public partial class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
+        {
+
+            public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+                : base(parentDataDefinition, rootDataDefinition)
+            {
+                GetDataValues = () => new MyArgsDataValues(this);
+                RegisterCustomizations();
+            }
+
+            protected override MemberDataDefinition? GetMemberDefinition(string memberName)
+            {
+                return memberName switch
+                {
+                };
+            }
+
+            public override IEnumerable<TReturn> Operate<TReturn> (IOperationOnMemberDefinition<TReturn> operationContainer)
+            {
+                var retValues = new TReturn[0];
+                return retValues;
+            }
+
+        }
 
         public class MyArgsDataValues : DataValues<MyArgs>
         {
@@ -54,28 +67,6 @@ namespace MyNamespace
             protected override MyArgs CreateInstance()
             {
                 return new MyArgs();            }
-        }
-
-        /// <summary>
-        ///  The data definition is available to data providers and are used for initialization.
-        /// </summary>
-        public partial class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
-        {
-
-            public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
-                : base(parentDataDefinition, rootDataDefinition)
-            {
-                GetDataValues = () => new MyArgsDataValues(this);
-                RegisterCustomizations();
-            }
-
-            public override IEnumerable<TReturn> CreateFromMembers<TReturn>(ICreatesFromMembers<TReturn> dataProvider)
-            {
-                return new List<TReturn>
-                {
-                };
-            }
-
         }
     }
 }

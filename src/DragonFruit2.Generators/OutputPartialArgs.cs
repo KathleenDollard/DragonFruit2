@@ -13,8 +13,8 @@ internal class OutputPartialArgs
         Constructors(sb, commandInfo);
         RegisterCustomDefaultsPartialMethod(sb, commandInfo);
 
-        OutputDataValues.GetClass(sb, commandInfo);
         OutputDataDefinition.GetClass(sb, commandInfo);
+        OutputDataValues.GetClass(sb, commandInfo);
 
         sb.CloseClass();
         sb.CloseNamespace(commandInfo.NamespaceName);

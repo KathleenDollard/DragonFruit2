@@ -55,6 +55,8 @@ public class VerifyTests
     {
         var driver = VerifyHelpers.GetDriver(argsSource, consoleSource);
 
+        var runResult = driver.GetRunResult();
+
         var verifySettings = new VerifySettings();
         verifySettings.UseDirectory("Snapshots/CommandOutput");
         return Verify(driver, verifySettings).UseParameters(desc);

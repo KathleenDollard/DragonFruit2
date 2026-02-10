@@ -15,7 +15,9 @@
   </Folder>
   <Folder Name="/DragonFruit2.Generation.Test.Projects/">
     <File Path="ReadMe.md" />
-    <Project Path="DragonFruit2.Generators.Test.Projects/SimpleConsoleApp/SimpleConsoleApp.csproj" />
+    <Project Path="DragonFruit2.Generators.Test.Projects/SimpleConsoleApp/SimpleConsoleApp.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="../.gitattributes" />

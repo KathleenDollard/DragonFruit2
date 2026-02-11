@@ -34,10 +34,22 @@ public sealed class LessThanAttribute : ValidatorAttribute
 
     // This is a positional argument
     public LessThanAttribute(object compareWith)
-        : base(nameof(GreaterThanValidator<>))
+        : base(typeof(GreaterThanValidator<>))
     {
         CompareWith = compareWith;
     }
 
     public object CompareWith { get; }
+}
+
+public static class LessThanValidatorExtensions
+{
+    extension<TValue>(MemberDataDefinition<TValue> memberDefinition)
+        where TValue : IComparable<TValue>
+    {
+        public void ValidateLessThan(TValue compareWithValue)
+        {
+            memberDefinition.RegisterValidator(new LessThanValidator<TValue>(memberDefinition.DefinitionName, compareWithValue));
+        }
+    }
 }

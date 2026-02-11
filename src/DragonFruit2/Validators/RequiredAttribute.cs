@@ -15,7 +15,7 @@ public sealed class RequiredAttribute : ValidatorAttribute
     /// </remarks>
     /// <param name="isRquired"></param>
     public RequiredAttribute(bool isRquired = true)
-        : base(nameof(GreaterThanValidator<>))
+        : base(typeof(GreaterThanValidator<>))
     { }
 
 }

@@ -1,10 +1,15 @@
 ﻿namespace DragonFruit2;
 
-public abstract class ValidatorAttribute :Attribute
+[AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
+public abstract class ValidatorAttribute : Attribute
 {
-    public ValidatorAttribute(string validatorName)
+
+    public ValidatorAttribute(Type validatorType)
     {
-        ValidatorName = validatorName;
+        ValidatorType = validatorType;
     }
-    public string ValidatorName { get; set; }
+
+    public Type ValidatorType { get; }
+
+    public void SetValidator()
 }

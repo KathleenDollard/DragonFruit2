@@ -58,11 +58,14 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
                 DataType = typeof(string),
                 IsRequired = true,
             };
+
             Age = new OptionDataDefinition<int>(this, nameof(Age))
             {
                 DataType = typeof(int),
                 IsRequired = false,
             };
+            Age.ValidateGreaterThan(0);
+
             Greeting = new OptionDataDefinition<string>(this, nameof(Greeting))
             {
                 DataType = typeof(string),
@@ -71,6 +74,7 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
 
             RegisterCustomizations();
         }
+
 
         public OptionDataDefinition<string> Name { get; }
         public OptionDataDefinition<int> Age { get; }

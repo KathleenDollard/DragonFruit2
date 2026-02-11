@@ -128,7 +128,7 @@ public class CommandInfoBuildingTests
     }
 
     [Fact]
-    public async Task PropertiesMarkedWithAttributeAreArgs()
+    public async Task PropertiesMarkedWithAttributeAreArgumentss()
     {
         var sourceText = """
             public partial class MyArgs
@@ -221,7 +221,6 @@ public class CommandInfoBuildingTests
 
     }
 
-
     [Fact]
     public async Task PropInfoRecognizesRequiredModifier()
     {
@@ -269,7 +268,6 @@ public class CommandInfoBuildingTests
         Assert.False(commandInfo.Options.Single().HasRequiredModifier);
 
     }
-
 
     [Fact]
     public async Task PropInfoRecognizesInitializer()

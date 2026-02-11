@@ -33,10 +33,21 @@ public sealed class MinLengthAttribute : ValidatorAttribute
 
     // This is a positional argument
     public MinLengthAttribute(object compareWith)
-        : base(nameof(MinLengthValidator))
+        : base(typeof(MinLengthValidator))
     {
         CompareWith = compareWith;
     }
 
     public object CompareWith { get; }
+}
+
+public static class MinLengthValidatorExtensions
+{
+    extension(MemberDataDefinition<string> memberDefinition)
+    {
+        public void ValidateMinimumLength(int maxLengthValue)
+        {
+            memberDefinition.RegisterValidator(new MinLengthValidator(memberDefinition.DefinitionName, maxLengthValue));
+        }
+    }
 }

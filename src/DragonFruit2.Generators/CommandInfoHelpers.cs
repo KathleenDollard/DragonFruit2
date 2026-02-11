@@ -108,7 +108,6 @@ public static class CommandInfoHelpers
 
         var info = new ValidatorInfo
         {
-
             Name = AttributeClassName(attrClass),
             FullTypeName = attrClass.ToDisplayString()
         };

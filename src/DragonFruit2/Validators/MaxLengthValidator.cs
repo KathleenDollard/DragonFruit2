@@ -33,10 +33,21 @@ public sealed class MaxLengthAttribute : ValidatorAttribute
 
     // This is a positional argument
     public MaxLengthAttribute(object compareWith)
-        : base(nameof(MaxLengthValidator))
+        : base(typeof(MaxLengthValidator))
     {
         CompareWith = compareWith;
     }
 
     public object CompareWith { get; }
+}
+
+public static class MaxLengthValidatorExtensions
+{
+    extension(MemberDataDefinition<string> memberDefinition)
+    {
+        public void ValidateMaxLength(int maxLengthValue)
+        {
+            memberDefinition.RegisterValidator(new MaxLengthValidator(memberDefinition.DefinitionName, maxLengthValue));
+        }
+    }
 }

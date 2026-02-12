@@ -46,6 +46,8 @@ public class OutputDataDefinition
             sb.OpenCurly();
             AddMemberInfo(sb, argumentInfo);
             sb.CloseCurly(endStatement: true);
+            AddValidation(sb, argumentInfo);
+            AddDefaults(sb, argumentInfo);
             sb.AppendLine();
         }
 
@@ -75,10 +77,10 @@ public class OutputDataDefinition
    
         static void AddValidation(StringBuilderWrapper sb, PropInfo propInfo)
         {
-            //foreach (var validator in propInfo.Validators)
-            //{
-            //    sb.AppendLine($"{propInfo.Name}.{validator.Name}({validator.Arguments})");
-            //}
+            foreach (var validatorInfo in propInfo.Validators)
+            {
+                sb.AppendLine($"{propInfo.Name}.RegisterValidator(new {validatorInfo.ValidatorName}<{propInfo.TypeName}>({propInfo.Name}.DefinitionName, 0));");
+            }
         }
         
         static void AddDefaults(StringBuilderWrapper sb, PropInfo propInfo)

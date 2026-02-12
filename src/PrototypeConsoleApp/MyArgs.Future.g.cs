@@ -64,7 +64,7 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
                 DataType = typeof(int),
                 IsRequired = false,
             };
-            Age.ValidateGreaterThan(0);
+            Age.RegisterValidator(new GreaterThanValidator<int>(Age.DefinitionName, 0));
 
             Greeting = new OptionDataDefinition<string>(this, nameof(Greeting))
             {

@@ -28,7 +28,7 @@ public class MaxLengthValidator : Validator<string>
 }
 
 [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-public sealed class MaxLengthAttribute : ValidatorAttribute
+public sealed class MaxLengthAttribute : MemberValidatorAttribute
 {
 
     // This is a positional argument

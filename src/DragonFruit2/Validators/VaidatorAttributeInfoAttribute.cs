@@ -2,11 +2,11 @@
 {
     public class VaidatorAttributeInfoAttribute : Attribute
     {
-        public VaidatorAttributeInfoAttribute(string extensionMethodName)
+        public VaidatorAttributeInfoAttribute(Type validatorType)
         {
-            ExtensionMethodName = extensionMethodName;
+            ValidatorType = validatorType;
         }
 
-        public string ExtensionMethodName { get; }
+        public Type  ValidatorType { get; }
     }
 }

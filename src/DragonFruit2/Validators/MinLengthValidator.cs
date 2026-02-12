@@ -28,7 +28,7 @@ public class MinLengthValidator : Validator<string>
 }
 
 [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-public sealed class MinLengthAttribute : ValidatorAttribute
+public sealed class MinLengthAttribute : MemberValidatorAttribute
 {
 
     // This is a positional argument

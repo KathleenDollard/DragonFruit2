@@ -75,10 +75,10 @@ public class OutputDataDefinition
    
         static void AddValidation(StringBuilderWrapper sb, PropInfo propInfo)
         {
-            foreach (var validator in propInfo.Validators)
-            {
-                sb.AppendLine($"{propInfo.Name}.{validator.Name}({validator.Arguments})");
-            }
+            //foreach (var validator in propInfo.Validators)
+            //{
+            //    sb.AppendLine($"{propInfo.Name}.{validator.Name}({validator.Arguments})");
+            //}
         }
         
         static void AddDefaults(StringBuilderWrapper sb, PropInfo propInfo)

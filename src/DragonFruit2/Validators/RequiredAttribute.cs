@@ -1,7 +1,7 @@
 ﻿namespace DragonFruit2.Validators;
 
 
-public sealed class RequiredAttribute : ValidatorAttribute
+public sealed class RequiredAttribute : MemberValidatorAttribute
 {
 
     /// <summary>

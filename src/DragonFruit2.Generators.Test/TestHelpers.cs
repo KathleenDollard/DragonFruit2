@@ -68,6 +68,11 @@ public static class TestHelpers
     public static Compilation GetCompilation(params string[] sources)
     {
         var syntaxTrees = sources.Select(x => CSharpSyntaxTree.ParseText(x)).ToArray();
+        return GetCompilation(syntaxTrees);
+    }
+
+    public static Compilation GetCompilation(params SyntaxTree[] syntaxTrees)
+    {
         var references = AppDomain.CurrentDomain.GetAssemblies()
                             .Where(assembly => !assembly.IsDynamic)
                             .Select(assembly => MetadataReference

@@ -116,7 +116,7 @@ public class DragonFruit2Builder : GeneratorBuilder<CommandInfo>
         var props = typeSymbol.GetMembers()
                               .OfType<IPropertySymbol>()
                               .Where(p => !p.IsStatic)
-                              .Select(p => CommandInfoHelpers.CreatePropInfo(p))
+                              .Select(p => PropInfoHelpers.CreatePropInfo(p, semanticModel))
                               .ToList();
 
         // Split into argument list and options

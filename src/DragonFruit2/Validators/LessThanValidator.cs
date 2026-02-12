@@ -29,7 +29,7 @@ public class LessThanValidator<TValue> : Validator<TValue>
 
 // TODO: Add analyzer to ensure the CompareWith type in the attribute matches the property type
 [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-public sealed class LessThanAttribute : ValidatorAttribute
+public sealed class LessThanAttribute : MemberValidatorAttribute
 {
 
     // This is a positional argument

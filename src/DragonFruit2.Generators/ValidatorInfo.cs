@@ -7,7 +7,7 @@ public class ValidatorInfo
 {
     public required string AttributeName { get; init; }
     public required string ValidatorName { get; init;  }
-    public required ValidatorArgumentInfo[] ValidatorValues { get; init;}
+    public required ValidatorArgumentInfo[] ValidatorArguments { get; init;}
 
 }
 

@@ -90,12 +90,16 @@ public static class PropInfoHelpers
         var ctorArgumentLookup = GetCtorArgumentLookup(validationAttribute);
         if (ctorArgumentLookup == null) return null;
 
+        var attrClass = validationAttribute.AttributeClass;
+        if (attrClass == null) return null;
+
+        var validatorType = GetValidatorType(attrClass);
+        if (validatorType == null) return null;
+
         // TODO: Support multiple validator type constructors, as soon as we figure out how to select the right one
         // These are the parameters to the validator type's constructor
-        var validatorCtorParameters = GetValidatorParameters(validationAttribute);
+        var validatorCtorParameters = GetValidatorParameters(validationAttribute, validatorType);
         if (validatorCtorParameters == null) return null;
-
-        var argumentInfos = new ValidatorArgumentInfo[validatorCtorParameters.Count() - 1]; // The first parameters is the DataValue (also property) name
 
         var arguments = new ValidatorArgumentInfo[validatorCtorParameters.Length];
 
@@ -103,46 +107,44 @@ public static class PropInfoHelpers
         {
             var validatorParameter = validatorCtorParameters[i + 1];  // Offset for first param being DataValue.Name
             var name = validatorParameter.Name;
-            var validatorType = validatorParameter.Type;
+            var validatorParameterType = validatorParameter.Type;
             if (!ctorArgumentLookup.TryGetValue(name, out var argumentTypeAndValue)) return null;
-                // TODO: Should we add a warning diagnostic or fail if the types do not match. We may not be able to handle implicit conversions here. Or should we rely on the analyzer and optize here. We are passing the semantic model a long way for this.
-                if (!semanticModel.Compilation.ClassifyConversion(validatorType, argumentTypeAndValue.argumentType).IsImplicit) return null;
+            // TODO: Should we add a warning diagnostic or fail if the types do not match. We may not be able to handle implicit conversions here. Or should we rely on the analyzer and optize here. We are passing the semantic model a long way for this.
+            if (!semanticModel.Compilation.ClassifyConversion(validatorParameterType, argumentTypeAndValue.argumentType).IsImplicit) return null;
             var value = argumentTypeAndValue.value;
             arguments[i] = new ValidatorArgumentInfo
             {
                 Name = name,
-                ValidatorTypeName = validatorType.ToString(),
+                ValidatorTypeName = validatorParameterType.ToString(),
                 ArgumentTypeName = argumentTypeAndValue.argumentType.ToString(),
                 Value = value
-            }; 
+            };
         }
 
         return new ValidatorInfo
         {
             AttributeName = AttributeClassName(attrClass),
             ValidatorName = validatorType.Name.ToString(),
-            ValidatorValues = null,
+            ValidatorArguments = arguments,
         };
 
-        static int? CtorPosition(ImmutableArray<IParameterSymbol> attributeCtorParameters, string name)
-        {
-            for (int i = 0; i < attributeCtorParameters.Count(); i++)
-            {
-                if (attributeCtorParameters[i].Name == name)
-                { return i; }
-            }
-            return null;
-        }
     }
 
-    private static IParameterSymbol[]? GetValidatorParameters(AttributeData validationAttribute)
+    private static INamedTypeSymbol? GetValidatorType(INamedTypeSymbol attrClass)
+    {
+        var infoAttribute = attrClass.GetAttributes().Where(x => x.AttributeClass?.Name == "ValidatorAttributeInfo").FirstOrDefault();
+        var validatorTypeConstant = infoAttribute?.ConstructorArguments.First();
+        var validatorTypeAsObject = validatorTypeConstant?.Value;
+        if (validatorTypeAsObject is INamedTypeSymbol validatorType)
+            return validatorType;
+        return null;
+    }
+
+    private static IParameterSymbol[]? GetValidatorParameters(AttributeData validationAttribute, ITypeSymbol validatorType)
     {
         // ctor in this method refers to the validator type's constructor
         var attrClass = validationAttribute.AttributeClass;
         if (attrClass is null) return null;
-
-        var validatorType = GetValidatorType(attrClass);
-        if (validatorType is null) return null;
 
         var members = validatorType.GetMembers();
         members = members.Any()
@@ -153,19 +155,8 @@ public static class PropInfoHelpers
         var validatorCtor = members
                 .OfType<IMethodSymbol>()
                 .FirstOrDefault(m => m.MethodKind == MethodKind.Constructor);
-        return validatorCtor.Parameters.ToArray();
-        static INamedTypeSymbol? GetValidatorType(INamedTypeSymbol attrClass)
-        {
-            var infoAttribute = attrClass.GetAttributes().Where(x => x.AttributeClass?.Name == "ValidatorAttributeInfo").FirstOrDefault();
-            var validatorTypeConstant = infoAttribute?.ConstructorArguments.First();
-            var validatorTypeAsObject = validatorTypeConstant?.Value;
-            if (validatorTypeAsObject is INamedTypeSymbol validatorType)
-                return validatorType;
-            return null;
-        }
+        return [.. validatorCtor.Parameters];
     }
-
-
 
     private static Dictionary<string, (ITypeSymbol argumentType, string value)>? GetCtorArgumentLookup(AttributeData validationAttribute)
     {
@@ -176,76 +167,12 @@ public static class PropInfoHelpers
 
         var arguments = validationAttribute.ConstructorArguments;
 
-        Dictionary<string, (ITypeSymbol argumentType, string value)> ret = new();
+        Dictionary<string, (ITypeSymbol argumentType, string value)> ret = [];
         for (int i = 0; i < parameters.Length; i++)
         {
             ret.Add(parameters[i].Name, (parameters[i].Type, arguments[i].ToCSharpString()));
         }
         return ret;
-    }
-
-    private static Dictionary<string, string>? GetAvailableValues(AttributeData validationAttribute)
-    {
-        // Constructor arguments
-        var ctorArgs = validationAttribute.ConstructorArguments
-            .Select(TypedConstantToString)
-            .ToList();
-        var attrClass = validationAttribute.AttributeClass;
-        var ctorParams = validationAttribute.AttributeConstructor?.Parameters.ToList();
-        if (ctorParams is null || ctorArgs is null) return null;
-
-        return ctorParams
-                .Zip(ctorArgs, (p, a) => new KeyValuePair<string, string>(p.Name, a))
-                .ToDictionary(kv => kv.Key, kv => kv.Value);
-    }
-
-    private static KeyValuePair<string, string>[]?
-                GetParameters(ConstructorInitializerSyntax ctorInitializer,
-                              Dictionary<string, string> availableValues,
-                              SemanticModel semanticModel)
-    {
-        var baseCtorSymbol = GetBaseCtorSymbol(ctorInitializer, semanticModel);
-        if (baseCtorSymbol is null)
-        {
-            // TODO: Register diagnostic, apparently no base class was found
-            return null;
-        }
-        var parameters = baseCtorSymbol.Parameters.Select(p => new KeyValuePair<string, string>(p.Name, p.Type.Name)).ToArray();
-
-        var retParameters = new KeyValuePair<string, string>[parameters.Length];
-        for (int i = 0; i < parameters.Length; i++)
-        {
-            var paramName = parameters[i].Key;
-            if (availableValues.TryGetValue(paramName, out var value))
-            {
-                retParameters[i] = new KeyValuePair<string, string>(paramName, value);
-                continue;
-            }
-            var pascalName = $"{char.ToUpperInvariant(paramName[0])}{paramName.Substring(1)}"; // Not using ToPascal from string extensions because we know we assume we have camel case to start, so this is easier
-            if (availableValues.TryGetValue(pascalName, out value))
-            {
-                retParameters[i] = new KeyValuePair<string, string>(paramName, value);
-                continue;
-            }
-            // TODO: Register diagnostic, apparently a parameter was not found by name
-            return null;
-        }
-        return retParameters;
-
-    }
-
-    private static IMethodSymbol? GetBaseCtorSymbol(ConstructorInitializerSyntax ctorInitializer, SemanticModel semanticModel)
-    {
-
-        // Get the symbol information for the initializer
-        SymbolInfo symbolInfo = semanticModel.GetSymbolInfo(ctorInitializer);
-
-        // The symbol should be an IMethodSymbol representing the called constructor
-        if (symbolInfo.Symbol is IMethodSymbol baseConstructorSymbol)
-        {
-            return baseConstructorSymbol;
-        }
-        return null;
     }
 
     private static string AttributeClassName(INamedTypeSymbol attrClass)

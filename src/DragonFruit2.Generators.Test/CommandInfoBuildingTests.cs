@@ -457,7 +457,7 @@ public class CommandInfoBuildingTests
         Assert.Single(propInfo.Validators);
         var validator = propInfo.Validators.Single();
         Assert.Equal("ValidatorTestAttributeOneCtorParam", validator.ValidatorName);
-        Assert.Single(validator.ValidatorValues);
+        Assert.Single(validator.ValidatorArguments);
         //Assert.Equal("0", validator.ValidatorValues[0]);
     }
 

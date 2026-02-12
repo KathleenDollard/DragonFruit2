@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
+using System.Reflection.Metadata;
 
 namespace DragonFruit2.Generators;
 
@@ -53,8 +54,6 @@ public static class PropInfoHelpers
 
         return propInfo;
 
-
-
         static (bool, string?) GetInitilializerInfo(IPropertySymbol p)
         {
             // Inspect syntax to find initializer and 'required' token usage for more precise info (nullable, default)
@@ -87,53 +86,102 @@ public static class PropInfoHelpers
     private static ValidatorInfo? GetValidatorInfo(AttributeData validationAttribute, SemanticModel semanticModel)
     {
         if (validationAttribute is null) return null;
-        var attrClass = validationAttribute.AttributeClass;
-        if (attrClass is null) return null;
 
-        #region Different approach
-        var ctors = attrClass.GetMembers().OfType<IMethodSymbol>().Where(x=>x.MethodKind == MethodKind.Constructor);
-        var infoAttribute = attrClass.GetAttributes().Where(x=>x.AttributeClass?.Name == "ValidatorAttributeInfo").FirstOrDefault();
-        var validatorType = infoAttribute?.ConstructorArguments.First();
-        #endregion
+        var ctorArgumentLookup = GetCtorArgumentLookup(validationAttribute);
+        if (ctorArgumentLookup == null) return null;
 
-        var ctorFromAttribute = validationAttribute.AttributeConstructor;
-        if (ctorFromAttribute is null)
+        // TODO: Support multiple validator type constructors, as soon as we figure out how to select the right one
+        // These are the parameters to the validator type's constructor
+        var validatorCtorParameters = GetValidatorParameters(validationAttribute);
+        if (validatorCtorParameters == null) return null;
+
+        var argumentInfos = new ValidatorArgumentInfo[validatorCtorParameters.Count() - 1]; // The first parameters is the DataValue (also property) name
+
+        var arguments = new ValidatorArgumentInfo[validatorCtorParameters.Length];
+
+        for (int i = 1; i < validatorCtorParameters.Length; i++)  // Loop starts at zero, becasue first value is DataValue.Name
         {
-            // TODO: Add diagnostic, apparently the attribute does not have a constructor
-            return null;
+            var validatorParameter = validatorCtorParameters[i + 1];  // Offset for first param being DataValue.Name
+            var name = validatorParameter.Name;
+            var validatorType = validatorParameter.Type;
+            if (!ctorArgumentLookup.TryGetValue(name, out var argumentTypeAndValue)) return null;
+                // TODO: Should we add a warning diagnostic or fail if the types do not match. We may not be able to handle implicit conversions here. Or should we rely on the analyzer and optize here. We are passing the semantic model a long way for this.
+                if (!semanticModel.Compilation.ClassifyConversion(validatorType, argumentTypeAndValue.argumentType).IsImplicit) return null;
+            var value = argumentTypeAndValue.value;
+            arguments[i] = new ValidatorArgumentInfo
+            {
+                Name = name,
+                ValidatorTypeName = validatorType.ToString(),
+                ArgumentTypeName = argumentTypeAndValue.argumentType.ToString(),
+                Value = value
+            }; 
         }
-        // TODO: Start here. The problem is that the DeclaringSyntaxReferences returns an empty list
-        //       I wonder if this is because it is not in this syntax tree.
-        var ctorReference = ctorFromAttribute.DeclaringSyntaxReferences.First(); // do not antiticipate partial constructors
-        if (ctorReference.GetSyntax() is not ConstructorDeclarationSyntax ctorSyntax)
-        {
-            // TODO: Apparently an internal error
-            return null;
-        }
-        var ctorInitializer = ctorSyntax.Initializer;
-        if (ctorInitializer is null || ctorInitializer.Kind() != SyntaxKind.BaseConstructorInitializer)
-        {
-            // TODO: Register diagnostic, apparently there is not a base initializer on the attribute.
-            return null;
-        }
-        var baseCtorArguments = ctorInitializer.ArgumentList.Arguments;
-        var validatorTypeName = baseCtorArguments.FirstOrDefault()?.Expression.GetText(); // or possibly ToString()
-        if (validatorType is null)
-        {
-            // TODO: Apparently the base ctor call does not pass an argument
-            return null;
-        }
-        var availableValues = GetAvailableValues(validationAttribute);
-        if (availableValues is null) return null; // if TODO:s are done, the diagnostic is already reported
-        KeyValuePair<string, string>[]? parameters = GetParameters(ctorInitializer, availableValues, semanticModel);
-        if (parameters is null) return null; // if TODO:s are done, the diagnostic is already reported
 
         return new ValidatorInfo
         {
             AttributeName = AttributeClassName(attrClass),
-            ValidatorName = validatorType.ToString(),
-            ValidatorValues = parameters
+            ValidatorName = validatorType.Name.ToString(),
+            ValidatorValues = null,
         };
+
+        static int? CtorPosition(ImmutableArray<IParameterSymbol> attributeCtorParameters, string name)
+        {
+            for (int i = 0; i < attributeCtorParameters.Count(); i++)
+            {
+                if (attributeCtorParameters[i].Name == name)
+                { return i; }
+            }
+            return null;
+        }
+    }
+
+    private static IParameterSymbol[]? GetValidatorParameters(AttributeData validationAttribute)
+    {
+        // ctor in this method refers to the validator type's constructor
+        var attrClass = validationAttribute.AttributeClass;
+        if (attrClass is null) return null;
+
+        var validatorType = GetValidatorType(attrClass);
+        if (validatorType is null) return null;
+
+        var members = validatorType.GetMembers();
+        members = members.Any()
+            ? members
+                    : validatorType.OriginalDefinition.GetMembers();
+
+        // TODO: Determine mechansm to support multile validator ctors, as that is a likely use case
+        var validatorCtor = members
+                .OfType<IMethodSymbol>()
+                .FirstOrDefault(m => m.MethodKind == MethodKind.Constructor);
+        return validatorCtor.Parameters.ToArray();
+        static INamedTypeSymbol? GetValidatorType(INamedTypeSymbol attrClass)
+        {
+            var infoAttribute = attrClass.GetAttributes().Where(x => x.AttributeClass?.Name == "ValidatorAttributeInfo").FirstOrDefault();
+            var validatorTypeConstant = infoAttribute?.ConstructorArguments.First();
+            var validatorTypeAsObject = validatorTypeConstant?.Value;
+            if (validatorTypeAsObject is INamedTypeSymbol validatorType)
+                return validatorType;
+            return null;
+        }
+    }
+
+
+
+    private static Dictionary<string, (ITypeSymbol argumentType, string value)>? GetCtorArgumentLookup(AttributeData validationAttribute)
+    {
+        // ctor in this class refers to the Attribute's contructor
+        var ctor = validationAttribute.AttributeConstructor;
+        if (ctor is null) return null;
+        var parameters = ctor.Parameters;
+
+        var arguments = validationAttribute.ConstructorArguments;
+
+        Dictionary<string, (ITypeSymbol argumentType, string value)> ret = new();
+        for (int i = 0; i < parameters.Length; i++)
+        {
+            ret.Add(parameters[i].Name, (parameters[i].Type, arguments[i].ToCSharpString()));
+        }
+        return ret;
     }
 
     private static Dictionary<string, string>? GetAvailableValues(AttributeData validationAttribute)

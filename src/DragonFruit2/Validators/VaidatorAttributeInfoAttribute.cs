@@ -1,8 +1,8 @@
 ﻿namespace DragonFruit2.Validators
 {
-    public class VaidatorAttributeInfoAttribute : Attribute
+    public class ValidatorAttributeInfo : Attribute
     {
-        public VaidatorAttributeInfoAttribute(Type validatorType)
+        public ValidatorAttributeInfo(Type validatorType)
         {
             ValidatorType = validatorType;
         }

@@ -29,7 +29,7 @@ public class GreaterThanValidator<TValue> : Validator<TValue>
 
 // TODO: Add analyzers to ensure the CompareWith type in the attribute matches the property type
 // // TODO: Add an analyzer that ensures validator constructor parameters appear as properties on attribute
-[VaidatorAttributeInfo(typeof(GreaterThanValidator<>))]
+[ValidatorAttributeInfo(typeof(GreaterThanValidator<>))]
 public sealed class GreaterThanAttribute : MemberValidatorAttribute
 {
 

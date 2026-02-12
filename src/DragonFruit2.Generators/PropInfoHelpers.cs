@@ -98,19 +98,19 @@ public static class PropInfoHelpers
 
         // TODO: Support multiple validator type constructors, as soon as we figure out how to select the right one
         // These are the parameters to the validator type's constructor
-        var validatorCtorParameters = GetValidatorParameters(validationAttribute, validatorType);
+        // The first parameter to the validator type constructor is the property name
+        var validatorCtorParameters = GetValidatorParameters(validationAttribute, validatorType).Skip(1).ToArray();
         if (validatorCtorParameters == null) return null;
 
         var arguments = new ValidatorArgumentInfo[validatorCtorParameters.Length];
-
-        for (int i = 1; i < validatorCtorParameters.Length; i++)  // Loop starts at zero, becasue first value is DataValue.Name
+        for (int i = 0; i < validatorCtorParameters.Length; i++)
         {
-            var validatorParameter = validatorCtorParameters[i + 1];  // Offset for first param being DataValue.Name
+            var validatorParameter = validatorCtorParameters[i];
             var name = validatorParameter.Name;
             var validatorParameterType = validatorParameter.Type;
             if (!ctorArgumentLookup.TryGetValue(name, out var argumentTypeAndValue)) return null;
             // TODO: Should we add a warning diagnostic or fail if the types do not match. We may not be able to handle implicit conversions here. Or should we rely on the analyzer and optize here. We are passing the semantic model a long way for this.
-            if (!semanticModel.Compilation.ClassifyConversion(validatorParameterType, argumentTypeAndValue.argumentType).IsImplicit) return null;
+            // It's a little more complicated because `semanticModel.Compilation.ClassifyConversion(argumentTypeAndValue.argumentType, validatorParameterType` will fail on common scenarios like `object` passed to `TValue`
             var value = argumentTypeAndValue.value;
             arguments[i] = new ValidatorArgumentInfo
             {
@@ -140,7 +140,7 @@ public static class PropInfoHelpers
         return null;
     }
 
-    private static IParameterSymbol[]? GetValidatorParameters(AttributeData validationAttribute, ITypeSymbol validatorType)
+    private static IEnumerable<IParameterSymbol>? GetValidatorParameters(AttributeData validationAttribute, ITypeSymbol validatorType)
     {
         // ctor in this method refers to the validator type's constructor
         var attrClass = validationAttribute.AttributeClass;

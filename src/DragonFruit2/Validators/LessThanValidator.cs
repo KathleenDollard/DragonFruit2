@@ -28,15 +28,13 @@ public class LessThanValidator<TValue> : Validator<TValue>
 }
 
 // TODO: Add analyzer to ensure the CompareWith type in the attribute matches the property type
-[AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
+[ValidatorAttributeInfo(typeof(LessThanValidator<>))]
 public sealed class LessThanAttribute : MemberValidatorAttribute
 {
 
-    // This is a positional argument
-    public LessThanAttribute(object compareWith)
-        : base(typeof(GreaterThanValidator<>))
+    public LessThanAttribute(object compareWithValue, string? customMessage = null)
     {
-        CompareWith = compareWith;
+        CompareWith = compareWithValue;
     }
 
     public object CompareWith { get; }

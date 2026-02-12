@@ -57,11 +57,21 @@
             IsRequiredForCli: false,
             Validators: [
               {
-                Name: GreaterThan,
-                FullTypeName: DragonFruit2.Validators.GreaterThanAttribute,
-                ConstructorArguments: [
-                  0,
-                  null
+                AttributeName: GreaterThan,
+                ValidatorName: GreaterThanValidator,
+                ValidatorArguments: [
+                  {
+                    Name: compareWithValue,
+                    ValidatorTypeName: TValue,
+                    ArgumentTypeName: object,
+                    Value: 0
+                  },
+                  {
+                    Name: customMessage,
+                    ValidatorTypeName: string?,
+                    ArgumentTypeName: string?,
+                    Value: null
+                  }
                 ]
               }
             ]
@@ -83,11 +93,21 @@
             IsRequiredForCli: false,
             Validators: [
               {
-                Name: GreaterThan,
-                FullTypeName: DragonFruit2.Validators.GreaterThanAttribute,
-                ConstructorArguments: [
-                  0,
-                  null
+                AttributeName: GreaterThan,
+                ValidatorName: GreaterThanValidator,
+                ValidatorArguments: [
+                  {
+                    Name: compareWithValue,
+                    ValidatorTypeName: TValue,
+                    ArgumentTypeName: object,
+                    Value: 0
+                  },
+                  {
+                    Name: customMessage,
+                    ValidatorTypeName: string?,
+                    ArgumentTypeName: string?,
+                    Value: null
+                  }
                 ]
               }
             ]
@@ -109,11 +129,21 @@
             IsRequiredForCli: false,
             Validators: [
               {
-                Name: GreaterThan,
-                FullTypeName: DragonFruit2.Validators.GreaterThanAttribute,
-                ConstructorArguments: [
-                  0,
-                  null
+                AttributeName: GreaterThan,
+                ValidatorName: GreaterThanValidator,
+                ValidatorArguments: [
+                  {
+                    Name: compareWithValue,
+                    ValidatorTypeName: TValue,
+                    ArgumentTypeName: object,
+                    Value: 0
+                  },
+                  {
+                    Name: customMessage,
+                    ValidatorTypeName: string?,
+                    ArgumentTypeName: string?,
+                    Value: null
+                  }
                 ]
               }
             ]

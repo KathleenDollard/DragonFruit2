@@ -15,7 +15,6 @@ public sealed class RequiredAttribute : MemberValidatorAttribute
     /// </remarks>
     /// <param name="isRquired"></param>
     public RequiredAttribute(bool isRquired = true)
-        : base(typeof(GreaterThanValidator<>))
     { }
 
 }

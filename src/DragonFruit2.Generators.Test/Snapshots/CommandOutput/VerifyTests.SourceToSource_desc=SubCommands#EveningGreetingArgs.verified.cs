@@ -54,6 +54,7 @@ namespace MyNamespace
                     DataType = typeof(int), 
                     IsRequired = false, 
                 };
+
                 RegisterCustomizations();
             }
             public OptionDataDefinition<int> Age { get; }

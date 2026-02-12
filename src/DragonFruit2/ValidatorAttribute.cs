@@ -35,29 +35,6 @@ namespace DragonFruit2;
 [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
 public abstract class MemberValidatorAttribute : Attribute
 {
-    protected MemberValidatorAttribute(Type validatorType, params object?[] arguments)
-    {
-        ValidatorType = validatorType;
-        Arguments = arguments;
-    }
-
-    // TODO: These properties are not used by DragonFruit2. Do we remove them, or leave them if the user looks at the attributes with reflection.
-    public Type ValidatorType { get; }
-    public object?[] Arguments { get; }
 
 }
 
-[AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-public abstract class MemberValidatorAttribute2<TValidator> : Attribute
-{
-    protected MemberValidatorAttribute2(Type validatorType, params object?[] arguments)
-    {
-        ValidatorType = validatorType;
-        Arguments = arguments;
-    }
-
-    // TODO: These properties are not used by DragonFruit2. Do we remove them, or leave them if the user looks at the attributes with reflection.
-    public Type ValidatorType { get; }
-    public object?[] Arguments { get; }
-
-}

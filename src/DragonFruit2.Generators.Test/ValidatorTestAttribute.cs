@@ -1,5 +1,7 @@
 ﻿namespace DragonFruit2.Generators.Test;
 
+public class ValidatorTest { }
+
 public sealed class ValidatorTestAttributeOneCtorParam : ValidatorAttribute
 {
 
@@ -26,16 +28,5 @@ public sealed class ValidatorTestAttributeOneNamedParam : ValidatorAttribute
     public int AnotherValue { get; set; }
 }
 
-public sealed class ValidatorTestAttributeMulitpleMixedParams : ValidatorAttribute
-{
-    public ValidatorTestAttributeMulitpleMixedParams(object compareWith, object second)
-        : base("ValidatorTest")
-    { }
-
-
-    public int AnotherValue { get; set; }
-
-    public int StillAnother { get; set; }
-}
 
 

@@ -27,18 +27,16 @@ public class MaxLengthValidator : Validator<string>
     }
 }
 
-[AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
+[ValidatorAttributeInfo(typeof(MaxLengthValidator))]
 public sealed class MaxLengthAttribute : MemberValidatorAttribute
 {
 
-    // This is a positional argument
-    public MaxLengthAttribute(object compareWith)
-        : base(typeof(MaxLengthValidator))
+    public MaxLengthAttribute(object maxLengthValue)
     {
-        CompareWith = compareWith;
+        MaxLengthValue = maxLengthValue;
     }
 
-    public object CompareWith { get; }
+    public object MaxLengthValue { get; }
 }
 
 public static class MaxLengthValidatorExtensions

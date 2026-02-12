@@ -33,11 +33,9 @@ public class GreaterThanValidator<TValue> : Validator<TValue>
 public sealed class GreaterThanAttribute : MemberValidatorAttribute
 {
 
-    // This is a positional argument
-    public GreaterThanAttribute(object compareWith, string? customMessage = null)
-        : base(typeof(GreaterThanValidator<>), compareWith, customMessage)
+    public GreaterThanAttribute(object compareWithValue, string? customMessage = null)
     {
-        CompareWith = compareWith;
+        CompareWith = compareWithValue;
     }
 
     public object CompareWith { get; }

@@ -27,18 +27,16 @@ public class MinLengthValidator : Validator<string>
     }
 }
 
-[AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
+[ValidatorAttributeInfo(typeof(MinLengthValidator))]
 public sealed class MinLengthAttribute : MemberValidatorAttribute
 {
 
-    // This is a positional argument
-    public MinLengthAttribute(object compareWith)
-        : base(typeof(MinLengthValidator))
+    public MinLengthAttribute(object minLengthValue)
     {
-        CompareWith = compareWith;
+        MinLengthValue = minLengthValue;
     }
 
-    public object CompareWith { get; }
+    public object MinLengthValue { get; }
 }
 
 public static class MinLengthValidatorExtensions

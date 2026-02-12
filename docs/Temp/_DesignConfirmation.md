@@ -31,13 +31,13 @@ Other forces also push away from the simplicity of current approaches like `Syst
 - [ ] ?? Do we want to have a partial `CommandDefinition` class, or do we want to generate a `CommandDefinition` property for registrations. Currently, `CommandDefinition` is available via the DataValues property of the Result for use after parsing; do we want to give access for initialization?
 - [ ] The names of the constructor arguments, or named properties much match exactly the names of the validator class's constructor parameters, and all the validator class's ctor parameters must be fulfilled
 - [ ] There are problems with generation, so currently the validator (and by implication the attribute) can have only one constructor
-- 
+- [ ] Should validator types use constructors or property assignment? It may be difficult to generate if we support both.
 - 
 - ## Current syntax
 
 All methods are strongly typed to the property value (`TValue`) and inferred via the `MemberDefinition<TValue>` parameter.
 
-Attributes are simply placed on the property.
+Definitions can be via registration or attributes placed on the property.
 
 ### Location for dynamic declarations
 

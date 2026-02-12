@@ -53,12 +53,15 @@ namespace MyNamespace
                     DataType = typeof(string), 
                     IsRequired = true, 
                 };
+
                 Add(new MorningGreetingArgs.MorningGreetingArgsDataDefinition(this, this.RootDataDefinition)
                 {
                 });
+
                 Add(new EveningGreetingArgs.EveningGreetingArgsDataDefinition(this, this.RootDataDefinition)
                 {
                 });
+
                 RegisterCustomizations();
             }
             public OptionDataDefinition<string> Name { get; }

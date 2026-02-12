@@ -54,6 +54,8 @@ namespace MyNamespace
                     DataType = typeof(int), 
                     IsRequired = false, 
                 };
+                Age.RegisterValidator(new GreaterThanValidator<int>(Age.DefinitionName, 0));
+
                 RegisterCustomizations();
             }
             public OptionDataDefinition<int> Age { get; }

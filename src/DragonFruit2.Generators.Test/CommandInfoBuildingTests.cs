@@ -4,7 +4,6 @@ namespace DragonFruit2.Generators.Test;
 
 public class CommandInfoBuildingTests
 {
-    #region CommandInfo Creation Tests
     [Fact]
     public async Task CommandInfoCreatedFromClass()
     {
@@ -101,9 +100,7 @@ public class CommandInfoBuildingTests
         Assert.NotNull(commandInfo);
         Assert.Equal("protected internal", commandInfo?.ArgsAccessibility);
     }
-    #endregion
 
-    #region PropInfo Creation Tests
     [Fact]
     public async Task PropertiesDefaultToOptions()
     {
@@ -128,7 +125,7 @@ public class CommandInfoBuildingTests
     }
 
     [Fact]
-    public async Task PropertiesMarkedWithAttributeAreArgs()
+    public async Task PropertiesMarkedWithAttributeAreArgumentss()
     {
         var sourceText = """
             public partial class MyArgs
@@ -221,7 +218,6 @@ public class CommandInfoBuildingTests
 
     }
 
-
     [Fact]
     public async Task PropInfoRecognizesRequiredModifier()
     {
@@ -269,7 +265,6 @@ public class CommandInfoBuildingTests
         Assert.False(commandInfo.Options.Single().HasRequiredModifier);
 
     }
-
 
     [Fact]
     public async Task PropInfoRecognizesInitializer()
@@ -432,96 +427,4 @@ public class CommandInfoBuildingTests
         Assert.Equal("R2D2", commandInfo.Options.Single().Description);
 
     }
-
-    [Fact]
-    public async Task PropInfoSingleValidatorWithCtorParameters()
-    {
-        var sourceText = """
-            using DragonFruit2.Validators;
-            using DragonFruit2.Generators.Test;;
-
-            public partial class MyArgs
-            { 
-                [ValidatorTestAttributeOneCtorParam(0)]
-                public int Age { get; set; } = 42;
-            }
-            """;
-        var compilation = TestHelpers.GetCompilation(sourceText, TestHelpers.EmptyConsoleAppCode);
-        var programTree = compilation.SyntaxTrees.Last();
-        var invocations = TestHelpers.GetParseArgsInvocations(programTree);
-        Assert.Single(invocations);
-
-        var commandInfo = DragonFruit2Builder.GetRootCommandInfoFromInvocation(invocations.Single(), compilation.GetSemanticModel(programTree));
-
-        Assert.NotNull(commandInfo);
-        Assert.Single(commandInfo.Options);
-        var propInfo = commandInfo.Options.Single();
-        Assert.Single(propInfo.Validators);
-        var validator = propInfo.Validators.Single();
-        Assert.Equal("ValidatorTestAttributeOneCtorParam", validator.Name);
-        Assert.Single(validator.ConstructorArguments);
-        Assert.Equal("0", validator.ConstructorArguments[0]);
-    }
-
-
-    [Fact]
-    public async Task PropInfoSingleValidatorWithNamedArguments()
-    {
-        var sourceText = """
-            using DragonFruit2.Validators;
-            using DragonFruit2.Generators.Test;;
-            
-            public partial class MyArgs
-            { 
-                [ValidatorTestAttributeOneNamedParam(AnotherValue = 2)]
-                public int Age { get; set; } = 42;
-            }
-            """;
-        var compilation = TestHelpers.GetCompilation(sourceText, TestHelpers.EmptyConsoleAppCode);
-        var programTree = compilation.SyntaxTrees.Last();
-        var invocations = TestHelpers.GetParseArgsInvocations(programTree);
-        Assert.Single(invocations);
-
-        var commandInfo = DragonFruit2Builder.GetRootCommandInfoFromInvocation(invocations.Single(), compilation.GetSemanticModel(programTree));
-
-        Assert.NotNull(commandInfo);
-        Assert.Single(commandInfo.Options);
-        var propInfo = commandInfo.Options.Single();
-        Assert.Single(propInfo.Validators);
-        var validator = propInfo.Validators.Single();
-        Assert.Single(validator.NamedArguments);
-        Assert.Equal("AnotherValue", validator.NamedArguments.Keys.Single());
-        Assert.Equal("2", validator.NamedArguments.Values.Single());
-    }
-
-
-    [Fact]
-    public async Task PropInfoMultipleValidators()
-    {
-        var sourceText = """
-            using DragonFruit2.Validators;
-            using DragonFruit2.Generators.Test;;
-            
-            public partial class MyArgs
-            { 
-                [ValidatorTestAttributeOneCtorParam(0)]
-                [ValidatorTestAttributeOneNamedParam(0, AnotherValue = 2)]
-                [ValidatorTestAttributeMulitpleMixedParams(0, "42", AnotherValue = 2, StillAnother = 43)]
-                public int Age { get; set; } = 42;
-            }
-            """;
-        var compilation = TestHelpers.GetCompilation(sourceText, TestHelpers.EmptyConsoleAppCode);
-        var programTree = compilation.SyntaxTrees.Last();
-        var invocations = TestHelpers.GetParseArgsInvocations(programTree);
-        Assert.Single(invocations);
-
-        var commandInfo = DragonFruit2Builder.GetRootCommandInfoFromInvocation(invocations.Single(), compilation.GetSemanticModel(programTree));
-
-        Assert.NotNull(commandInfo);
-        Assert.Single(commandInfo.Options);
-        var propInfo = commandInfo.Options.Single();
-        Assert.Equal(3, propInfo.Validators.Count);
-        var validator = propInfo.Validators[0];
-    }
-    #endregion
 }

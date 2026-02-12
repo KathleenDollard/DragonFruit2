@@ -54,9 +54,11 @@ namespace MyNamespace
                     DataType = typeof(int), 
                     IsRequired = false, 
                 };
+
                 Add(new Bar.BarDataDefinition(this, this.RootDataDefinition)
                 {
                 });
+
                 RegisterCustomizations();
             }
             public OptionDataDefinition<int> Age { get; }

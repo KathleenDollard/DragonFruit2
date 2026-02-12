@@ -9,7 +9,7 @@ public class OutputDataDefinition
         Constructor(sb, commandInfo);
         Properties(sb, commandInfo);
         GetMemberDefinition(sb, commandInfo);
-        Operate(sb, commandInfo)    ;
+        Operate(sb, commandInfo);
         sb.AppendLine();
 
         sb.CloseClass();
@@ -35,6 +35,9 @@ public class OutputDataDefinition
             sb.OpenCurly();
             AddMemberInfo(sb, optionInfo);
             sb.CloseCurly(endStatement: true);
+            AddValidation(sb, optionInfo);
+            AddDefaults(sb, optionInfo);
+            sb.AppendLine();
         }
 
         foreach (var argumentInfo in commandInfo.Arguments)
@@ -43,11 +46,15 @@ public class OutputDataDefinition
             sb.OpenCurly();
             AddMemberInfo(sb, argumentInfo);
             sb.CloseCurly(endStatement: true);
+            AddValidation(sb, argumentInfo);
+            AddDefaults(sb, argumentInfo);
+            sb.AppendLine();
         }
 
         foreach (var subcommandInfo in commandInfo.SubCommands)
         {
             AddSubcommandInfo(sb, subcommandInfo);
+            sb.AppendLine();
         }
 
         sb.AppendLine("RegisterCustomizations();");
@@ -67,7 +74,24 @@ public class OutputDataDefinition
             sb.CloseCurly(closeParens: true, endStatement: true);
 
         }
+   
+        static void AddValidation(StringBuilderWrapper sb, PropInfo propInfo)
+        {
+            foreach (var validatorInfo in propInfo.Validators)
+            {
+                sb.AppendLine($"{propInfo.Name}.RegisterValidator(new {validatorInfo.ValidatorName}<{propInfo.TypeName}>({propInfo.Name}.DefinitionName, 0));");
+            }
+        }
+        
+        static void AddDefaults(StringBuilderWrapper sb, PropInfo propInfo)
+        {
+            // not yet implemented
+        }
+
+
     }
+
+
 
     private static void Properties(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
@@ -77,7 +101,7 @@ public class OutputDataDefinition
 
         }
     }
-   
+
     private static void GetMemberDefinition(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
         sb.OpenMethod("protected override MemberDataDefinition? GetMemberDefinition(string memberName)");

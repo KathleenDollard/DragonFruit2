@@ -113,31 +113,31 @@ internal class OutputPartialArgs
         sb.CloseMethod();
     }
 
-    internal static void InitializeValidatorsMethod(StringBuilderWrapper sb, CommandInfo commandInfo)
-    {
-        sb.OpenMethod($"""private void InitializeValidators()""");
-        foreach (var prop in commandInfo.PropInfos)
-        {
-            if (prop.Validators is not null && prop.Validators.Any())
-            {
-                var localSymbolName = OutputHelpers.GetLocalSymbolName(prop.Name);
-                sb.AppendLine($"{localSymbolName}Validators ??= new List<Validator<{prop.TypeName}>>();");
-                foreach (var validator in prop.Validators)
-                {
-                    sb.Append($"""{localSymbolName}Validators.Add(new {validator.Name}Validator<{prop.TypeName}>("{prop.Name}", """);
-                    sb.Append(string.Join(", ", validator.ConstructorArguments));
-                    if (validator.NamedArguments.Any())
-                    {
-                        sb.Append(",");
-                        sb.Append(string.Join(", ", validator.NamedArguments.Select(kv => $"{kv.Key}: {kv.Value}")));
-                    }
-                    sb.AppendLine("));");
-                }
-                sb.AppendLine();
-            }
-        }
-        sb.CloseMethod();
-    }
+    //internal static void InitializeValidatorsMethod(StringBuilderWrapper sb, CommandInfo commandInfo)
+    //{
+    //    sb.OpenMethod($"""private void InitializeValidators()""");
+    //    foreach (var prop in commandInfo.PropInfos)
+    //    {
+    //        if (prop.Validators is not null && prop.Validators.Any())
+    //        {
+    //            var localSymbolName = OutputHelpers.GetLocalSymbolName(prop.Name);
+    //            sb.AppendLine($"{localSymbolName}Validators ??= new List<Validator<{prop.TypeName}>>();");
+    //            foreach (var validator in prop.Validators)
+    //            {
+    //                sb.Append($"""{localSymbolName}Validators.Add(new {validator.Name}Validator<{prop.TypeName}>("{prop.Name}", """);
+    //                sb.Append(string.Join(", ", validator.ConstructorArguments));
+    //                if (validator.NamedArguments.Any())
+    //                {
+    //                    sb.Append(",");
+    //                    sb.Append(string.Join(", ", validator.NamedArguments.Select(kv => $"{kv.Key}: {kv.Value}")));
+    //                }
+    //                sb.AppendLine("));");
+    //            }
+    //            sb.AppendLine();
+    //        }
+    //    }
+    //    sb.CloseMethod();
+    //}
 
     internal static void RegisterCustomDefaultsPartialMethod(StringBuilderWrapper sb, CommandInfo commandInfo)
     {

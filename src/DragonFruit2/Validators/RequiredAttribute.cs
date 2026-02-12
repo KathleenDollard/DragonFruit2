@@ -1,7 +1,7 @@
 ﻿namespace DragonFruit2.Validators;
 
 
-public sealed class RequiredAttribute : ValidatorAttribute
+public sealed class RequiredAttribute : MemberValidatorAttribute
 {
 
     /// <summary>
@@ -15,7 +15,6 @@ public sealed class RequiredAttribute : ValidatorAttribute
     /// </remarks>
     /// <param name="isRquired"></param>
     public RequiredAttribute(bool isRquired = true)
-        : base(nameof(GreaterThanValidator<>))
     { }
 
 }

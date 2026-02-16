@@ -4,7 +4,7 @@ DragonFruit2 is intended as the next generation of the DragonFruit portion of Sy
 
 ## Notes on docs
 
-Unfortunately, is evolving relatively rapidly and up to date docs are challenging. (The Design Overview)[docs/Design/DesignOverview.md] explains how the application runs. The documents in the Design folder are at least OK, and those in its subfolders will not be helpful.
+Unfortunately, is evolving relatively rapidly and up to date docs are challenging. [The Design Overview](docs/Design/DesignOverview.md) explains how the application runs. The documents in the Design folder are at least OK, and those in its subfolders will not be helpful.
 
 This `ReadMe.md` file is also being kept up to date.
 

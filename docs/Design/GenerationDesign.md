@@ -1,5 +1,7 @@
 # Generation design for DragonFruit2
 
+_This may have slipped somewhat out of date, but is still basically correct (2026-02-16)
+
 DragonFruit is a moderately complex generator, and thus a potentially difficult one to understand. Aspects of the solution are designed to mitigate this.
 
 ## Key projects in the solution

@@ -64,8 +64,6 @@ public class Builder<TRootArgs>
         {
             var instance = result.DataValues.CreateInstance();
             result.Args = instance;
-
-            Validate(result);
         }
         return result;
     }

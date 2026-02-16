@@ -4,7 +4,7 @@ DragonFruit2 is intended as the next generation of the DragonFruit portion of Sy
 
 ## Notes on docs
 
-Unfortunately, the docs are not up to date as the system is evolving relatively rapidly. (The overview)[docs/__Overview.md] gives an idea of project thinking and [this design document](docs/DesignOverview.md) gives a view of what the individual pieces are intended to do. The [sequence diagram](docs/DesignGraphs.md/#sequence-diagram) will probably be helpful in understanding how the system fits together.
+Unfortunately, is evolving relatively rapidly and up to date docs are challenging. (The Design Overview)[docs/Design/DesignOverview.md] explains how the application runs. The documents in the Design folder are at least OK, and those in its subfolders will not be helpful.
 
 This `ReadMe.md` file is also being kept up to date.
 
@@ -117,7 +117,7 @@ public partial class MyArgs
     public string Greeting { get; set; } = string.Empty;
 }
 ```
-
+ 
 ## Naming
 
 _ It is generally suggested that your arg class use normal naming without suffixes. However,
@@ -163,99 +163,9 @@ The pragmatic considerations are:
 - `recursive`, which has sometimes challenged folks, is strictly an aspect of System.CommandLine and based on an attribute. It's unrelated to the Args data.
 - When working with a result it can be typed to the parent and a `switch` used to determine which subcommand was executed.
 
-
-## Future features
-
-If the first phase is getting all SCL featues working with simple gestures, the next phase is likely adding features. It would be highly desirable
-to support this second phase with extensibilty points that did not reuquire understanding code generation details.
-
-Some of the features that could be supported include:
-
-- If we can identify error that occur because a required value is missing, we could prompt for it with something like "Please enter value for <option/argument name>: ".
-- A different help system could be slotted in, using whatever approach is desired, by circumventing the default one. For example, verbose help or examples.
-- Something like directives could be used to indicate alternate output - particularly full markdown or HTML documentation or platform specific tab completion. This could be help, or possibly application output.
-- Defaults from configuration or calculated from environment.
-- Wrappers for other front ends, such as APIs and GUIs.
-
-Some features will require a deeper understanding of the code generation process:
-
-- A fast generation mode that relies on a CLI attribute, rather than retrieving the type from the `ParseArgs` generic argument. Supporting two modes is not a high priority, but a non-attributed mode is likely not fast enough to be a design generator, and thus there sometimes be squiggles resolved by a build.
-
 ## Non-negotiables
 
 - Simple, simple, simple for simple CLIs with linear scaling on complicating features. If cliffs exist, they are for very complex scenarios that do not follow the System.CommandLine interpretation of Posix
-- .NETStandard support. Also, using code written in C# 7.1 must work.
+- .NETStandard support. Also, using code written in C# 7.3 must work.
 - Focus on System.CommandLine doing what it does really well - parsing and strong typing results.
-
-## TODO:
-
-- Support CLI Name attribute
-- Consider allowing Arg suffix to identify arguments
-- Description from XML comments
-- Handle case where there is no namespace
-
-## Use of symbols in retrieving CLI values
-
-If we support alternate providers for testing, configuration based defaults and other scenarios, it seems odd to force CLI specific 
-name munging across the system. This would also result in changes in multiple places if an option was changed to an argument or similar.
-
-As a result, the generated code tracks symbols. But, the other data providers won't use that. So, there are alternate keys which 
-allow the main key to remain a string, but other keys to be added. This will be an implementation detail to most users.
-
-## Note on the project layout
-
-We're managing a generator and common files that need to be available in both `netstandard2.0` and `net7.0+` contexts. As a result there are a lot of projects at the moment.
-
-## The static interface methods
-
-To keep things simple for the common CLI case, we need a mechanism to call a static method based on a generic, especially for 
-the `Create` static method. This must be static because it is a factory method.
-
-We can create the method easily enough, but we need to _call_ it based solely on a generic argument. There are a few possible 
-approaches:
-
-- Use a static interface method, and a default interface implementation. This is appealing, but requires .NET 7. This is the approach
-in the prototype
-  - Upside: Simple, clean, efficient
-  - Downside: .NET 7 only
-- Use a static extension member against `IArgs` (without a static interface member) or similar 
-  - Downside: I'm not clear which frameworks this works on
-  - Downside: It will be messy because the method would have to accept `IArgs` as the member
-  - My intuition says there is joy here, I just haven't spent much time on it
-
-- Have a base class for `Args` that has a static method taking `IArgs` that throws, but avoids a 
-compile error before generation runs, and then the derived class has a static method on `MyArgs`.
-  - Downside: Does not work, because static methods can't be called via type arguments
-  - Downside: We are stealing the user's inheritance chain
-
-- Some sort of Builder class that the user specifies
-  - Downside: Much more complex for the user, therefore, not pursuing
-
-- Something I have not thought of
-- Use reflection to find the method and call it. OK, we're not doing this
-
--- old notes
-
-There are several scenarios where you may wish to use the classes in this assembly in other ways.
-
-- You may wish to modify how data is collected - for example you could
-use attributes that have different names. You can modify the data extraction 
-without changes other changes.
-
-- You may wish to modify the code that is output. For example, you may wish to add more attributes
-to the generated output or change the accessibility of one or more members.You can modify the 
-code that is created without other changes.
-
-- You may wish to change both the way data is extracted and change how `ParseArgs` works.For example, 
-you may want to extract information from methods, rather than properties. This would 
-require changes to extraction and also a diferent method (rather than `ParseArgs` that using 
-code would call (such as a new static extension method or deriving from `DragonFruit2.Cli`
-
-- You may wish to add more information to the process. In this case, you will need to make 
-changes to the data extraction process, the core information classes (`CommandInfo` and `PropertyInfo`), 
-and the code that is emitted.
-
-- You may wish to do something drastically different, such as using JSON to define your CLI and 
-creating a dictionary of return values. That is cool, I'm not sure that this library will offer
-benefit.
 

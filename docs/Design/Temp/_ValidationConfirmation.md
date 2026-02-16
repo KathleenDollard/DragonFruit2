@@ -61,20 +61,6 @@ public partial class MyArgs : ArgsRootBase<MyArgs>
    }
 ```
 
-Alternatively, we could generate a property on the `Args` class for the `CommandDefinition`. This could be private to avoid expanding the `Args` class API. For both approaches, we could also commit to nesting the `CommandDefinition`, allowing it to just be called `CommandDefinition`. This would look like:
-
-```c#
-public partial class MyArgs : ArgsRootBase<MyArgs>
-{
-    public int Age { get; init; } = 1;
-    // Other properties 
-
-    CommandDefinition.Age.Default(22);
-    CommandDefinition.Age.ValidateGreaterThan(0);
-    CommandDefinition.Age.RegisterAsRequired();
-   }
-```
-
 ### Forms
 
 The current canonical form is:

@@ -1,16 +1,14 @@
 <Solution>
   <Folder Name="/docs/">
-    <File Path="../docs/DataProviders.md" />
-    <File Path="../docs/DataValues.md" />
-    <File Path="../docs/DesignGraphs.md" />
-    <File Path="../docs/DesignOverview.md" />
-    <File Path="../docs/Execution.md" />
-    <File Path="../docs/Failures.md" />
-    <File Path="../docs/Finalzers.md" />
-    <File Path="../docs/Transforms.md" />
-    <File Path="../docs/Validation.md" />
+    <File Path="../docs/Design/DataValues.md" />
+    <File Path="../docs/Design/DesignOverview.md" />
+    <File Path="../docs/Design/GenerationDesign.md" />
+    <File Path="../docs/Design/GoalsAndAudience.md" />
+    <File Path="../docs/Design/Questions and Answers.md" />
+    <File Path="../docs/Design/RequiredValues.md" />
+    <File Path="../docs/Design/StartupProblem.md" />
+    <File Path="../docs/Design/Transforms.md" />
     <File Path="../docs/_Overview.md" />
-    <File Path="../docs/__Overview.md" />
     <File Path="TestingStrategy.md" />
   </Folder>
   <Folder Name="/DragonFruit2.Generation.Test.Projects/">

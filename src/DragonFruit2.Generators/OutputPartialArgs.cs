@@ -39,7 +39,9 @@ internal class OutputPartialArgs
         var baseType = commandInfo.BaseName ?? $"ArgsRootBase<{commandInfo.Name}>";
         sb.XmlSummary(
                 $"""Auto-generated partial class for building CLI commands for <see cref="{commandInfo.Name}"/>" and creating a new {commandInfo.Name} instance from a <see cref="System.CommandLine.ParseResult" />.""");
-        sb.OpenClass($"{commandInfo.ArgsAccessibility} partial class {commandInfo.Name} : {baseType}");
+        // While we know the accessibility, we do not use it hear to improved the user experience if the implementing programmer changes the accessiblity.
+        // Un C#, when no accessibiity is declared on a partial class, the accessibility of other portions of the partial are used
+        sb.OpenClass($"partial class {commandInfo.Name} : {baseType}");
     }
 
     private static void Constructors(StringBuilderWrapper sb, CommandInfo commandInfo)

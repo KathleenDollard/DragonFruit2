@@ -4,17 +4,17 @@ public enum DiagnosticId
 {
     // Validators
     GreaterThan = 1,
-    GreaterThanOrEqual = 2, 
+    GreaterThanOrEqual = 2,
     LessThan = 3,
     LessThanOrEqual = 4,
     Required = 5,
+    MinLength = 6,
+    MaxLength = 7,
 
     // System.CommandLine integration
     SystemCommandLine = 100,
     UnknownParsingFailure = 101,
-    // TODO: Do we need the next two
-    MinLength = 102, 
-    MaxLength = 103,
+    UnexpectedException = 102,
 
     // DragonFruit core
     NoActiveCommand = 200,

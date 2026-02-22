@@ -47,25 +47,37 @@ public class Builder<TRootArgs>
     public Result<TRootArgs> ParseArgs(string[]? commandLineArguments)
     {
         commandLineArguments ??= GetArgsFromEnvironment();
-        CommandLineArguments = commandLineArguments;
-
-        InitializeDataProviders();
         var result = new Result<TRootArgs>(commandLineArguments);
-        if (!TryGetActiveCommandDefinition(result, out var activeCommandDefinition))
+        try
         {
-            result.AddDiagnostic(new Diagnostic(DiagnosticId.NoActiveCommand.ToValidationIdString(), DiagnosticSeverity.Error, null, "No active command could be determined."));
+            CommandLineArguments = commandLineArguments;
+
+            InitializeDataProviders(result);
+            if (!TryGetActiveCommandDefinition(result, out var activeCommandDefinition))
+            {
+                result.AddDiagnostic(new Diagnostic(DiagnosticId.NoActiveCommand.ToValidationIdString(), DiagnosticSeverity.Error, null, "No active command could be determined."));
+                return result;
+            }
+            result.ActiveCommandDefinition = activeCommandDefinition;
+            if (result.DataValues is null) throw new InvalidOperationException("DataValues should not be null after ActiveCommandDefinition is set");
+
+            GatherDataValues(result);
+            if (CheckRequired(result) && Validate(result))
+            {
+                var instance = result.DataValues.CreateInstance();
+                result.Args = instance;
+            }
             return result;
         }
-        result.ActiveCommandDefinition = activeCommandDefinition;
-        if (result.DataValues is null) throw new InvalidOperationException("DataValues should not be null after ActiveCommandDefinition is set");
-
-        GatherDataValues(result);
-        if (CheckRequired(result) && Validate(result))
+        catch (Exception e)
         {
-            var instance = result.DataValues.CreateInstance();
-            result.Args = instance;
+            result.AddDiagnostic(new Diagnostic(DiagnosticId.UnexpectedException.ToValidationIdString(), DiagnosticSeverity.Error, 
+                Message:$"""
+                Unexpected exception: 
+                   {e.Message}
+                """));
+            return result;
         }
-        return result;
     }
 
     private bool CheckRequired(Result<TRootArgs> result)
@@ -92,7 +104,7 @@ public class Builder<TRootArgs>
         var isValid = true;
         foreach (var dataValue in result.DataValues)
         {
-            if (! dataValue.Validate())
+            if (!dataValue.Validate())
             { isValid = false; }
         }
         return isValid;
@@ -125,11 +137,11 @@ public class Builder<TRootArgs>
         return false;
     }
 
-    private void InitializeDataProviders()
+    private void InitializeDataProviders(Result<TRootArgs> result)
     {
         foreach (var dataProvider in DataProviders)
         {
-            dataProvider.Initialize(this, RootCommandDefinition);
+            dataProvider.Initialize(this, RootCommandDefinition, result);
         }
     }
 }

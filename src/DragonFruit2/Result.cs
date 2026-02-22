@@ -4,12 +4,16 @@ public abstract class Result
 {
     public abstract IEnumerable<Diagnostic> Diagnostics { get; }
     private readonly List<Diagnostic> diagnostics = [];
+    // For .NET Framework runtimes, it is important not to recreate the Random instance as the seed can be repeated in a loop, such as when we support scripts
+    private static Random random = new();
 
     public Result(string[] commandLineArguments)
     {
         CommandLineArguments = commandLineArguments;
+        RunId = random.Next();
     }
 
+    public int RunId { get; init; }
     public DragonFruit2Configuration Configuration { get; } = new();
     protected IEnumerable<Diagnostic> CommandDiagnostics => diagnostics;
 
@@ -40,11 +44,13 @@ public abstract class Result
 public class Result<TRootArgs> : Result
     where TRootArgs : ArgsRootBase<TRootArgs>
 {
+
     public Result(string[] commandLineArguments) : base(commandLineArguments)
     {
     }
 
     public TRootArgs? Args { get; internal set; }
+    public DataValues<TRootArgs>? DataValues { get; internal set; }
 
     public CommandDataDefinition<TRootArgs>? ActiveCommandDefinition
     {
@@ -57,17 +63,27 @@ public class Result<TRootArgs> : Result
             DataValues = field.CreateDataValues();
         }
     }
-    public DataValues<TRootArgs>? DataValues { get; internal set; }
 
     public override IEnumerable<Diagnostic> Diagnostics
+    // This is in the TRootArgs specific version because it accesses DataValues
     {
         get
         {
             // TODO: Check if we need the null check in the following LINQ.
             var memberDiagnostics = DataValues
-                                        .Where(d=>d.Diagnostics is not null && d.Diagnostics.Any())
-                                        .SelectMany(d=> d.Diagnostics);
+                                        .Where(d => d.Diagnostics is not null && d.Diagnostics.Any())
+                                        .SelectMany(d => d.Diagnostics);
             return CommandDiagnostics.Concat(memberDiagnostics);
         }
+    }
+
+    public void Cleanup()
+    {
+
+        if (!Configuration.ResultDebuggingLevel.HasFlag(ResultDebuggingLevel.DataValues))
+        {
+            DataValues = null;
+        }
+
     }
 }

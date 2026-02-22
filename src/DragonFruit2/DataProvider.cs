@@ -30,7 +30,7 @@ public abstract class DataProvider<TRootArgs> : DataProvider
         return false;
     }
 
-    public virtual void Initialize(Builder<TRootArgs> builder, CommandDataDefinition<TRootArgs> commandDefinition)
+    public virtual void Initialize(Builder<TRootArgs> builder, CommandDataDefinition<TRootArgs> commandDefinition, Result<TRootArgs> result)
     {
         // no op
     }

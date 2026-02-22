@@ -12,9 +12,11 @@ public enum DiagnosticId
     // System.CommandLine integration
     SystemCommandLine = 100,
     UnknownParsingFailure = 101,
+    UnexpectedException = 102,
+
     // TODO: Do we need the next two
-    MinLength = 102, 
-    MaxLength = 103,
+    //MinLength = , 
+    //MaxLength = ,
 
     // DragonFruit core
     NoActiveCommand = 200,

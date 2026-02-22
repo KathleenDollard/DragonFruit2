@@ -13,11 +13,6 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         : base(builder)
     { }
 
-    // TODO: Move ParseResult to the Result as it run specific, while the CLI definition is RootArgs dependent
-    private ParseResult? _parseResult = null;
-
-    public string[]? InputArgs => Builder.CommandLineArguments;
-
     private IEnumerable<Diagnostic>? TransformErrors(IReadOnlyList<ParseError> errors)
     {
         return errors.Select(CreateValidationFailure);
@@ -28,51 +23,36 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
                    string.Empty,
                    error.Message);
     }
-
-    public Command? RootCommand
-    {
-        get;
-        set;
-    }
-
-    private string[]? _parseResultArgs;
-
+    private int cachedRunId;
+    public Command? RootCommand { get; set; }
     /// <summary>
     /// This is the System.CommandLine.ParseResult that is used internally.
     /// </summary>
     /// <remarks>
     /// A single value is cached, which is used during a single run and if there is some reason another
-    /// call is made with the same command line args.
+    /// call is made with the same command line args, sucn as would happen if we support scripts
     /// <br/>
-    /// Note that this cache is via the generic, if there are multiple root args, such as in an 
-    /// interactive or scripting scenario, they will be separately cached.
+    /// Note that this cache is via this class, which is hte TRootArgs generic, if there are multiple root args, 
+    /// such as might happen in an interactive or scripting scenario, they will be separately cached.
     /// </remarks>
-    public ParseResult? ParseResult
-    {
-        get
-        {
-            if (RootCommand is null) throw new InvalidOperationException("RootCommand cannot be null");
-            if (InputArgs is null) throw new InvalidOperationException("InputArgs cannot be null");
-            if (field is null || _parseResultArgs != InputArgs)
-            {
-                field = RootCommand?.Parse(InputArgs);
-                _parseResultArgs = InputArgs ?? [];
-            }
-            return field;
-        }
+    public ParseResult? ParseResult { get; private set; }
 
-        private set;
+    private void InitializeRun(Result<TRootArgs> result)
+    {
+        if (RootCommand is null) throw new InvalidOperationException("RootCommand cannot be null");
+        ParseResult = RootCommand.Parse(result.CommandLineArguments);
+        cachedRunId = result.RunId;
     }
 
     public Dictionary<(Type argsType, string propertyName), Symbol> LookupSymbol { get; set; } = [];
 
-    public override void Initialize(Builder<TRootArgs> builder, CommandDataDefinition<TRootArgs> commandDefinition)
+    public override void Initialize(Builder<TRootArgs> builder, CommandDataDefinition<TRootArgs> commandDefinition, Result<TRootArgs> result)
     {
         RootCommand = new SclWrappers.RootCommand(commandDefinition);
-        InitializeCommand(RootCommand, builder, commandDefinition);
+        InitializeCommand(RootCommand, builder, commandDefinition, result);
     }
 
-    private void InitializeCommand(System.CommandLine.Command command, Builder<TRootArgs> builder, CommandDataDefinition commandDefinition)
+    private void InitializeCommand(System.CommandLine.Command command, Builder<TRootArgs> builder, CommandDataDefinition commandDefinition, Result<TRootArgs> result)
     {
         var memberSymbols = commandDefinition.Operate(new CreateFromMembersOperation(this));
         command.AddRange(memberSymbols);
@@ -80,10 +60,10 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         foreach (var subcommandDefinition in commandDefinition.Subcommands)
         {
             var subCommand = new SclWrappers.Command(subcommandDefinition);
-            InitializeCommand(subCommand, builder, subcommandDefinition);
+            InitializeCommand(subCommand, builder, subcommandDefinition, result);
             command.Add(subCommand);
         }
-        command.SetAction(p => _parseResult = p);
+        command.SetAction(p => ParseResult = p);
     }
 
     public struct CreateFromMembersOperation : IOperationOnMemberDefinition<Symbol>
@@ -108,8 +88,16 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
 
     public override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition, Result<TRootArgs> result, out TValue value)
     {
+        if (ParseResult is null || cachedRunId != result.RunId)
+        {
+            InitializeRun(result);
+        }
+        if (ParseResult is null)
+        {
+            value = default!;
+            return false;
+        }
         var key = (memberDefinition.CommandDefinition.ArgsType, memberDefinition.DefinitionName);
-        var _ = ParseResult ?? throw new InvalidOperationException("Attempt to retrieve value before parsign complete.");
         var symbol = LookupSymbol[key];
         if (symbol is not null)
         {
@@ -160,8 +148,9 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
                 {
                     outValue = default!;
                     return false;
-                }                ;
-                bool value =true; // If there were tokens, or there was no identifier token, it was already handled
+                }
+                ;
+                bool value = true; // If there were tokens, or there was no identifier token, it was already handled
                 if (value is TValue castValue) // This is to silence NRT warning
                 {
                     outValue = castValue;
@@ -175,7 +164,7 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         }
     }
 
-    public void AddNameLookup((Type argsType, string propertyName) key, Symbol symbol)
+    private void AddNameLookup((Type argsType, string propertyName) key, Symbol symbol)
     {
         LookupSymbol[key] = symbol;
     }
@@ -183,6 +172,10 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
     public bool TryGetActiveArgsDefinition(Result<TRootArgs> result, [NotNullWhen(true)] out CommandDataDefinition<TRootArgs> activeCommandDefinition)
     {
 
+        if (ParseResult is null || cachedRunId != result.RunId)
+        {
+            InitializeRun(result);
+        }
         if (ParseResult is null)
         {
             activeCommandDefinition = null!;
@@ -203,5 +196,50 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
                 return false;
         }
         ;
+    }
+
+    public class CliDataProviderInfo
+    {
+        public ParseResult ParseResult { get; }
+
+        public CliDataProviderInfo(ParseResult parseResult)
+        {
+            ParseResult = parseResult;
+        }
+
+
+        //private ParseResult? _parseResult = null;
+
+        //public string[]? InputArgs => Builder.CommandLineArguments;
+
+        ///// <summary>
+        ///// This is the System.CommandLine.ParseResult that is used internally.
+        ///// </summary>
+        ///// <remarks>
+        ///// A single value is cached, which is used during a single run and if there is some reason another
+        ///// call is made with the same command line args.
+        ///// <br/>
+        ///// Note that this cache is via the generic, if there are multiple root args, such as in an 
+        ///// interactive or scripting scenario, they will be separately cached.
+        ///// </remarks>
+        //public ParseResult? ParseResult
+        //{
+        //    get
+        //    {
+        //        if (RootCommand is null) throw new InvalidOperationException("RootCommand cannot be null");
+        //        if (InputArgs is null) throw new InvalidOperationException("InputArgs cannot be null");
+        //        if (field is null || _parseResultArgs != InputArgs)
+        //        {
+        //            field = RootCommand?.Parse(InputArgs);
+        //            _parseResultArgs = InputArgs ?? [];
+        //        }
+        //        return field;
+        //    }
+
+        //    private set;
+        //}
+
+
+
     }
 }

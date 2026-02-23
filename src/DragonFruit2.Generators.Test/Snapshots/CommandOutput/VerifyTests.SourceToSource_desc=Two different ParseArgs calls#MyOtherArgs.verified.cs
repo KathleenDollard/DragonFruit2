@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 /// <summary>
 /// Auto-generated partial class for building CLI commands for <see cref="MyOtherArgs"/>" and creating a new MyOtherArgs instance from a <see cref="System.CommandLine.ParseResult" />.
 /// </summary>
-public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
+partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
 {
 
     [SetsRequiredMembers()]

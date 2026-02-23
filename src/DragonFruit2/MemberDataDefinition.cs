@@ -14,7 +14,7 @@ public abstract class MemberDataDefinition : DataDefinition
 {
     public abstract IEnumerable<Diagnostic>? Validate(DataValue dataValue);
 
-    public MemberDataDefinition(CommandDataDefinition commandDefinition, string name, bool isOption)
+    protected MemberDataDefinition(CommandDataDefinition commandDefinition, string name, bool isOption)
         : base(name)
     {
         CommandDefinition = commandDefinition;
@@ -27,10 +27,10 @@ public abstract class MemberDataDefinition : DataDefinition
     public bool IsOption { get; }
 }
 
-public class MemberDataDefinition<TValue> : MemberDataDefinition
+public abstract class MemberDataDefinition<TValue> : MemberDataDefinition
 {
     private readonly List<DefaultDefinition<TValue>> _defaultDefinitions = [];
-    public readonly List<Validator<TValue>> _validators = [];
+    private readonly List<Validator<TValue>> _validators = [];
 
     public MemberDataDefinition(CommandDataDefinition commandDefinition, string name, bool isOption)
         : base(commandDefinition, name, isOption)

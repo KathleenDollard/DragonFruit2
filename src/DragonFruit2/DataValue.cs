@@ -3,7 +3,7 @@
 public abstract record class DataValue
 {
     public abstract bool Validate();
-    protected abstract IEnumerable<Diagnostic>? UntypedDiagnostics { get; }
+    private protected abstract IEnumerable<Diagnostic>? UntypedDiagnostics { get; }
     public IEnumerable<Diagnostic>? Diagnostics => UntypedDiagnostics;
 
     public DataValue(string name, Type argsType, DataValues dataValues, MemberDataDefinition memberDefinition)
@@ -38,7 +38,7 @@ public record class DataValue<TValue> : DataValue
     private List<Diagnostic<TValue>>? _diagnostics;
     public new IEnumerable<Diagnostic<TValue>>? Diagnostics => _diagnostics;
 
-    protected override IEnumerable<Diagnostic>? UntypedDiagnostics 
+    private protected override IEnumerable<Diagnostic>? UntypedDiagnostics 
         => Diagnostics?.OfType<Diagnostic>();
 
     public void SetValue(TValue value, DataProvider setBy)

@@ -9,9 +9,9 @@ public static class DefaultOffsetNumeric
         return new DefaultOffsetInt32(start, offset);
     }
 
-    public static DefaultOffsetInt32 Create(string name, int offset)
+    public static DefaultOffsetInt32 Create(string otherMemberName, int offset)
     {
-        return new DefaultOffsetInt32(name, offset);
+        return new DefaultOffsetInt32(otherMemberName, offset);
     }
 
     // TODO: Add Create methods and stub classes for other numeric types, ensuring the approach works in .NET Standard and can be consumed by C# 7.3

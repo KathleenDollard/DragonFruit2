@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using DragonFruit2.Validators;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DragonFruit2.Defaults;
 
@@ -6,11 +7,11 @@ public class DefaultConstant<TValue> : DefaultDefinition<TValue>
 {
     private TValue _defaultValue;
 
-    public static DefaultConstant<TValue> Create(TValue value)
-    { return new DefaultConstant<TValue>(value); }
+    public static DefaultConstant<TValue> Create(string valueName, TValue  value)
+    { return new DefaultConstant<TValue>(valueName, value); }
 
-    public DefaultConstant(TValue value)
-        : base($"value")
+    public DefaultConstant(string valueName, TValue value)
+        : base(valueName, $"value")
     {
         _defaultValue = value;
     }
@@ -28,5 +29,28 @@ public class DefaultConstant<TValue> : DefaultDefinition<TValue>
     {
         value = _defaultValue!;
         return true;
+    }
+}
+
+[DefaultAttributeInfo(typeof(DefaultConstant<>))]
+public sealed class DefaultAttribute : DefaultBaseAttribute
+{
+
+    public DefaultAttribute(object defaultValue)
+    {
+        DefaultValue = defaultValue;
+    }
+
+    public object DefaultValue { get; }
+}
+
+public static class DefaultConstantExtensions
+{
+    extension<TValue>(MemberDataDefinition<TValue> memberDefinition)
+    {
+        public void Default(TValue defaultValue)
+        {
+            memberDefinition.RegisterValidator(new DefaultConstant<TValue>(memberDefinition.DefinitionName, compareWithValue));
+        }
     }
 }

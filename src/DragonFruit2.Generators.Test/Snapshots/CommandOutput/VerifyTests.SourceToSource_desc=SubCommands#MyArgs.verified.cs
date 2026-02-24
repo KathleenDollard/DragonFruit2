@@ -12,7 +12,7 @@ namespace MyNamespace
     /// <summary>
     /// Auto-generated partial class for building CLI commands for <see cref="MyArgs"/>" and creating a new MyArgs instance from a <see cref="System.CommandLine.ParseResult" />.
     /// </summary>
-    public partial class MyArgs : ArgsRootBase<MyArgs>
+    partial class MyArgs : ArgsRootBase<MyArgs>
     {
 
         public MyArgs()

@@ -12,7 +12,7 @@ namespace MyNamespace
     /// <summary>
     /// Auto-generated partial class for building CLI commands for <see cref="EveningGreetingArgs"/>" and creating a new EveningGreetingArgs instance from a <see cref="System.CommandLine.ParseResult" />.
     /// </summary>
-    public partial class EveningGreetingArgs : MyArgs
+    partial class EveningGreetingArgs : MyArgs
     {
 
         public EveningGreetingArgs()

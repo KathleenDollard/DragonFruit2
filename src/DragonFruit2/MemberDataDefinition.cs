@@ -76,7 +76,7 @@ public abstract class MemberDataDefinition<TValue> : MemberDataDefinition
     }
     public void Default(TValue value)
     {
-        _defaultDefinitions.Add(DefaultConstant<TValue>.Create(value));
+        //_defaultDefinitions.Add(DefaultConstant<TValue>.Create(value));
     }
 
     public void RegisterValidator(Validator<TValue> validator)

@@ -14,7 +14,7 @@ public abstract class DataProvider<TRootArgs> : DataProvider
 
     public Builder<TRootArgs> Builder { get; }
 
-    public abstract bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition, Result<TRootArgs> result, out TValue Value);
+    protected abstract bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition, Result<TRootArgs> result, out TValue Value);
 
     public bool TrySetDataValue<TValue>(DataValue<TValue> dataValue, Result<TRootArgs> result)
     {

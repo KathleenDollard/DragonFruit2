@@ -86,7 +86,7 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         }
     }
 
-    public override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition, Result<TRootArgs> result, out TValue value)
+    protected override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition, Result<TRootArgs> result, out TValue value)
     {
         if (ParseResult is null || cachedRunId != result.RunId)
         {

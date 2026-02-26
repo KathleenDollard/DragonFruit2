@@ -79,7 +79,7 @@ public class OutputDataDefinition
         {
             foreach (var validatorInfo in propInfo.Validators)
             {
-                sb.AppendLine($"{propInfo.Name}.RegisterValidator(new {validatorInfo.ValidatorName}<{propInfo.TypeName}>({propInfo.Name}.DefinitionName, 0));");
+                sb.AppendLine($"{propInfo.Name}.RegisterValidator(new {validatorInfo.ValidatorTypeName}<{propInfo.TypeName}>({propInfo.Name}.DefinitionName, 0));");
             }
         }
         

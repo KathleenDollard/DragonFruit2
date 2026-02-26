@@ -10,7 +10,7 @@ internal class StubDataProvider : DataProvider<StubRootArgs>
     public StubDataProvider(Builder<StubRootArgs> builder) : base(builder)
     {
     }
-    public override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition,
+    protected override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition,
                                              Result<StubRootArgs> result,
                                              out TValue Value)
     {

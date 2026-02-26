@@ -12,7 +12,7 @@ public class DefaultDataProvider<TRootArgs> : DataProvider<TRootArgs>
 
     private readonly Dictionary<(Type argsType, string propertyName), object> defaultValues = new();
 
-    public override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition,
+    protected override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition,
                                              Result<TRootArgs> result,
                                              [NotNullWhen(true)] out TValue value)
     {

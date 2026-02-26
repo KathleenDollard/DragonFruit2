@@ -28,8 +28,8 @@ public class LessThanValidator<TValue> : Validator<TValue>
 }
 
 // TODO: Add analyzer to ensure the CompareWith type in the attribute matches the property type
-[ValidatorAttributeInfo(typeof(LessThanValidator<>))]
-public sealed class LessThanAttribute : MemberValidatorAttribute
+[MemberAttributeAttribute(typeof(LessThanValidator<>))]
+public sealed class LessThanAttribute
 {
 
     public LessThanAttribute(object compareWithValue, string? customMessage = null)

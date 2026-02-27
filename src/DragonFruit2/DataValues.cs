@@ -19,14 +19,14 @@ public abstract class DataValues : IEnumerable<DataValue>
         _values[value.Name] = value;
     }
 
-    public bool TryGetValue<TValue>(string name,[NotNullWhen(true)] out DataValue<TValue>? value)
+    public bool TryGetValue<TValue>(string name,[NotNullWhen(true)] ref DataValue<TValue>? dataValue)
     {
         if (_values.TryGetValue(name, out var existing) && existing is DataValue<TValue> typed)
         {
-            value = typed;
+            dataValue = typed;
             return true;
         }
-        value = null;
+        dataValue = null;
         return false;
     }
 
@@ -47,7 +47,7 @@ public abstract class DataValues<TRootArgs> : DataValues
         :base (commandDefinition)
     {  }
 
-    public abstract void SetDataValues(DataProvider<TRootArgs> dataProvider, Result<TRootArgs> result);
+    public abstract bool Operate<TReturn>(IOperateOnDataValue<TRootArgs,TReturn> operationContainer);
 
     protected internal abstract TRootArgs CreateInstance();
 

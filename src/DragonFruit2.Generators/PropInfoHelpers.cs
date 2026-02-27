@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
 using System.Reflection.Metadata;
+using System.Xml.Linq;
 
 namespace DragonFruit2.Generators;
 
@@ -35,22 +36,8 @@ public static class PropInfoHelpers
             InitializerText = initializerText,
         };
 
-        var validationAttributes = propSymbol.GetAttributes()
-            .Where(x => x.AttributeClass?.BaseType?.Name == "MemberValidatorAttribute")
-            .Select(x => x);
-        foreach (var validationAttribute in validationAttributes)
-        {
-            var validatorInfo = GetValidatorInfo(validationAttribute, semanticModel);
-            if (validatorInfo != null)
-            {
-                propInfo.Validators.Add(validatorInfo);
-            }
-        }
-
-
-        // Decide whether the property should be treated as required for CLI:
-        // - explicit 'required' modifier wins
-        // - otherwise non-nullable reference types without initializer are required
+        var validators = GetValidators(propSymbol.GetAttributes(),semanticModel, propInfo);
+        var defaults = GetDefaults(propSymbol.GetAttributes(),semanticModel, propInfo);
 
         return propInfo;
 
@@ -75,6 +62,40 @@ public static class PropInfoHelpers
             }
             return (false, null);
         }
+    }
+
+    private static IEnumerable<DefaultInfo> GetDefaults(ImmutableArray<AttributeData> attributes, SemanticModel semanticModel, PropInfo propInfo)
+    {
+        var validators = new List<DefaultInfo>();
+        var validationAttributes = attributes
+            .Where(x => x.AttributeClass?.BaseType?.Name == "MemberValidatorAttribute")
+            .Select(x => x);
+        foreach (var validationAttribute in validationAttributes)
+        {
+            //var validatorInfo = GetValidatorInfo(validationAttribute, semanticModel);
+            //if (validatorInfo != null)
+            //{
+            //    validators.Add(validatorInfo);
+            //}
+        }
+        return validators;
+    }
+
+    private static IEnumerable<ValidatorInfo> GetValidators(IEnumerable<AttributeData> attributes, SemanticModel semanticModel, PropInfo propInfo)
+    {
+        var validators = new List<ValidatorInfo>();
+        var validationAttributes = attributes
+            .Where(x => x.AttributeClass?.BaseType?.Name == "MemberValidatorAttribute")
+            .Select(x => x);
+        foreach (var validationAttribute in validationAttributes)
+        {
+            var validatorInfo = GetValidatorInfo(validationAttribute, semanticModel);
+            if (validatorInfo != null)
+            {
+                validators.Add(validatorInfo);
+            }
+        }
+        return validators;
     }
 
     /// <summary>
@@ -115,8 +136,8 @@ public static class PropInfoHelpers
             arguments[i] = new ValidatorArgumentInfo
             {
                 Name = name,
-                ValidatorTypeName = validatorParameterType.ToString(),
-                ArgumentTypeName = argumentTypeAndValue.argumentType.ToString(),
+                ValidatorParameterTypeName = validatorParameterType.ToString(),
+                AttributeArgumentTypeName = argumentTypeAndValue.argumentType.ToString(),
                 Value = value
             };
         }
@@ -124,7 +145,7 @@ public static class PropInfoHelpers
         return new ValidatorInfo
         {
             AttributeName = AttributeClassName(attrClass),
-            ValidatorName = validatorType.Name.ToString(),
+            ValidatorTypeName = validatorType.Name.ToString(),
             ValidatorArguments = arguments,
         };
 

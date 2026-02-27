@@ -308,7 +308,7 @@ public class CommandInfoHelpersTests
 
         Assert.Single(result.Validators);
         var validator = result.Validators.First();
-        Assert.Equal("GreaterThanValidator", validator.ValidatorName);
+        Assert.Equal("GreaterThanValidator", validator.ValidatorTypeName);
     }
 
     [Fact]
@@ -362,7 +362,7 @@ public class CommandInfoHelpersTests
         var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
 
         Assert.Equal(2, result.Validators.Count);
-        var validatorNames = result.Validators.Select(v => v.ValidatorName).ToList();
+        var validatorNames = result.Validators.Select(v => v.ValidatorTypeName).ToList();
         Assert.Contains("GreaterThanValidator", validatorNames);
         Assert.Contains("LessThanValidator", validatorNames);
     }

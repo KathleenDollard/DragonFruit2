@@ -1,4 +1,5 @@
 ﻿using DragonFruit2.Validators;
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 
 namespace DragonFruit2;
@@ -6,11 +7,6 @@ namespace DragonFruit2;
 public class Builder<TRootArgs>
     where TRootArgs : ArgsRootBase<TRootArgs>
 {
-
-    public static string[] GetArgsFromEnvironment()
-    {
-        return [.. Environment.GetCommandLineArgs().Skip(1)];
-    }
 
     public Builder(CommandDataDefinition<TRootArgs> rootCommandDefinition, DragonFruit2Configuration? configuration = null)
     {
@@ -53,32 +49,132 @@ public class Builder<TRootArgs>
             CommandLineArguments = commandLineArguments;
 
             InitializeDataProviders(result);
-            if (!TryGetActiveCommandDefinition(result, out var activeCommandDefinition))
+            if (!TryGetActiveCommandDefinition(result, out var activeCommandDefinition, out var activeDataProvider))
             {
                 result.AddDiagnostic(new Diagnostic(DiagnosticId.NoActiveCommand.ToValidationIdString(), DiagnosticSeverity.Error, null, "No active command could be determined."));
                 return result;
             }
             result.ActiveCommandDefinition = activeCommandDefinition;
+            if (result.ActiveDataProvider is null)
+
+                result.ActiveDataProvider = activeDataProvider;
             if (result.DataValues is null) throw new InvalidOperationException("DataValues should not be null after ActiveCommandDefinition is set");
 
-            GatherDataValues(result);
+            GatherActiveDataValues(result);
+            GatherDefaultValues(result);
             if (CheckRequired(result) && Validate(result))
             {
                 var instance = result.DataValues.CreateInstance();
                 result.Args = instance;
             }
+
             return result;
         }
         catch (Exception e)
         {
-            result.AddDiagnostic(new Diagnostic(DiagnosticId.UnexpectedException.ToValidationIdString(), DiagnosticSeverity.Error, 
-                Message:$"""
+            result.AddDiagnostic(new Diagnostic(DiagnosticId.UnexpectedException.ToValidationIdString(), DiagnosticSeverity.Error,
+                Message: $"""
                 Unexpected exception: 
                    {e.Message}
                 """));
             return result;
         }
     }
+
+    public static string[] GetArgsFromEnvironment()
+    {
+        return [.. Environment.GetCommandLineArgs().Skip(1)];
+    }
+
+    private bool TryGetActiveCommandDefinition(Result<TRootArgs> result,
+                                               [NotNullWhen(true)] out CommandDataDefinition<TRootArgs> activeCommandDefinition,
+                                               [NotNullWhen(true)] out DataProvider<TRootArgs> activeDataProvider)
+    {
+        foreach (var dataProvider in DataProviders.OfType<IActiveArgsProvider<TRootArgs>>())
+        {
+            if (dataProvider.TryGetActiveArgsDefinition(result, out activeCommandDefinition, out activeDataProvider))
+            {
+                return true;
+            }
+        }
+        activeCommandDefinition = null!;
+        activeDataProvider = null!;
+        return false;
+    }
+
+    private void GatherActiveDataValues(Result<TRootArgs> result)
+    {
+
+        result.DataValues?.Operate(new SetActiveDataValueOperation(result, result.ActiveDataProvider));
+    }
+
+    internal struct SetActiveDataValueOperation : IOperateOnDataValue<TRootArgs, Void>
+    {
+        private readonly DataProvider<TRootArgs> _dataProvider;
+        public SetActiveDataValueOperation(Result<TRootArgs> result, DataProvider<TRootArgs> dataProvider)
+        {
+            Result = result;
+            _dataProvider = dataProvider;
+        }
+
+        public Result<TRootArgs> Result { get; init; }
+        public string OperationName => nameof(SetActiveDataValueOperation);
+
+        public bool TryOperate<TValue>(DataValue<TValue> dataValue,
+                                       IOperateOnDataValue<TRootArgs, Void> operation,
+                                       out Void _)
+        {
+            _ = default;
+            if (dataValue is not null && !dataValue.IsSet)
+            {
+                _dataProvider.TrySetDataValue(dataValue, Result);
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private void GatherDefaultValues(Result<TRootArgs> result)
+    {
+        result.DataValues?.Operate(new SetDefaultValueOperation(result, result.ActiveDataProvider, DataProviders));
+    }
+
+    internal struct SetDefaultValueOperation : IOperateOnDataValue<TRootArgs, Void>
+    {
+        private readonly IEnumerable<DataProvider<TRootArgs>> _dataProviders;
+        private readonly DataProvider<TRootArgs> _activeDataProvider;
+
+        public SetDefaultValueOperation(Result<TRootArgs> result, DataProvider<TRootArgs> activeDataProvider, IEnumerable<DataProvider<TRootArgs>> dataProviders)
+        {
+            Result = result;
+            _dataProviders = dataProviders;
+            _activeDataProvider = activeDataProvider;
+        }
+
+        public Result<TRootArgs> Result { get; init; }
+        public readonly string OperationName => nameof(SetActiveDataValueOperation);
+
+        public bool TryOperate<TValue>(DataValue<TValue> dataValue,
+                                       IOperateOnDataValue<TRootArgs, Void> operation,
+                                       out Void _)
+        {
+            _ = default;
+            var activeDataProvider = _activeDataProvider;
+            var remainingDataProviders = _dataProviders.Where(dp => dp != activeDataProvider);
+            if (dataValue is not null && !dataValue.IsSet)
+            {
+                foreach (var dataProvider in _dataProviders)
+                {
+                dataProvider.TrySetDataValue(dataValue, Result);
+                return true;
+
+                }
+            }
+            return false;
+        }
+    }
+
+
 
     private bool CheckRequired(Result<TRootArgs> result)
     {
@@ -108,33 +204,6 @@ public class Builder<TRootArgs>
             { isValid = false; }
         }
         return isValid;
-    }
-
-    private void GatherDataValues(Result<TRootArgs> result)
-    {
-        if (result.ActiveCommandDefinition is null)
-        {
-            throw new ArgumentNullException(nameof(result.ActiveCommandDefinition));
-        }
-        // TPDO: This is called after a null check on result.DataValues. Are we setting DataValues twice?
-        result.DataValues = result.ActiveCommandDefinition.CreateDataValues();
-        foreach (var dataProvider in DataProviders)
-        {
-            result.DataValues.SetDataValues(dataProvider, result);
-        }
-    }
-
-    private bool TryGetActiveCommandDefinition(Result<TRootArgs> result, [NotNullWhen(true)] out CommandDataDefinition<TRootArgs> activeCommandDefinition)
-    {
-        foreach (var dataProvider in DataProviders.OfType<IActiveArgsProvider<TRootArgs>>())
-        {
-            if (dataProvider.TryGetActiveArgsDefinition(result, out activeCommandDefinition))
-            {
-                return true;
-            }
-        }
-        activeCommandDefinition = null!;
-        return false;
     }
 
     private void InitializeDataProviders(Result<TRootArgs> result)

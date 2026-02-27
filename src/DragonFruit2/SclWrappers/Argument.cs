@@ -5,11 +5,11 @@ public class Argument<TValue> : System.CommandLine.Argument<TValue>, IHasDataDef
     public Argument(ArgumentDataDefinition<TValue> argumentDefinition)
         : base(argumentDefinition.PosixName)
     {
-        ArgumentDefinition = argumentDefinition;
+        ArgumentDataDefinition = argumentDefinition;
     }
 
-    public ArgumentDataDefinition<TValue> ArgumentDefinition { get; }
+    public ArgumentDataDefinition<TValue> ArgumentDataDefinition { get; }
 
-    public DataDefinition DataDefinition => ArgumentDefinition;
+    public DataDefinition DataDefinition => ArgumentDataDefinition;
 
 }

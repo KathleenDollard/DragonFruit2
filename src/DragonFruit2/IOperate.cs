@@ -1,13 +1,17 @@
 ﻿namespace DragonFruit2;
 
-public interface IOperationOnDataValue
-{
-    TReturn Operate<TReturn, TValue>(DataValue<TValue> dataValue);
-}
-
 public interface IOperationOnMemberDefinition<TReturn>
 {
     TReturn Operate<TValue>(MemberDataDefinition<TValue> memberDefinition);
 }
+
+public interface IOperateOnDataValue<TRootArgs, TReturn>
+    where TRootArgs : ArgsRootBase<TRootArgs>
+{
+    bool TryOperate<TValue>(DataValue<TValue> dataValue,IOperateOnDataValue<TRootArgs, TReturn> operation, out TReturn returnValue);
+    Result<TRootArgs> Result { get; }
+    string OperationName { get; }
+}
+
 
 

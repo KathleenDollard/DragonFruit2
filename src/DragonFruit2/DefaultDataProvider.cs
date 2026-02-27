@@ -10,15 +10,15 @@ public class DefaultDataProvider<TRootArgs> : DataProvider<TRootArgs>
     {
     }
 
-    private readonly Dictionary<(Type argsType, string propertyName), object> defaultValues = new();
 
-    public override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition,
+    protected override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition,
                                              Result<TRootArgs> result,
                                              [NotNullWhen(true)] out TValue value)
     {
+
         if (result.DataValues is DataValues<TRootArgs> dataValues)
         {
-            if (memberDefinition.TryGetDefault(dataValues, out var outValue))
+            if (memberDefinition.TrySetDefault(dataValues, out var outValue))
             {
                 value = outValue;
                 return true;
@@ -26,13 +26,5 @@ public class DefaultDataProvider<TRootArgs> : DataProvider<TRootArgs>
         }
         value = default!;
         return false;
-    }
-
-    public void RegisterDefault<TValue>(Type argsType, string propertyName, TValue value)
-    {
-        if (value is not null && !value.Equals(default(TValue)))
-        {
-            defaultValues[(argsType, propertyName)] = value;
-        }
     }
 }

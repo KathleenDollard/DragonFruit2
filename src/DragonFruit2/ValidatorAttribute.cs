@@ -1,11 +1,11 @@
-﻿using DragonFruit2.Validators;
-
-namespace DragonFruit2;
+﻿namespace DragonFruit2;
 
 /// <summary>
 /// Base class for DragonFruit2 validation attributes. This is used only during compile time generation.
 /// </summary>
 /// <remarks>
+/// 2026-02-24 This long commnt may be out of date
+/// 
 /// The type and arguments are used only during generation to create a call from user code
 /// to an extension method or validator constructor. The names and types must align. Since
 /// we must collect the values as objects, this creates a potential problem with the generator
@@ -33,8 +33,6 @@ namespace DragonFruit2;
 /// <br/>
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-public abstract class MemberValidatorAttribute : Attribute
-{
-
-}
+public abstract class MemberHelperAttribute : Attribute
+{}
 

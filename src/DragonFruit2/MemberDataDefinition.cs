@@ -39,14 +39,14 @@ public abstract class MemberDataDefinition<TValue> : MemberDataDefinition
     public IEnumerable<DefaultDefinition<TValue>> Defaults => _defaultDefinitions;
     public IEnumerable<Validator<TValue>> Validators => _validators;
 
-    public bool TryGetDefault(DataValues dataValues, [NotNullWhen(true)] out TValue value)
+    public bool TrySetDefault(DataValues dataValues, [NotNullWhen(true)] out TValue dataValue)
     {
         foreach (var defaultDefinition in Defaults)
         {
-            if (defaultDefinition.TryGetDefaultValue(dataValues, out value))
+            if (defaultDefinition.TrySetDefaultValue(dataValues, out dataValue))
             { return true; }
         }
-        value = default!;
+        dataValue = default!;
         return false;
     }
 
@@ -76,7 +76,7 @@ public abstract class MemberDataDefinition<TValue> : MemberDataDefinition
     }
     public void Default(TValue value)
     {
-        _defaultDefinitions.Add(DefaultConstant<TValue>.Create(value));
+        //_defaultDefinitions.Add(DefaultConstant<TValue>.Create(value));
     }
 
     public void RegisterValidator(Validator<TValue> validator)

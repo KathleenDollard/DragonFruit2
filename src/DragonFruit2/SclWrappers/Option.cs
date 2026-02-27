@@ -5,11 +5,11 @@ public class Option<TValue> : System.CommandLine.Option<TValue>, IHasDataDefinit
     public Option(OptionDataDefinition<TValue> optionDefinition)
         : base($"--{optionDefinition.PosixName}")
     {
-        OptionDefinition = optionDefinition;
+        OptionDataDefinition = optionDefinition;
         Recursive = optionDefinition.Recursive;
     }
 
-    public OptionDataDefinition<TValue> OptionDefinition { get; }
-    public DataDefinition DataDefinition => OptionDefinition;
+    public OptionDataDefinition<TValue> OptionDataDefinition { get; }
+    public DataDefinition DataDefinition => OptionDataDefinition;
 
 }

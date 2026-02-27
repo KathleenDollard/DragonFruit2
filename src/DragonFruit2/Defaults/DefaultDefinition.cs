@@ -16,7 +16,7 @@ public abstract class DefaultDefinition<TValue> : DefaultDefinition
         _dependentValueNames = dependentValueNames;
     }
 
-    public abstract bool TryGetDefaultValue(DataValues dataValues, [NotNullWhen(true)] out TValue value);
+    public abstract bool TrySetDefaultValue(DataValues dataValues, [NotNullWhen(true)] out TValue value);
 
     public string ValueName { get; }
     public string Description { get; }

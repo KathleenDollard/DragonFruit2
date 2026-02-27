@@ -66,7 +66,7 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         command.SetAction(p => ParseResult = p);
     }
 
-    public struct CreateFromMembersOperation : IOperationOnMemberDefinition<Symbol>
+    internal struct CreateFromMembersOperation : IOperationOnMemberDefinition<Symbol>
     {
         private CliDataProvider<TRootArgs> _dataProvider;
         public CreateFromMembersOperation(CliDataProvider<TRootArgs> dataProvider)
@@ -169,7 +169,9 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         LookupSymbol[key] = symbol;
     }
 
-    public bool TryGetActiveArgsDefinition(Result<TRootArgs> result, [NotNullWhen(true)] out CommandDataDefinition<TRootArgs> activeCommandDefinition)
+    public bool TryGetActiveArgsDefinition(Result<TRootArgs> result,
+                                           [NotNullWhen(true)] out CommandDataDefinition<TRootArgs> activeCommandDefinition,
+                                           [NotNullWhen(true)] out DataProvider<TRootArgs> activeDataProvider)
     {
 
         if (ParseResult is null || cachedRunId != result.RunId)
@@ -178,6 +180,7 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         }
         if (ParseResult is null)
         {
+            activeDataProvider = null!;
             activeCommandDefinition = null!;
             return false;
         }
@@ -186,12 +189,15 @@ public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsPr
         switch (command)
         {
             case SclWrappers.Command sclCommand and IHasDataDefinition { DataDefinition: CommandDataDefinition<TRootArgs> dataDefinition }:
+                activeDataProvider = this;
                 activeCommandDefinition = dataDefinition;
                 return true;
             case SclWrappers.RootCommand sclRootCommand and IHasDataDefinition { DataDefinition: CommandDataDefinition<TRootArgs> dataDefinition }:
+                activeDataProvider = this;
                 activeCommandDefinition = dataDefinition;
                 return true;
             default:
+                activeDataProvider = this;
                 activeCommandDefinition = null!;
                 return false;
         }

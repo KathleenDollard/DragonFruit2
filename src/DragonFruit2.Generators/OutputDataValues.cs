@@ -7,7 +7,7 @@ internal class OutputDataValues
         OpenClass(commandInfo, sb);
 
         Constructor(sb, commandInfo);
-        SetDataValues(sb, commandInfo);
+        Operate(sb, commandInfo);
         sb.AppendLine();
         Fields(sb, commandInfo);
         Properties(sb, commandInfo);
@@ -34,15 +34,20 @@ internal class OutputDataValues
         sb.CloseConstructor();
     }
 
-    private static void SetDataValues(StringBuilderWrapper sb, CommandInfo commandInfo)
+    private static void Operate(StringBuilderWrapper sb, CommandInfo commandInfo)
     {
-        sb.OpenMethod($"public override void SetDataValues(DataProvider<{commandInfo.RootName}> dataProvider, Result<{commandInfo.RootName}> result)");
+        sb.OpenMethod($" public override bool Operate<TReturn>(IOperateOnDataValue<{commandInfo.RootName}, TReturn> operationContainer)");
+        sb.OpenTry();
         foreach (var propInfo in commandInfo.SelfAndAncestorPropInfos)
         {
-            sb.OpenIf($"{propInfo.Name} is not null && !{propInfo.Name}.IsSet");
-            sb.AppendLine($"dataProvider.TrySetDataValue({propInfo.Name}, result);");
-            sb.CloseIf();
+            sb.AppendLine($"operationContainer.TryOperate({propInfo.Name}, operationContainer, out var _);");
         }
+        sb.Return("true");
+        sb.CloseTryAndOpenCatch();
+        sb.AppendLine($$"""Diagnostic failure = new(DiagnosticId.UnexpectedException.ToValidationIdString(), DiagnosticSeverity.Error, $"An unexpected error occurred while operating on data values in the {operationContainer.OperationName}");""");
+        sb.AppendLine("operationContainer.Result.AddDiagnostic(failure);");
+        sb.Return("false");
+        sb.CloseCatch();
         sb.CloseMethod();
     }
 

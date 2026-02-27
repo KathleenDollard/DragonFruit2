@@ -136,6 +136,21 @@ public class StringBuilderWrapper
     }
     internal void CloseForEach() => CloseCurly();
 
+
+    internal void OpenTry()
+    {
+        AppendLine("try");
+        OpenCurly();
+    }
+    internal void CloseTryAndOpenCatch(string exceptionArgument = "Exception ex")
+    {
+        CloseCurly();
+        AppendLine($"catch ({exceptionArgument})");
+        OpenCurly();
+    }
+
+    internal void CloseCatch() => CloseCurly();
+
     internal void XmlSummary(string summary)
     {
         AppendLine("/// <summary>");
@@ -174,7 +189,7 @@ public class StringBuilderWrapper
         AppendLine($"// {line}");
     }
 
-    internal void Return(string? returnValue = null, bool noSemicolon = false)
+    internal void Return(object? returnValue = null, bool noSemicolon = false)
     {
         AppendLine($"""return {returnValue}{(noSemicolon ? "" : ";")}""");
     }
@@ -192,4 +207,6 @@ public class StringBuilderWrapper
             _ => throw new NotSupportedException($"Type {typeof(T).FullName} is not supported for C# literal conversion"),
         };
     }
+
+
 }

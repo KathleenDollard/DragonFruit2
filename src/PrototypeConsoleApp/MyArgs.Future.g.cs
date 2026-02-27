@@ -14,7 +14,7 @@ namespace SampleConsoleApp;
 /// <summary>
 /// 
 /// </summary>
- partial class MyArgs : ArgsRootBase<MyArgs>
+partial class MyArgs : ArgsRootBase<MyArgs>
 {
     // Only generate the following constructor if there are no other constructors defined (possibly via partial constructor)
     public MyArgs()
@@ -115,19 +115,20 @@ namespace SampleConsoleApp;
             Add(Greeting);
         }
 
-        public override void SetDataValues(DataProvider<MyArgs> dataProvider, Result<MyArgs> result)
+        public override bool Operate<TReturn>(IOperateOnDataValue<MyArgs, TReturn> operationContainer)
         {
-            if (Name is not null && !Name.IsSet)
+            try
             {
-                dataProvider.TrySetDataValue(Name, result);
+                operationContainer.TryOperate(Name, operationContainer, out var _);
+                operationContainer.TryOperate(Age, operationContainer, out var _);
+                operationContainer.TryOperate(Greeting, operationContainer, out var _);
+                return true;
             }
-            if (Age is not null && !Age.IsSet)
+            catch (Exception ex)
             {
-                dataProvider.TrySetDataValue(Age, result);
-            }
-            if (Greeting is not null && !Greeting.IsSet)
-            {
-                dataProvider.TrySetDataValue(Greeting, result);
+                Diagnostic failure = new(DiagnosticId.UnexpectedException.ToValidationIdString(), DiagnosticSeverity.Error, $"An unexpected error occurred while operating on data values in the {operationContainer.OperationName}. The error was {ex.Message}");
+                operationContainer.Result.AddDiagnostic(failure);
+                return false;
             }
         }
 

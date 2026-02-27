@@ -91,6 +91,33 @@ sequenceDiagram
 
 ```
 
+## Phases
+
+The method names are from the `DataProvider` pont of view.
+
+Parentheses indicates the feature has not been created.
+
+- Data gathering: Players: `DataProvider`s, including defaults
+  - Initialization
+  - `GetActiveCommandDef` (many `DataProvider`s are _not_ `IActiveArgProvider`s)
+  - `TrySetDataValue`
+  - (Cleanup)
+- (Transformation): Players: `Transfomers`
+- Validation: Players: `Validator`s
+- Instantiation: Players: None (internal)
+- 
+### Data gathering
+
+Initialization allows setup that can be shared between runs when we offer a reentrant mode. For example, a provider specific command tree may be created, such as in System.CommandLine. Initialization may alternatively be done the first time it is needed, if it is expensive and rarely used. The only operations that should be performed are setting private values in the data provider, and adding diagnostics to the `Result`.
+
+`GetActiveCommandDef` determines which command has been selected. Only one can be active during a given run. Any scenarios that should perform multiple commands (such as a script) should be considered separate runs. `DataProvider`s such as CLI parsers or script runners provide the active command def, while others, such as configuration, do not. The only operations that should be performed are initialization if it was delayed, returning the active command def found, and adding diagnostics to `Result`. The command line string is available in the `Result` instance.
+
+`TrySetDataValue` sets the data value if, and _only_ if it owns the value. The `DataProvider` is passed to ensure a trail of provenance (although spoofing would currently be trivial, and we might later consider some checks). A few data sources are CLI parsing, configuration files, the file system, current date/time, environment variables, etc. We will provide a System.CommandLine data provider, a default data provider, a configuration data provider if we settle on design, and environment variables if we design how to match. The only operations that should be performed are initialization if was delayed, setting the value if appropriate and adding diagnostics to 'Result`
+
+The `DefaultDataProvider` is the provider of default values that depend on the environment (`DateTime.Now()` for example) or other provided values. There is no fundamental difference between a default based on configuration or an environment variable and that set based on relative to another value that was supplied.
+
+
+
 ## A little more detail
 
 ### Startup
@@ -98,6 +125,8 @@ sequenceDiagram
 Switching the call from the library (needed for initial discovery) to the typed `Bulder<TRootArgs>` requires a little parlor trick. The sleight of hand depends on types in the current assembly being preferred over those in other namespaces. There is a little quirk with the `using` statement being required to start, and then marked as unnecessary. This occurs in the generated `Cli.cs` file.
 
 _To find the generated files in VS: in Solution Explorer, open dependencies/analyzers/DragonFruit2.Generators/DragonFruit2.Generators.DragonFruit2Generator_
+
+
 
 ### Root and active Args
 
@@ -107,6 +136,10 @@ Subcommands derive from `TRootArgs`, so the active command is always also a `TRo
 
 Data providers may implement `IActiveArgsProvider`. If the implementation is present, it is queried to find the active args. This avoids making the System.CommandLine special, and supports future alternate parsers (_wat!!!_) and scripting which my intuition thinks will arise as easier for humans than AI generating unfamiliar command line text. First one wins, and there is currently no support for a different priority order for finding the active args and finding data. It is not clear if a similar `IDataProvider` is appropriate - we do not have a scenario for an `IActiveArgsProvider` providing data at a different priority than it provides the active args.
 
+### Arg class helpers
 
+Each Arg class has two generated nested classes. 
+
+`CommandDef` contains the declarations collected from code hints during generation. For example, properties marked as `required` are declared as required to give a validation message and supply info for help.
 
 

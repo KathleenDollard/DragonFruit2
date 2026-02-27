@@ -1,5 +1,4 @@
-﻿using DragonFruit2.Validators;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace DragonFruit2.Defaults;
 
@@ -25,15 +24,16 @@ public class DefaultConstant<TValue> : DefaultDefinition<TValue>
     /// <param name="value"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public override bool TryGetDefaultValue(DataValues dataValues, [NotNullWhen(true)] out TValue value)
+    public override bool TrySetDefaultValue(DataValues dataValues, [NotNullWhen(true)] out TValue value)
     {
         value = _defaultValue!;
         return true;
     }
 }
 
+// TODO: We need analyzers to check the type of the default value matches the property type, and that the attribute constructor parameter appears as a property on the attribute
 [DefaultAttributeInfo(typeof(DefaultConstant<>))]
-public sealed class DefaultAttribute : DefaultBaseAttribute
+public sealed class DefaultAttribute
 {
 
     public DefaultAttribute(object defaultValue)
@@ -50,7 +50,7 @@ public static class DefaultConstantExtensions
     {
         public void Default(TValue defaultValue)
         {
-            memberDefinition.RegisterValidator(new DefaultConstant<TValue>(memberDefinition.DefinitionName, compareWithValue));
+            throw new NotImplementedException();
         }
     }
 }

@@ -64,6 +64,8 @@ public class Result<TRootArgs> : Result
         }
     }
 
+    public DataProvider<TRootArgs> ActiveDataProvider { get; internal set; }
+
     public override IEnumerable<Diagnostic> Diagnostics
     // This is in the TRootArgs specific version because it accesses DataValues
     {
@@ -76,6 +78,7 @@ public class Result<TRootArgs> : Result
             return CommandDiagnostics.Concat(memberDiagnostics);
         }
     }
+
 
     public void Cleanup()
     {

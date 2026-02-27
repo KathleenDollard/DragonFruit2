@@ -18,7 +18,7 @@ public class DefaultDataProvider<TRootArgs> : DataProvider<TRootArgs>
     {
         if (result.DataValues is DataValues<TRootArgs> dataValues)
         {
-            if (memberDefinition.TryGetDefault(dataValues, out var outValue))
+            if (memberDefinition.TrySetDefault(dataValues, out var outValue))
             {
                 value = outValue;
                 return true;

@@ -1,8 +1,12 @@
-﻿namespace DragonFruit2;
+﻿using DragonFruit2.Defaults;
+
+namespace DragonFruit2;
 
 public abstract record class DataValue
 {
     public abstract bool Validate();
+    protected internal abstract bool TrySetDefaultValue<TRootArgs>(DefaultDefinition defaultDefinition)
+        where TRootArgs : ArgsRootBase<TRootArgs>;
     private protected abstract IEnumerable<Diagnostic>? UntypedDiagnostics { get; }
     public IEnumerable<Diagnostic>? Diagnostics => UntypedDiagnostics;
 
@@ -38,7 +42,7 @@ public record class DataValue<TValue> : DataValue
     private List<Diagnostic<TValue>>? _diagnostics;
     public new IEnumerable<Diagnostic<TValue>>? Diagnostics => _diagnostics;
 
-    private protected override IEnumerable<Diagnostic>? UntypedDiagnostics 
+    private protected override IEnumerable<Diagnostic>? UntypedDiagnostics
         => Diagnostics?.OfType<Diagnostic>();
 
     public void SetValue(TValue value, DataProvider setBy)
@@ -72,8 +76,24 @@ public record class DataValue<TValue> : DataValue
         {  // No validation issues found
             return true;
         }
-        AddDiagnostics(newDiagnostics); 
+        AddDiagnostics(newDiagnostics);
         return false;
     }
 
+
+    protected internal override bool TrySetDefaultValue<TRootArgs>(DefaultDefinition defaultDefinition)
+    {
+        if (defaultDefinition is not DefaultDefinition<TValue> typedDefaultDefinition)
+        {
+            // not sure if we should throw here.
+            return false;
+        }
+        if (typedDefaultDefinition.TryGetDefaultValue(DataValues, MemberDefinition, out var defaultValue))
+        { 
+            // TODO: Determine how to describe provenance
+            SetValue(defaultValue, DefaultDataProvider<TRootArgs>.Instance());
+            return true;
+        }
+        return false;
+    }
 }

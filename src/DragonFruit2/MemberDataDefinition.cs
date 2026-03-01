@@ -43,7 +43,7 @@ public abstract class MemberDataDefinition<TValue> : MemberDataDefinition
     {
         foreach (var defaultDefinition in Defaults)
         {
-            if (defaultDefinition.TrySetDefaultValue(dataValues, out dataValue))
+            if (defaultDefinition.TryGetDefaultValue(dataValues, this, out dataValue))
             { return true; }
         }
         dataValue = default!;
@@ -76,6 +76,7 @@ public abstract class MemberDataDefinition<TValue> : MemberDataDefinition
     }
     public void Default(TValue value)
     {
+        CommandDefinition.RegisterDefault(this, new DefaultConstant<TValue>(this, value));
         //_defaultDefinitions.Add(DefaultConstant<TValue>.Create(value));
     }
 

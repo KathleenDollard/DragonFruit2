@@ -10,7 +10,7 @@ public abstract class CommandDataDefinition : DataDefinition
     public abstract IEnumerable<TReturn> Operate<TReturn>(IOperationOnMemberDefinition<TReturn> operationContainer);
 
     private readonly List<CommandDataDefinition> _subcommands = [];
-    private readonly Dictionary<string, DefaultDefinition> _defaultDefinitions = [];
+    private readonly List< DefaultDefinition> _defaultDefinitions = [];
     private readonly Dictionary<string, Validator> _validators = [];
 
     public CommandDataDefinition(Type rootArgs,
@@ -25,14 +25,12 @@ public abstract class CommandDataDefinition : DataDefinition
 
 
     public Type ArgsType { get; }
-
     public CommandDataDefinition? ParentDataDefinition { get; }
     public CommandDataDefinition RootDataDefinition { get; }
 
     // IsOptionStyle is not yet implemented, and will indicate whether the option performs an action, thus behaving like a command
     public bool IsOptionStyle { get; set; }
-
-    //public IEnumerable<MemberDataDefinition> Members => _members.Values;
+    public IEnumerable<DefaultDefinition> DefaultDefinitions => _defaultDefinitions;
     public IEnumerable<CommandDataDefinition> Subcommands => _subcommands;
 
     public void Add(CommandDataDefinition subcommand) => _subcommands.Add(subcommand);
@@ -47,6 +45,12 @@ public abstract class CommandDataDefinition : DataDefinition
 
         _validators.Add(name, validator);
     }
+
+    internal void RegisterDefault<TValue>(MemberDataDefinition<TValue> memberDataDefinition, DefaultDefinition<TValue> defaultDefinition)
+    {
+        _defaultDefinitions.Add( defaultDefinition);
+    }
+
 }
 
 public abstract class CommandDataDefinition<TRootArgs> : CommandDataDefinition

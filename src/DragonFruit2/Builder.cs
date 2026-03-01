@@ -61,7 +61,8 @@ public class Builder<TRootArgs>
             if (result.DataValues is null) throw new InvalidOperationException("DataValues should not be null after ActiveCommandDefinition is set");
 
             GatherActiveDataValues(result);
-            GatherDefaultValues(result);
+            result.DataValues.SetDefaults<TRootArgs>();
+            //GatherFromOtherDataProviders(result);
             if (CheckRequired(result) && Validate(result))
             {
                 var instance = result.DataValues.CreateInstance();
@@ -134,17 +135,17 @@ public class Builder<TRootArgs>
         }
     }
 
-    private void GatherDefaultValues(Result<TRootArgs> result)
+    private void GatherFromOtherDataProviders(Result<TRootArgs> result)
     {
-        result.DataValues?.Operate(new SetDefaultValueOperation(result, result.ActiveDataProvider, DataProviders));
+        result.DataValues?.Operate(new GatherFromOterDataProvidersOperation(result, result.ActiveDataProvider, DataProviders));
     }
 
-    internal struct SetDefaultValueOperation : IOperateOnDataValue<TRootArgs, Void>
+    internal struct GatherFromOterDataProvidersOperation : IOperateOnDataValue<TRootArgs, Void>
     {
         private readonly IEnumerable<DataProvider<TRootArgs>> _dataProviders;
         private readonly DataProvider<TRootArgs> _activeDataProvider;
 
-        public SetDefaultValueOperation(Result<TRootArgs> result, DataProvider<TRootArgs> activeDataProvider, IEnumerable<DataProvider<TRootArgs>> dataProviders)
+        public GatherFromOterDataProvidersOperation(Result<TRootArgs> result, DataProvider<TRootArgs> activeDataProvider, IEnumerable<DataProvider<TRootArgs>> dataProviders)
         {
             Result = result;
             _dataProviders = dataProviders;

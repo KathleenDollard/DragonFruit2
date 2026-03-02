@@ -61,8 +61,8 @@ public class Builder<TRootArgs>
             if (result.DataValues is null) throw new InvalidOperationException("DataValues should not be null after ActiveCommandDefinition is set");
 
             GatherActiveDataValues(result);
-            GatherDefaultValues(result);
-            if (CheckRequired(result) && Validate(result))
+            GatherFromOtherDataProviders(result);
+            if (Validate(result))
             {
                 var instance = result.DataValues.CreateInstance();
                 result.Args = instance;
@@ -134,17 +134,17 @@ public class Builder<TRootArgs>
         }
     }
 
-    private void GatherDefaultValues(Result<TRootArgs> result)
+    private void GatherFromOtherDataProviders(Result<TRootArgs> result)
     {
-        result.DataValues?.Operate(new SetDefaultValueOperation(result, result.ActiveDataProvider, DataProviders));
+        result.DataValues?.Operate(new GatherFromOterDataProvidersOperation(result, result.ActiveDataProvider, DataProviders));
     }
 
-    internal struct SetDefaultValueOperation : IOperateOnDataValue<TRootArgs, Void>
+    internal struct GatherFromOterDataProvidersOperation : IOperateOnDataValue<TRootArgs, Void>
     {
         private readonly IEnumerable<DataProvider<TRootArgs>> _dataProviders;
         private readonly DataProvider<TRootArgs> _activeDataProvider;
 
-        public SetDefaultValueOperation(Result<TRootArgs> result, DataProvider<TRootArgs> activeDataProvider, IEnumerable<DataProvider<TRootArgs>> dataProviders)
+        public GatherFromOterDataProvidersOperation(Result<TRootArgs> result, DataProvider<TRootArgs> activeDataProvider, IEnumerable<DataProvider<TRootArgs>> dataProviders)
         {
             Result = result;
             _dataProviders = dataProviders;
@@ -165,8 +165,10 @@ public class Builder<TRootArgs>
             {
                 foreach (var dataProvider in _dataProviders)
                 {
-                dataProvider.TrySetDataValue(dataValue, Result);
-                return true;
+                    if (dataProvider.TrySetDataValue(dataValue, Result))
+                    {
+                        return true;
+                    }
 
                 }
             }
@@ -176,21 +178,24 @@ public class Builder<TRootArgs>
 
 
 
-    private bool CheckRequired(Result<TRootArgs> result)
-    {
-        if (result.ActiveCommandDefinition is null) throw new ArgumentNullException(nameof(result.ActiveCommandDefinition));
-        if (result.DataValues is null) throw new ArgumentNullException(nameof(result.DataValues));
+    //private bool CheckRequired(Result<TRootArgs> result)
+    //{
+    //    if (result.ActiveCommandDefinition is null) throw new ArgumentNullException(nameof(result.ActiveCommandDefinition));
+    //    if (result.DataValues is null) throw new ArgumentNullException(nameof(result.DataValues));
 
-        foreach (var dataValue in result.DataValues)
-        {
-            if (dataValue.MemberDefinition.IsRequired && !dataValue.IsSet)
-            {
-                result.AddDiagnostic(new Diagnostic(DiagnosticId.Required.ToValidationIdString(), DiagnosticSeverity.Error, dataValue.MemberDefinition.DefinitionName));
-                return false;
-            }
-        }
-        return true;
-    }
+    //    foreach (var dataValue in result.DataValues)
+    //    {
+    //        if (dataValue.MemberDefinition.IsRequired && !dataValue.IsSet)
+    //        {
+    //            result.AddDiagnostic(new Diagnostic(DiagnosticId.Required.ToValidationIdString(),
+    //                                                DiagnosticSeverity.Error,
+    //                                                dataValue.MemberDefinition.DefinitionName,
+    //                                                $"Required value not supplied: {dataValue.MemberDefinition.DefinitionName}"));
+    //            return false;
+    //        }
+    //    }
+    //    return true;
+    //}
 
     private bool Validate(Result<TRootArgs> result)
     {

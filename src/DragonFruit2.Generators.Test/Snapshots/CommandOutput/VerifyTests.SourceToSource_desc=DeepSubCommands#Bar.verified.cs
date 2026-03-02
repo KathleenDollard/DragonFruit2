@@ -59,15 +59,19 @@ namespace MyNamespace
             {
             }
 
-            public override void SetDataValues(DataProvider<MyArgs> dataProvider, Result<MyArgs> result)
+             public override bool Operate<TReturn>(IOperateOnDataValue<MyArgs, TReturn> operationContainer)
             {
-                if (Age is not null && !Age.IsSet)
+                try
                 {
-                    dataProvider.TrySetDataValue(Age, result);
+                    operationContainer.TryOperate(Age, operationContainer, out var _);
+                    operationContainer.TryOperate(Name, operationContainer, out var _);
+                    return true;
                 }
-                if (Name is not null && !Name.IsSet)
+                catch (Exception ex)
                 {
-                    dataProvider.TrySetDataValue(Name, result);
+                    Diagnostic failure = new(DiagnosticId.UnexpectedException.ToValidationIdString(), DiagnosticSeverity.Error, $"An unexpected error occurred while operating on data values in the {operationContainer.OperationName}");
+                    operationContainer.Result.AddDiagnostic(failure);
+                    return false;
                 }
             }
 

@@ -40,6 +40,7 @@ public record class PropInfo
                       NullableAnnotation == NullableAnnotation.NotAnnotated && !HasInitializer;
 
     public List<ValidatorInfo> Validators { get; init; } = [];
+    public List<DefaultInfo> Defaults { get; init; } = [];
 }
 
 

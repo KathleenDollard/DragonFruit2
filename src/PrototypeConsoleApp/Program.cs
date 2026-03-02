@@ -7,9 +7,9 @@ Console.WriteLine("Welcome to the Sample Console App!") ;
 if (myArgsDataValues.IsValid)
 {
     var myArgs = myArgsDataValues.Args!; // Safe to use '!' because IsValid is true
-    var drink = ", would you like some wine?.";
+    var drink = $", so would you like some wine?.";
     var noDrink = ".";
-    Console.WriteLine($"{myArgs.Greeting} {myArgs.Name}{(myArgs.Age >= 18 ? drink : noDrink)}");
+    Console.WriteLine($"{myArgs.Greeting} {myArgs.Name}, you're {myArgs.Age}{(myArgs.Age >= 18 ? drink : noDrink)}");
 }
 else
 {

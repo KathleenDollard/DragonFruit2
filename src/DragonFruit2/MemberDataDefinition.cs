@@ -39,17 +39,6 @@ public abstract class MemberDataDefinition<TValue> : MemberDataDefinition
     public IEnumerable<DefaultDefinition<TValue>> Defaults => _defaultDefinitions;
     public IEnumerable<Validator<TValue>> Validators => _validators;
 
-    public bool TrySetDefault(DataValues dataValues, [NotNullWhen(true)] out TValue dataValue)
-    {
-        foreach (var defaultDefinition in Defaults)
-        {
-            if (defaultDefinition.TrySetDefaultValue(dataValues, out dataValue))
-            { return true; }
-        }
-        dataValue = default!;
-        return false;
-    }
-
     public override IEnumerable<Diagnostic>? Validate(DataValue dataValue)
     {
         if (!(dataValue is DataValue<TValue> typedDataValue))
@@ -57,10 +46,10 @@ public abstract class MemberDataDefinition<TValue> : MemberDataDefinition
             throw new InvalidOperationException($"Data values is of an unexpected type. The expect type is {typeof(TValue)}, but the passed type is {dataValue.GetType().GenericTypeArguments.First()}");
         }
 
-        List<Diagnostic>? diagnostics =null;
+        List<Diagnostic>? diagnostics = null;
         foreach (var validator in Validators)
         {
-            var newDiagnostics =  validator.Validate(typedDataValue);
+            var newDiagnostics = validator.Validate(typedDataValue);
             if (newDiagnostics is not null && newDiagnostics.Any())
             {
                 diagnostics ??= new List<Diagnostic>();
@@ -74,8 +63,10 @@ public abstract class MemberDataDefinition<TValue> : MemberDataDefinition
     {
         _defaultDefinitions.Add(defaultDefinition);
     }
+
     public void Default(TValue value)
     {
+        _defaultDefinitions.Add(new DefaultConstant<TValue>(this, value));
         //_defaultDefinitions.Add(DefaultConstant<TValue>.Create(value));
     }
 

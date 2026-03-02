@@ -33,7 +33,10 @@ public abstract class Result
             Console.WriteLine("The input was not valid. Problems included:");
             foreach (Diagnostic failure in Diagnostics)
             {
-                Console.WriteLine($"* {failure.Message}");
+                var message = failure.Message is null
+                    ? failure.Id
+                    : failure.Message;
+                Console.WriteLine($"* {message}");
             }
             Console.WriteLine();
         }

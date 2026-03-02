@@ -9,14 +9,16 @@
         /// The name of the attribute used
         /// </summary>
         public required string AttributeName { get; init; }
+
         /// <summary>
-        /// The name of the DefaultDefinition class  to use
-        /// </summary>       
-        public required string DefaultName { get; init; }
+        /// Name of the type of the default definition to use
+        /// </summary>
+        public required string DefaultTypeName { get; init; }
+
         /// <summary>
         /// The arguments entered for this default attribute
         /// </summary>       
-        public required DefaultArgumentInfo[] DefaultArguments { get; init; }
+        public required ArgumentInfo[] DefaultArguments { get; init; }
 
     }
 

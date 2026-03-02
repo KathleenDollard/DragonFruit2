@@ -58,18 +58,18 @@
             Validators: [
               {
                 AttributeName: GreaterThan,
-                ValidatorName: GreaterThanValidator,
+                ValidatorTypeName: GreaterThanValidator,
                 ValidatorArguments: [
                   {
                     Name: compareWithValue,
-                    ValidatorTypeName: TValue,
-                    ArgumentTypeName: object,
+                    ParameterTypeName: TValue,
+                    AttributeArgumentTypeName: object,
                     Value: 0
                   },
                   {
                     Name: customMessage,
-                    ValidatorTypeName: string?,
-                    ArgumentTypeName: string?,
+                    ParameterTypeName: string?,
+                    AttributeArgumentTypeName: string?,
                     Value: null
                   }
                 ]
@@ -94,18 +94,18 @@
             Validators: [
               {
                 AttributeName: GreaterThan,
-                ValidatorName: GreaterThanValidator,
+                ValidatorTypeName: GreaterThanValidator,
                 ValidatorArguments: [
                   {
                     Name: compareWithValue,
-                    ValidatorTypeName: TValue,
-                    ArgumentTypeName: object,
+                    ParameterTypeName: TValue,
+                    AttributeArgumentTypeName: object,
                     Value: 0
                   },
                   {
                     Name: customMessage,
-                    ValidatorTypeName: string?,
-                    ArgumentTypeName: string?,
+                    ParameterTypeName: string?,
+                    AttributeArgumentTypeName: string?,
                     Value: null
                   }
                 ]
@@ -130,18 +130,18 @@
             Validators: [
               {
                 AttributeName: GreaterThan,
-                ValidatorName: GreaterThanValidator,
+                ValidatorTypeName: GreaterThanValidator,
                 ValidatorArguments: [
                   {
                     Name: compareWithValue,
-                    ValidatorTypeName: TValue,
-                    ArgumentTypeName: object,
+                    ParameterTypeName: TValue,
+                    AttributeArgumentTypeName: object,
                     Value: 0
                   },
                   {
                     Name: customMessage,
-                    ValidatorTypeName: string?,
-                    ArgumentTypeName: string?,
+                    ParameterTypeName: string?,
+                    AttributeArgumentTypeName: string?,
                     Value: null
                   }
                 ]

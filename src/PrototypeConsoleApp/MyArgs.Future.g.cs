@@ -58,6 +58,7 @@ partial class MyArgs : ArgsRootBase<MyArgs>
                 DataType = typeof(string),
                 IsRequired = true,
             };
+            Name.RegisterValidator(new RequiredValidator<string>(Name.DefinitionName));
 
             Age = new OptionDataDefinition<int>(this, nameof(Age))
             {
@@ -65,6 +66,7 @@ partial class MyArgs : ArgsRootBase<MyArgs>
                 IsRequired = false,
             };
             Age.RegisterValidator(new GreaterThanValidator<int>(Age.DefinitionName, 0));
+            Age.RegisterValidator(new RequiredValidator<int>(Age.DefinitionName));
 
             Greeting = new OptionDataDefinition<string>(this, nameof(Greeting))
             {

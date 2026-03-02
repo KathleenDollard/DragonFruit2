@@ -37,7 +37,6 @@ Similarly, `DataValues` includes a `DataValue` collection. `DataValues` always c
 
 ### Sequence diagram
 
-
 ```mermaid
 sequenceDiagram
     actor program as Program.cs

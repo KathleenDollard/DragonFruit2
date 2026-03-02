@@ -51,7 +51,7 @@ public static class TestHelpers
         }
         """;
 
-    public static (string?, IEnumerable<Diagnostic>) GetGeneratorDriver(params string[] sources)
+    public static (string?, IEnumerable<Microsoft.CodeAnalysis.Diagnostic>) GetGeneratorDriver(params string[] sources)
     {
         var compilation = GetCompilation(sources);
 

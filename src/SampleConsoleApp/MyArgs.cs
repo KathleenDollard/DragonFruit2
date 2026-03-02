@@ -29,6 +29,7 @@ internal partial class MyArgs : ArgsRootBase<MyArgs>
         public override void RegisterCustomizations()
         {
             Greeting.Default("Hi there!");
+            Age.Default(3);
         }
     }
 }

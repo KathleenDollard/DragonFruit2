@@ -5,7 +5,7 @@ namespace DragonFruit2;
 
 public abstract class DataValues : IEnumerable<DataValue>
 {
-    readonly Dictionary<string, DataValue> _values = [];
+    readonly Dictionary<MemberDataDefinition, DataValue> _values = [];
 
     protected DataValues(CommandDataDefinition commandDefinition)
     {
@@ -16,19 +16,19 @@ public abstract class DataValues : IEnumerable<DataValue>
 
     protected void Add<TValue>(DataValue<TValue> value)
     {
-        _values[value.Name] = value;
+        _values[value.MemberDefinition] = value;
     }
 
-    public bool TryGetValue<TValue>(string name,[NotNullWhen(true)] ref DataValue<TValue>? dataValue)
-    {
-        if (_values.TryGetValue(name, out var existing) && existing is DataValue<TValue> typed)
-        {
-            dataValue = typed;
-            return true;
-        }
-        dataValue = null;
-        return false;
-    }
+    //public bool TryGetValue<TValue>(string name, [NotNullWhen(true)] ref DataValue<TValue>? dataValue)
+    //{
+    //    if (_values.TryGetValue(name, out var existing) && existing is DataValue<TValue> typed)
+    //    {
+    //        dataValue = typed;
+    //        return true;
+    //    }
+    //    dataValue = null;
+    //    return false;
+    //}
 
     public IEnumerator<DataValue> GetEnumerator()
     {
@@ -38,16 +38,17 @@ public abstract class DataValues : IEnumerable<DataValue>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
-    }}
+    }
+}
 
 public abstract class DataValues<TRootArgs> : DataValues
     where TRootArgs : ArgsRootBase<TRootArgs>
 {
     protected DataValues(CommandDataDefinition commandDefinition)
-        :base (commandDefinition)
-    {  }
+        : base(commandDefinition)
+    { }
 
-    public abstract bool Operate<TReturn>(IOperateOnDataValue<TRootArgs,TReturn> operationContainer);
+    public abstract bool Operate<TReturn>(IOperateOnDataValue<TRootArgs, TReturn> operationContainer);
 
     protected internal abstract TRootArgs CreateInstance();
 

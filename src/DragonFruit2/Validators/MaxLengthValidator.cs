@@ -27,12 +27,11 @@ public class MaxLengthValidator : Validator<string>
     }
 }
 
-[MemberAttributeAttribute(typeof(MaxLengthValidator))]
-public sealed class MaxLengthAttribute : MemberAttributeAttribute
+[ValidatorAttribute(typeof(MaxLengthValidator))]
+public sealed class MaxLengthAttribute : ValidatorBaseAttribute
 {
 
     public MaxLengthAttribute(object maxLengthValue)
-        : base(typeof(MaxLengthValidator))
     {
         MaxLengthValue = maxLengthValue;
     }

@@ -94,11 +94,18 @@ namespace MyNamespace
                 Add(Name);
             }
 
-            public override void SetDataValues(DataProvider<MyArgs> dataProvider, Result<MyArgs> result)
+             public override bool Operate<TReturn>(IOperateOnDataValue<MyArgs, TReturn> operationContainer)
             {
-                if (Name is not null && !Name.IsSet)
+                try
                 {
-                    dataProvider.TrySetDataValue(Name, result);
+                    operationContainer.TryOperate(Name, operationContainer, out var _);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Diagnostic failure = new(DiagnosticId.UnexpectedException.ToValidationIdString(), DiagnosticSeverity.Error, $"An unexpected error occurred while operating on data values in the {operationContainer.OperationName}");
+                    operationContainer.Result.AddDiagnostic(failure);
+                    return false;
                 }
             }
 

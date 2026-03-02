@@ -39,37 +39,6 @@ public abstract class DataValues : IEnumerable<DataValue>
     {
         return GetEnumerator();
     }
-
-    public void SetDefaults<TRootArgs>()
-        where TRootArgs : ArgsRootBase<TRootArgs>
-    {
-        while (true)
-        {
-            var anythingChanged = false;
-            foreach (var defaultDefinition in CommandDefinition.DefaultDefinitions)
-            {
-                if (_values.TryGetValue(defaultDefinition.MemberDataDefinition, out var matchingDataValue))
-                {
-                    if (matchingDataValue.IsSet)
-                    { continue; }
-                }
-
-                if (matchingDataValue.IsSet)
-                { break; }
-
-                // The following will fail if the dependent values are not present
-                if (matchingDataValue.TrySetDefaultValue<TRootArgs>(defaultDefinition))
-                {
-                    anythingChanged = true;
-                    break;
-                }
-            }
-            if (!anythingChanged)
-            {
-                break;
-            }
-        }
-    }
 }
 
 public abstract class DataValues<TRootArgs> : DataValues

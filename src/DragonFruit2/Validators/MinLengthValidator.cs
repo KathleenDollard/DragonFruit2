@@ -27,7 +27,7 @@ public class MinLengthValidator : Validator<string>
     }
 }
 
-[MemberAttribute(typeof(MinLengthValidator))]
+[ValidatorAttribute(typeof(MinLengthValidator))]
 public sealed class MinLengthAttribute : ValidatorBaseAttribute
 {
 

@@ -56,8 +56,18 @@ partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
         {
         }
 
-        public override void SetDataValues(DataProvider<MyOtherArgs> dataProvider, Result<MyOtherArgs> result)
+         public override bool Operate<TReturn>(IOperateOnDataValue<MyOtherArgs, TReturn> operationContainer)
         {
+            try
+            {
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Diagnostic failure = new(DiagnosticId.UnexpectedException.ToValidationIdString(), DiagnosticSeverity.Error, $"An unexpected error occurred while operating on data values in the {operationContainer.OperationName}");
+                operationContainer.Result.AddDiagnostic(failure);
+                return false;
+            }
         }
 
         private Type argsType = typeof(MyOtherArgs);

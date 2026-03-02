@@ -1,9 +1,9 @@
 ﻿namespace DragonFruit2.Defaults
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = true, Inherited = true)]
-    public class MemberDefaultBaseAttribute: Attribute
+    public class DefaultBaseAttribute: Attribute
     {
-        public MemberDefaultBaseAttribute(Type validatorType)
+        public DefaultBaseAttribute(Type validatorType)
         {
             DefaultType = validatorType;
         }

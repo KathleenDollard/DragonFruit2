@@ -5,8 +5,8 @@ namespace DragonFruit2;
 public abstract record class DataValue
 {
     public abstract bool Validate();
-    protected internal abstract bool TrySetDefaultValue<TRootArgs>(DefaultDefinition defaultDefinition)
-        where TRootArgs : ArgsRootBase<TRootArgs>;
+    //protected internal abstract bool TrySetDefaultValue<TRootArgs>(DefaultDefinition defaultDefinition)
+    //    where TRootArgs : ArgsRootBase<TRootArgs>;
     private protected abstract IEnumerable<Diagnostic>? UntypedDiagnostics { get; }
     public IEnumerable<Diagnostic>? Diagnostics => UntypedDiagnostics;
 
@@ -81,19 +81,19 @@ public record class DataValue<TValue> : DataValue
     }
 
 
-    protected internal override bool TrySetDefaultValue<TRootArgs>(DefaultDefinition defaultDefinition)
-    {
-        if (defaultDefinition is not DefaultDefinition<TValue> typedDefaultDefinition)
-        {
-            // not sure if we should throw here.
-            return false;
-        }
-        if (typedDefaultDefinition.TryGetDefaultValue(DataValues, MemberDefinition, out var defaultValue))
-        { 
-            // TODO: Determine how to describe provenance
-            SetValue(defaultValue, DefaultDataProvider<TRootArgs>.Instance());
-            return true;
-        }
-        return false;
-    }
+    //protected internal override bool TrySetDefaultValue<TRootArgs>(DefaultDefinition defaultDefinition)
+    //{
+    //    if (defaultDefinition is not DefaultDefinition<TValue> typedDefaultDefinition)
+    //    {
+    //        // not sure if we should throw here.
+    //        return false;
+    //    }
+    //    if (typedDefaultDefinition.TryGetDefaultValue(DataValues, MemberDefinition, out var defaultValue))
+    //    { 
+    //        // TODO: Determine how to describe provenance
+    //        SetValue(defaultValue, DefaultDataProvider<TRootArgs>.Instance());
+    //        return true;
+    //    }
+    //    return false;
+    //}
 }

@@ -2,8 +2,6 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
-using System.Reflection.Metadata;
-using System.Xml.Linq;
 
 namespace DragonFruit2.Generators;
 
@@ -36,8 +34,8 @@ public static class PropInfoHelpers
             InitializerText = initializerText,
         };
 
-        var validators = GetValidators(propSymbol.GetAttributes(),semanticModel, propInfo);
-        var defaults = GetDefaults(propSymbol.GetAttributes(),semanticModel, propInfo);
+        propInfo.Validators.AddRange(GetValidators(propSymbol.GetAttributes(), semanticModel, propInfo));
+        propInfo.Defaults.AddRange(GetDefaults(propSymbol.GetAttributes(), semanticModel, propInfo));
 
         return propInfo;
 
@@ -64,32 +62,15 @@ public static class PropInfoHelpers
         }
     }
 
-    private static IEnumerable<DefaultInfo> GetDefaults(ImmutableArray<AttributeData> attributes, SemanticModel semanticModel, PropInfo propInfo)
-    {
-        var validators = new List<DefaultInfo>();
-        var validationAttributes = attributes
-            .Where(x => x.AttributeClass?.BaseType?.Name == "MemberValidatorAttribute")
-            .Select(x => x);
-        foreach (var validationAttribute in validationAttributes)
-        {
-            //var validatorInfo = GetValidatorInfo(validationAttribute, semanticModel);
-            //if (validatorInfo != null)
-            //{
-            //    validators.Add(validatorInfo);
-            //}
-        }
-        return validators;
-    }
 
     private static IEnumerable<ValidatorInfo> GetValidators(IEnumerable<AttributeData> attributes, SemanticModel semanticModel, PropInfo propInfo)
     {
         var validators = new List<ValidatorInfo>();
-        var validationAttributes = attributes
-            .Where(x => x.AttributeClass?.BaseType?.Name == "MemberValidatorAttribute")
-            .Select(x => x);
-        foreach (var validationAttribute in validationAttributes)
+        var validationAttributePairs = GetMatchingAttributes(attributes, "ValidatorAttributeAttribute");
+
+        foreach (var (validationAttribute, validationAttrAttr) in validationAttributePairs)
         {
-            var validatorInfo = GetValidatorInfo(validationAttribute, semanticModel);
+            var validatorInfo = GetValidatorInfo(validationAttribute, validationAttrAttr, semanticModel);
             if (validatorInfo != null)
             {
                 validators.Add(validatorInfo);
@@ -98,13 +79,14 @@ public static class PropInfoHelpers
         return validators;
     }
 
+
     /// <summary>
     /// Extract validator metadata from an AttributeData.
     /// This reads the attribute class, constructor arguments and named arguments.
     /// The returned ValidatorInfo is populated with the attribute name, full type name,
     /// a list of constructor-argument string representations, and a dictionary of named args.
     /// </summary>
-    private static ValidatorInfo? GetValidatorInfo(AttributeData validationAttribute, SemanticModel semanticModel)
+    private static ValidatorInfo? GetValidatorInfo(AttributeData validationAttribute, AttributeData validationAttrAttr, SemanticModel semanticModel)
     {
         if (validationAttribute is null) return null;
 
@@ -114,16 +96,16 @@ public static class PropInfoHelpers
         var attrClass = validationAttribute.AttributeClass;
         if (attrClass == null) return null;
 
-        var validatorType = GetValidatorType(attrClass);
+        var validatorType = GetTypeForAttributeParameter(attrClass, validationAttrAttr);
         if (validatorType == null) return null;
 
         // TODO: Support multiple validator type constructors, as soon as we figure out how to select the right one
         // These are the parameters to the validator type's constructor
         // The first parameter to the validator type constructor is the property name
-        var validatorCtorParameters = GetValidatorParameters(validationAttribute, validatorType).Skip(1).ToArray();
+        var validatorCtorParameters = GetParameters(validationAttribute, validatorType).Skip(1).ToArray();
         if (validatorCtorParameters == null) return null;
 
-        var arguments = new ValidatorArgumentInfo[validatorCtorParameters.Length];
+        var arguments = new ArgumentInfo[validatorCtorParameters.Length];
         for (int i = 0; i < validatorCtorParameters.Length; i++)
         {
             var validatorParameter = validatorCtorParameters[i];
@@ -133,12 +115,12 @@ public static class PropInfoHelpers
             // TODO: Should we add a warning diagnostic or fail if the types do not match. We may not be able to handle implicit conversions here. Or should we rely on the analyzer and optize here. We are passing the semantic model a long way for this.
             // It's a little more complicated because `semanticModel.Compilation.ClassifyConversion(argumentTypeAndValue.argumentType, validatorParameterType` will fail on common scenarios like `object` passed to `TValue`
             var value = argumentTypeAndValue.value;
-            arguments[i] = new ValidatorArgumentInfo
+            arguments[i] = new ArgumentInfo
             {
                 Name = name,
-                ValidatorParameterTypeName = validatorParameterType.ToString(),
+                ParameterTypeName = validatorParameterType.ToString(),
                 AttributeArgumentTypeName = argumentTypeAndValue.argumentType.ToString(),
-                Value = value
+                Value = value is TypedConstant tc ? TypedConstantToString(tc) : ConstantToString(value)
             };
         }
 
@@ -151,17 +133,97 @@ public static class PropInfoHelpers
 
     }
 
-    private static INamedTypeSymbol? GetValidatorType(INamedTypeSymbol attrClass)
+
+    private static IEnumerable<DefaultInfo> GetDefaults(ImmutableArray<AttributeData> attributes, SemanticModel semanticModel, PropInfo propInfo)
     {
-        var infoAttribute = attrClass.GetAttributes().Where(x => x.AttributeClass?.Name == "ValidatorAttributeInfo").FirstOrDefault();
-        var validatorTypeConstant = infoAttribute?.ConstructorArguments.First();
+        var defaults = new List<DefaultInfo>();
+        var defaultAttributePairs = GetMatchingAttributes(attributes, "DefaultAttributeAttribute");
+
+        foreach (var (defaultAttribute, defaultAttrAttr) in defaultAttributePairs)
+        {
+            var defaultInfo = GetDefaultInfo(defaultAttribute, defaultAttrAttr, semanticModel);
+            if (defaultInfo != null)
+            {
+                defaults.Add(defaultInfo);
+            }
+        }
+        return defaults;
+    }
+
+    private static IEnumerable<(AttributeData attribute, AttributeData attributeAttribute)>
+        GetMatchingAttributes(IEnumerable<AttributeData> attributes, string attributeName)
+    {
+        var ret = new List<(AttributeData attribute, AttributeData attributeAttribute)>();
+        foreach (var attribute in attributes)
+        {
+            var attrClass = attribute.AttributeClass;
+            if (attrClass == null) continue;
+            var matchingAttribute = attrClass
+                .GetAttributes()
+                .FirstOrDefault(x => x?.AttributeClass?.Name == attributeName);
+            if (matchingAttribute is null) continue;
+
+            ret.Add((attribute, matchingAttribute));
+        }
+        return ret;
+    }
+
+    private static DefaultInfo? GetDefaultInfo(AttributeData defaultAttribute, AttributeData defaultAttrAttr, SemanticModel semanticModel)
+    {
+        if (defaultAttribute is null) return null;
+
+        var ctorArgumentLookup = GetCtorArgumentLookup(defaultAttribute);
+        if (ctorArgumentLookup == null) return null;
+
+        var attrClass = defaultAttribute.AttributeClass;
+        if (attrClass == null) return null;
+
+        var defaultType = GetTypeForAttributeParameter(attrClass, defaultAttrAttr);
+        if (defaultType == null) return null;
+
+        // TODO: Support multiple validator type constructors, as soon as we figure out how to select the right one
+        // These are the parameters to the validator type's constructor
+        // The first parameter to the validator type constructor is the property name
+        var defaultCtorParameters = GetParameters(defaultAttribute, defaultType).Skip(1).ToArray();
+        if (defaultCtorParameters == null) return null;
+
+        var arguments = new ArgumentInfo[defaultCtorParameters.Length];
+        for (int i = 0; i < defaultCtorParameters.Length; i++)
+        {
+            var validatorParameter = defaultCtorParameters[i];
+            var name = validatorParameter.Name;
+            var validatorParameterType = validatorParameter.Type;
+            if (!ctorArgumentLookup.TryGetValue(name, out var argumentTypeAndValue)) return null;
+            // TODO: Should we add a warning diagnostic or fail if the types do not match. We may not be able to handle implicit conversions here. Or should we rely on the analyzer and optize here. We are passing the semantic model a long way for this.
+            // It's a little more complicated because `semanticModel.Compilation.ClassifyConversion(argumentTypeAndValue.argumentType, validatorParameterType` will fail on common scenarios like `object` passed to `TValue`
+            var value = argumentTypeAndValue.value;
+            arguments[i] = new ArgumentInfo
+            {
+                Name = name,
+                ParameterTypeName = validatorParameterType.ToString(),
+                AttributeArgumentTypeName = argumentTypeAndValue.argumentType.ToString(),
+                Value = value is TypedConstant tc ? TypedConstantToString(tc) : ConstantToString(value)
+            };
+        }
+
+        return new DefaultInfo
+        {
+            AttributeName = AttributeClassName(attrClass),
+            DefaultTypeName = defaultType.Name.ToString(),
+            DefaultArguments = arguments,
+        };
+    }
+
+    private static INamedTypeSymbol? GetTypeForAttributeParameter(INamedTypeSymbol attrClass, AttributeData attributeAttribute)
+    {
+        var validatorTypeConstant = attributeAttribute?.ConstructorArguments.First();
         var validatorTypeAsObject = validatorTypeConstant?.Value;
         if (validatorTypeAsObject is INamedTypeSymbol validatorType)
             return validatorType;
         return null;
     }
 
-    private static IEnumerable<IParameterSymbol>? GetValidatorParameters(AttributeData validationAttribute, ITypeSymbol validatorType)
+    private static IEnumerable<IParameterSymbol>? GetParameters(AttributeData validationAttribute, ITypeSymbol validatorType)
     {
         // ctor in this method refers to the validator type's constructor
         var attrClass = validationAttribute.AttributeClass;
@@ -179,7 +241,7 @@ public static class PropInfoHelpers
         return [.. validatorCtor.Parameters];
     }
 
-    private static Dictionary<string, (ITypeSymbol argumentType, string value)>? GetCtorArgumentLookup(AttributeData validationAttribute)
+    private static Dictionary<string, (ITypeSymbol argumentType, object value)>? GetCtorArgumentLookup(AttributeData validationAttribute)
     {
         // ctor in this class refers to the Attribute's contructor
         var ctor = validationAttribute.AttributeConstructor;
@@ -188,10 +250,10 @@ public static class PropInfoHelpers
 
         var arguments = validationAttribute.ConstructorArguments;
 
-        Dictionary<string, (ITypeSymbol argumentType, string value)> ret = [];
+        Dictionary<string, (ITypeSymbol argumentType, object value)> ret = [];
         for (int i = 0; i < parameters.Length; i++)
         {
-            ret.Add(parameters[i].Name, (parameters[i].Type, arguments[i].ToCSharpString()));
+            ret.Add(parameters[i].Name, (parameters[i].Type, arguments[i]));
         }
         return ret;
     }
@@ -218,10 +280,17 @@ public static class PropInfoHelpers
             return "[" + string.Join(", ", elems) + "]";
         }
 
-        if (tc.Value is string s) return $"\"{s}\"";
-        if (tc.Value is char c) return $"'{c}'";
-        if (tc.Value is bool b) return b ? "true" : "false";
-        if (tc.Value is IFormattable f) return f.ToString(null, System.Globalization.CultureInfo.InvariantCulture) ?? tc.Value.ToString() ?? "null";
-        return tc.Value?.ToString() ?? "null";
+        return ConstantToString(tc.Value);
     }
+
+    static string ConstantToString(object? value)
+        => value switch
+        {
+            string s => $"\"{s}\"",
+            char c => $"'{c}'",
+            bool b => b ? "true" : "false",
+            IFormattable f => f.ToString(null, System.Globalization.CultureInfo.InvariantCulture) ?? value.ToString() ?? "null",
+            _ => value?.ToString() ?? "null",
+
+        };
 }

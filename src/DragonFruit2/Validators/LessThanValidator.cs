@@ -3,13 +3,13 @@
 public class LessThanValidator<TValue> : Validator<TValue>
     where TValue : IComparable<TValue>
 {
-    public LessThanValidator(string valueName, TValue compareWithValue)
-        : base((int)DiagnosticId.GreaterThan, valueName)
+    public LessThanValidator(string valueName, TValue compareWithValue, string? customMessage = null)
+        : base((int)DiagnosticId.LessThan, valueName)
     {
         CompareWithValue = compareWithValue;
     }
 
-    public override string Description => $"The value of {ValueName} must be greater than {CompareWithValue}";
+    public override string Description => $"The value of {ValueName} must be less than {CompareWithValue}";
     public TValue CompareWithValue { get; }
 
     public override IEnumerable<Diagnostic<TValue>> Validate(DataValue<TValue> dataValue)
@@ -20,7 +20,7 @@ public class LessThanValidator<TValue> : Validator<TValue>
         }
         if (dataValue.Value!.CompareTo(CompareWithValue) >= 0)
         {
-            var message = $"The value of {ValueName} must be greater than {CompareWithValue}, and {dataValue.Value} is not.";
+            var message = $"The value of {ValueName} must be less than {CompareWithValue}, and {dataValue.Value} is not.";
             return [new Diagnostic<TValue>(Id, DiagnosticSeverity.Error, ValueName, dataValue.Value, message)];
         }
         return [];
@@ -28,10 +28,9 @@ public class LessThanValidator<TValue> : Validator<TValue>
 }
 
 // TODO: Add analyzer to ensure the CompareWith type in the attribute matches the property type
-[MemberAttributeAttribute(typeof(LessThanValidator<>))]
-public sealed class LessThanAttribute
+[ValidatorAttribute(typeof(LessThanValidator<>))]
+public sealed class LessThanAttribute : ValidatorBaseAttribute
 {
-
     public LessThanAttribute(object compareWithValue, string? customMessage = null)
     {
         CompareWith = compareWithValue;

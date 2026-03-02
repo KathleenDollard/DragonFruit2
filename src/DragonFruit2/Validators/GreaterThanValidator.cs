@@ -29,15 +29,16 @@ public class GreaterThanValidator<TValue> : Validator<TValue>
 
 // TODO: Add analyzers to ensure the CompareWith type in the attribute matches the property type
 // TODO: Add an analyzer that ensures validator constructor parameters appear as properties on attribute
-[MemberAttribute(typeof(GreaterThanValidator<>))]
+[ValidatorAttribute(typeof(GreaterThanValidator<>))]
 public sealed class GreaterThanAttribute : ValidatorBaseAttribute
 {
-
     public GreaterThanAttribute(object compareWithValue, string? customMessage = null)
     {
         CompareWith = compareWithValue;
     }
 
+    // This value is never used in our system. Should we hold it in case someone
+    // is also doing reflection-based validation, or should we just throw it away?
     public object CompareWith { get; }
 }
 

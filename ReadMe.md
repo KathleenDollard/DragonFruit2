@@ -1,4 +1,31 @@
-# Overview
+
+## NEWSFLASH!!!!
+
+Kathleen was interviewed about CLIs and DragonFruit2 on .NET Rocks show #1992, scheduled for release March 5, 2026. If you are visiting based on that show - Welcome!!!
+
+## Housekeeping
+
+Check out the ["Help wanted" label under issues](https://github.com/KathleenDollard/DragonFruit2/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22help%20wanted%22).
+
+Please open issues for anything you think is a bug, or anything that you would like to see in the project (technically).
+
+I've opened up [discussions](https://github.com/KathleenDollard/DragonFruit2/discussions). If you have questions or want to better understand the project, that would be a great place. General discussions on CLI design are fine too.
+
+### Code of conduct
+
+I appreciate kindness. If you need to read a code of conduct to know how to be kind, the [.NET Foundation Code of Conduct part "Our Standards"](https://dotnetfoundation.org/about/policies/code-of-conduct) seems as good as any. However, enforcement in this repo will be - if I think you are being a jerk I will toss you out.
+
+Specific concerns are requested, appreciated, and will often be embraced.
+
+### State of the project
+
+This project is a prototype. I do not plan for it to be anything else while it is in this location. At the moment that also means I have not put it on NuGet yet.
+
+You should be able to use it to simplify creation of System.CommandLine apps. Defaults are limited to constants, validation is limited, and alternative data providers (for defaults), such as configuration files are not implemented. Please report any bugs.
+
+I would appreciate it greatly if you played with this and gave feedback. If you wish to use it in a production project, you should be prepared to fork it and maintain it. My hope is that we will find enough interest and contributors to find a good home for this project, decide if it needs a new name, and all the things involved moving a project to a permanent presence. I cannot assure you that will ever happen, so you will want a back up plan.
+
+## Overview
 
 DragonFruit2 is intended as the next generation of the DragonFruit portion of System.CommandLine. The simplicity of System.CommandLine.DragonFruit made it very popular. However, it was a proof of concept and the underlying approach was not customizable or extensible. Also, we have come to believe that the key win is to maximize the scenarios where the implementing programmer can rely on their C# knowledge and avoid the distraction of learning a new library.
 
@@ -82,10 +109,109 @@ You would call this in the terminal as:
 > .\<your project name>.exe Hello --name World
 ```
 
-### Learn how to use System.CommandLine
+### SubCommands
 
-Build a simple console app and explore the generated code. This is a scenario to support the grow-up story
-wgere 
+Subcommands are handled via derived classes. While this may be surprising, it allows a very natural handling of things like how the returned result specifies what command was selected. A simple example is:
+
+```csharp
+public partial class SubCommandArgs
+{
+    public required string Name { get; set; }
+    public virtual string Greeting { get; set; } = "Hello";
+}
+
+public partial class MorningArgs : SubCommandArgs
+{
+}
+
+public partial class EveningArgs : SubCommandArgs
+{
+    public override string Greeting { get; set; } = "Good evening";
+}
+```
+
+
+### Validation
+
+Validation (and defaults) can be defined in one of two ways: attributes or registration. Attributes are convenient, but there are things you cannot express in attributes, including the current date. Registration offers a fluent style of defining all of the validation for each command in a single place.
+
+Declaring a property as `required` results in `Required` validation.
+
+Defining validation via an attribute:
+
+```csharp
+internal partial class MyArgs : ArgsRootBase<MyArgs>
+{
+    public required string Name { get; init; }
+    [GreaterThan(0)]
+    public int Age { get; init; } = 1;
+    public required string Greeting { get; init; } = "Howdy";
+}
+```
+
+Defining validation via registration:
+
+```csharp
+internal partial class MyArgs : ArgsRootBase<MyArgs>
+{
+    public required string Name { get; init; }
+    [GreaterThan(0)]
+    public int Age { get; init; } = 1;
+    public required string Greeting { get; init; } = "Howdy";
+
+    partial class MyArgsDataDefinition
+    {
+        public override void RegisterCustomizations()
+        {
+            Age.ValidateGreaterThan(0);
+        }
+    }
+}
+```
+
+Registration requires a partial class, which you might be unfamiliar with. Trust me it works!
+
+### Default values
+
+Default values work almost like validation, in that both attribute and registration approaches are supported. In addition we are experimenting with support for simple property initialization.
+
+Adding a default value to the previous example via an attribute:
+
+```csharp
+internal partial class MyArgs : ArgsRootBase<MyArgs>
+{
+    public required string Name { get; init; }
+    [GreaterThan(0)]
+    public int Age { get; init; }
+    [DefaultConstant("Hello")]
+    public required string Greeting { get; init; };
+}
+```
+
+Adding a default value to the previous example via registration:
+
+```csharp
+internal partial class MyArgs : ArgsRootBase<MyArgs>
+{
+    public required string Name { get; init; }
+    [GreaterThan(0)]
+    public int Age { get; init; }
+    public required string Greeting { get; init; }
+
+    partial class MyArgsDataDefinition
+    {
+        public override void RegisterCustomizations()
+        {
+            Age.ValidateGreaterThan(0);
+            Age.DefaultConstant("Hello");
+        }
+    }
+}
+```
+
+### Execution
+
+A `TryExecute` method that runs an `Execute` method on the `Args` class is planned.
 
 ## Overall design
 
@@ -93,8 +219,6 @@ Commands are defined via a class or struct (which can be a record) that is passe
 the `ParseArgs` or `Invoke` method.
 
 Options and arguments are defined via properties on the command declaring class.
-
-Subcommands are defined via classes that are derived from the parent class.
 
 ```c#
 namespace SampleConsoleApp;

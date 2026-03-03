@@ -28,5 +28,10 @@
 		<ProjectReference Include="..\DragonFruit2\DragonFruit2.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Snapshots\CommandInfo\" />
+	  <Folder Include="Snapshots\GenOutput\" />
+	</ItemGroup>
+
 
 </Project>

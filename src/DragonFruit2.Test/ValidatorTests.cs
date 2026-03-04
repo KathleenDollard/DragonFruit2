@@ -2,7 +2,7 @@
 
 namespace DragonFruit2.Test;
 
-public class ValdatorTests
+public class ValidatorTests
 {
     [Fact]
     public void GreaterThanValidator_extension_creates_validator()

@@ -1,8 +1,0 @@
-﻿{
-  Args: {
-    Name: Alice,
-    Age: 30,
-    Greeting: Hello
-  },
-  IsValid: true
-}

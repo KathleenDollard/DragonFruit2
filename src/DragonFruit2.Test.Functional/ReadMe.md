@@ -1,4 +1,4 @@
-# DragonFruit2.Test.Project
+# DragonFruit2.Test.Functional
 
 The purpose of this project is to provide a project that will be generated to create the code for tests of DragonFruit2behavior. These tests should be for things that can't be tested in unit tests and require the dependency on generation.
 

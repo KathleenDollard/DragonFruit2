@@ -1,6 +1,4 @@
-﻿using DragonFruit2;
-
-namespace DragonFruit2.Test.Project;
+﻿namespace DragonFruit2.Test.Functional;
 
 public partial class EntryCommand : ArgsRootBase<EntryCommand>
 {

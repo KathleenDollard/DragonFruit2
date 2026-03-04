@@ -1,4 +1,4 @@
-﻿namespace DragonFruit2.Test.Project;
+﻿namespace DragonFruit2.Test.Functional;
 
 public interface IReportSelf
 {

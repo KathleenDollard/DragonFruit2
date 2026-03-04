@@ -1,7 +1,6 @@
-﻿using DragondFruit2.Test.Project;
-using DragonFruit2.Validators;
+﻿using DragonFruit2.Validators;
 
-namespace DragonFruit2.Test.Project;
+namespace DragonFruit2.Test.Functional;
 
 public class ValidatorTests
 {

@@ -1,10 +1,8 @@
-﻿using DragonFruit2;
-using DragonFruit2.Test.Project;
-using DragonFruit2.Validators;
+﻿using DragonFruit2.Validators;
 
-namespace DragondFruit2.Test.Project;
+namespace DragonFruit2.Test.Functional;
 
-public partial class ValidatorTestsCommand : ArgsRootBase<ValidatorTestsCommand>, IReportSelf
+public partial class ValidatorTestCommand : ArgsRootBase<ValidatorTestCommand>, IReportSelf
 {
     // Properties in this Command should not be required. Use another command,
     // possibly a subcommand of this for organization.

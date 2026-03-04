@@ -2,7 +2,7 @@
   "profiles": {
     "Profile 1": {
       "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\SampleConsoleApp\\SampleConsoleApp.csproj"
+      "targetProject": "..\\DragonFruit2.Test.Project\\DragonFruit2.Test.Project.csproj"
     }
   }
 }

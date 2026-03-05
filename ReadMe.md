@@ -1,7 +1,9 @@
 
 ## NEWSFLASH!!!!
 
-Kathleen was interviewed about CLIs and DragonFruit2 on .NET Rocks show #1992, scheduled for release March 5, 2026. If you are visiting based on that show - Welcome!!!
+Kathleen was interviewed about CLIs and DragonFruit2 on [.NET Rocks show #1992](https://open.spotify.com/episode/7uio0R72UtP1bEh8YKJfqn?si=25c3d592aba8444b ), scheduled for release March 5, 2026. If you are visiting based on that show - Welcome!!! 
+
+Kathleen will be speaking at [Techorama](https://www.techorama.be/) May 11-13. One of her talks will be _Staying sane when writing Roslyn source generators_, which will feature the techniques in the DragonFruit2 source generators.
 
 ## Housekeeping
 

@@ -5,7 +5,7 @@ public class MinLengthValidator : Validator<string>
     public MinLengthValidator(string valueName, int minLengthValue)
         : base((int)DiagnosticId.MinLength, valueName)
     {
-        minLengthValue = MinLengthValue;
+        MinLengthValue = minLengthValue;
     }
 
     public override string Description => $"The string {ValueName} must be longer than {MinLengthValue}";

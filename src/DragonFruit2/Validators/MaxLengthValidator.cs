@@ -5,10 +5,10 @@ public class MaxLengthValidator : Validator<string>
     public MaxLengthValidator(string valueName, int maxLengthValue)
         : base((int)DiagnosticId.MaxLength, valueName)
     {
-        maxLengthValue = MaxLengthValue;
+        MaxLengthValue = maxLengthValue;
     }
 
-    public override string Description => $"The string {ValueName} must be longer than {MaxLengthValue}";
+    public override string Description => $"The string {ValueName} must not be longer than {MaxLengthValue}";
     public int MaxLengthValue { get; }
 
     public override IEnumerable<Diagnostic<string>> Validate(DataValue<string> dataValue)
@@ -18,9 +18,9 @@ public class MaxLengthValidator : Validator<string>
         {
             return Enumerable.Empty<Diagnostic<string>>();
         }
-        if (dataValue.Value.Length < MaxLengthValue)
+        if (dataValue.Value.Length > MaxLengthValue)
         {
-            var message = $"The value of {ValueName} must be greater than {MaxLengthValue}, and {dataValue.Value} is not.";
+            var message = $"The value of {ValueName} must not be longer than {MaxLengthValue}, and {dataValue.Value} is.";
             return [new Diagnostic<string>(Id, DiagnosticSeverity.Error, ValueName, dataValue.Value, message)];
         }
         return [];

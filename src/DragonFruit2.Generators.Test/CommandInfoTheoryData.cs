@@ -1,10 +1,12 @@
-﻿namespace DragonFruit2.Generators.Test;
+﻿using DragonFruit2.Generators.Metadata;
 
-public class CommandInfoTheoryData : TheoryData<string, string, string, CommandInfo>
+namespace DragonFruit2.Generators.Test;
+
+public class CommandInfoTheoryData : TheoryData<string, string, string>
 {
-    private void AddTheoryData(string name, string argsSource, string consoleSource, CommandInfo commandInfo)
+    private void AddTheoryData(string name, string argsSource, string consoleSource)
     {
-        Add(name, argsSource, consoleSource, commandInfo);
+        Add(name, argsSource, consoleSource);
     }
 
     public CommandInfoTheoryData()
@@ -12,78 +14,34 @@ public class CommandInfoTheoryData : TheoryData<string, string, string, CommandI
         AddTheoryData("DeepSubCommands",
                 argsSource:
                     """
+                    using DragonFruit2;
+
                     namespace MyNamespace
                     {
-                        public partial class MyArgs : ArgsRootBase<MyArgs>
+                        [CommandClass]
+                        public partial class MyArgs : CommandRootBase<MyArgs>
                         {
                             public required string Name { get; set; }
                         }
 
+                        [CommandClass]
                         public partial class MorningGreetingArgs : MyArgs
                         {
                         }
 
+                        [CommandClass]
                         public partial class EveningGreetingArgs : MyArgs
                         {
                             public int Age { get; init; } = 1;
                         }
+                        [CommandClass]
                         public partial class Bar : EveningGreetingArgs
                         {
                         }
                     }
                     """,
-                consoleSource: TestHelpers.EmptyConsoleAppCodeWithArgsMyNamespace,
-                commandInfo: GetDeepSubCommandsCommandInfo());
+                consoleSource: TestHelpers.EmptyConsoleAppCodeWithArgsMyNamespace);
 
-        static CommandInfo GetDeepSubCommandsCommandInfo()
-        {
-            var deepSubCommandInfo = new CommandInfo()
-            {
-                Name = "MyArgs",
-                RootName = "MyArgs",
-                NamespaceName = "MyNamespace",
-                ArgsAccessibility = "public"
-            };
-            deepSubCommandInfo.Options.Add(new PropInfo()
-            {
-                Name = "Name",
-                TypeName = "string",
-                ContainingTypeName = "MyArgs",
-                HasRequiredModifier = true,
-            });
-            deepSubCommandInfo.SubCommands.Add(
-                        new CommandInfo()
-                        {
-                            Name = "MorningGreetingArgs",
-                            RootName = "MyArgs",
-                            NamespaceName = "MyNamespace",
-                            ArgsAccessibility = "public"
-                        });
-            var deepSubCommandsEveningCommandInfo = new CommandInfo()
-            {
-                Name = "EveningGreetingArgs",
-                RootName = "MyArgs",
-                NamespaceName = "MyNamespace",
-                ArgsAccessibility = "public"
-            };
-            deepSubCommandsEveningCommandInfo.Options.Add(new PropInfo()
-            {
-                Name = "Age",
-                TypeName = "int",
-                ContainingTypeName = "MyArgs",
-                HasRequiredModifier = false,
-            });
-            var deeperSubCommandsEveningCommandInfo = new CommandInfo()
-            {
-                Name = "Bar",
-                RootName = "MyArgs",
-                NamespaceName = "MyNamespace",
-                ArgsAccessibility = "public"
-            };
-            deepSubCommandsEveningCommandInfo.SubCommands.Add(deeperSubCommandsEveningCommandInfo);
-            deepSubCommandInfo.SubCommands.Add(deepSubCommandsEveningCommandInfo);
-            return deepSubCommandInfo;
-        }
     }
 
 }

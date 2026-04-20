@@ -1,3 +1,4 @@
+using DragonFruit2.Generators.Metadata;
 using Microsoft.CodeAnalysis;
 
 namespace DragonFruit2.Generators;
@@ -9,36 +10,56 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var rootCommandInfos = context.SyntaxProvider
+        var cliInfos = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: static (node, _) => builder.InitialFilter(node),
-                transform: static (ctx, _) => builder.Transform(ctx))
+                predicate: builder.InitialEntryPointFilter,
+                transform: static (context, cancelToken) => builder.TransformEntryPoint(context, cancelToken))
             .WithTrackingName("ParseArgsInvocations")
             .Where(static s => s is not null)
             .Select(static (s, _) => s!) // Quiet nullability warning
             .Collect()
             .WithTrackingName(TrackingNames.Extract);
 
-        var boundRootCommandInfos = rootCommandInfos
-            .Select((infos, ctx) => builder.BindParentsAndRemoveDuplicates(infos))
-            .WithTrackingName(TrackingNames.BindParentsAndRemoveDuplicates);
+        var commandInfos = context.SyntaxProvider
+            .ForAttributeWithMetadataName(
+                fullyQualifiedMetadataName: "DragonFruit2.CommandClass",
+                predicate: static (node, _) => true,
+                transform: static (ctx, _) => builder.TransformCommandClasses(ctx))
+            .WithTrackingName("ParseArgsInvocations")
+            .Where(static s => s is not null)
+            .Select(static (s, _) => s!) // Quiet nullability warning
+            .Collect()
+            .WithTrackingName(TrackingNames.Extract);
 
-        var allCommandInfos = boundRootCommandInfos
-            .SelectMany(static (collected, _) => collected.SelectMany(commandInfo => builder.GetSelfAndDescendants(commandInfo)))
+        var commandRootsWithTrees = commandInfos
+            .Select((infos, ctx) => CommandBuilder.BuildCommandTree(infos))
+            .WithTrackingName(TrackingNames.BuildTrees);
+
+        var cliInfosWithTrees = cliInfos
+            .Combine(commandRootsWithTrees)
+            .Select(CommandBuilder.CreateHierarchyAndGroup)
+            .WithTrackingName(TrackingNames.BuildTrees);
+
+        var spreadCliInfoGroups = cliInfosWithTrees
+            .SelectMany(CommandBuilder.SpreadCliInfos);
+
+        // TODO: Group by namespace and SelectMany for separate files for each
+
+        // This allows generating a file per command 
+        var individualCommands = commandRootsWithTrees
+            .SelectMany((commandNodes, ctx) => CommandBuilder.FlattenHierarchy(commandNodes, ctx))
             .WithTrackingName(TrackingNames.FlattenHierarchy);
 
-        var collectedAllCommandInfos = allCommandInfos.Collect();
-
-        context.RegisterSourceOutput(collectedAllCommandInfos,
-                static (spc, cmdInfos) =>
+        context.RegisterSourceOutput(spreadCliInfoGroups,
+                static (spc, groupedCli) =>
                 {
-                    builder.OutputCliSource(spc, cmdInfos);
+                    builder.OutputCliSource(spc, groupedCli);
                 });
 
-        context.RegisterSourceOutput(allCommandInfos,
-            static (spc, collected) =>
+        context.RegisterSourceOutput(individualCommands,
+            static (spc, commandClass) =>
         {
-            builder.OutputSource(spc, collected);
+            builder.OutputCommandPartialSource(spc, commandClass);
         });
     }
 

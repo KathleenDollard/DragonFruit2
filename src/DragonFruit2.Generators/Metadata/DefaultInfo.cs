@@ -1,4 +1,4 @@
-﻿namespace DragonFruit2.Generators
+﻿namespace DragonFruit2.Generators.Metadata
 {
     /// <summary>
     /// Info for the generator about defaults based on attributes, registered defaults are created at runtime via the Register method

@@ -1,4 +1,4 @@
-﻿namespace DragonFruit2.Generators;
+﻿namespace DragonFruit2.Generators.Metadata;
 
 /// <summary>
 /// Info for the generator about validation arguments

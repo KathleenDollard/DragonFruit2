@@ -2,7 +2,7 @@
 
 namespace DragonFruit2.Test.Functional;
 
-public partial class ValidatorTestsCommand : ArgsRootBase<ValidatorTestsCommand>, IReportSelf
+public partial class ValidatorTestsCommand : CommandRootBase<ValidatorTestsCommand>, IReportSelf
 {
     // Properties in this Command should not be required. Use another command,
     // possibly a subcommand of this for organization.

@@ -1,4 +1,4 @@
-namespace DragonFruit2.Generators;
+namespace DragonFruit2.Generators.Metadata;
 
 /// <summary>
 /// This information can be used in a generator to create classes 
@@ -8,17 +8,17 @@ public record class CommandInfo
 {
     private string? simpleName;
 
-    // TODO: Make these required and use init scope. The generator is expected to run in modern C# (only the code generated for the user needs to be C# 7.3
     public required string Name { get; init; }
     public string? NamespaceName { get; init; }
     public string FullName
         => NamespaceName is null
             ? Name
             : $"{NamespaceName}.{Name}";
-    public string? CliNamespaceName { get; init; }
-    public required string ArgsAccessibility {  get; init; }
-    public string? BaseName { get; init; }
-    public required string? RootName { get; init; }
+    //public string? CliNamespaceName { get; init; }
+    public required string Accessibility {  get; init; }
+    public required string? BaseTypeName { get; init; }
+    public required string? BaseTypeNamespace { get; init; }
+    //public required string? RootName { get; init; }
 
     public string? SimpleName
     {
@@ -37,34 +37,13 @@ public record class CommandInfo
                : Name;
         return name.ToKebabCase();
     }
-    public CommandInfo? ParentCommandInfo { get; set; } = null;
+    //public CommandInfo? ParentCommandInfo { get; set; } = null;
 
     public List<PropInfo> Arguments => field ??= [];
 
     public List<PropInfo> Options => field ??= [];
 
-    public List<CommandInfo> SubCommands => field ??= [];
-
     public IEnumerable<PropInfo> PropInfos => Options.Concat(Arguments);
-    public IEnumerable<PropInfo> SelfAndAncestorPropInfos
-    {
-        get
-        {
-            return PropInfos.Concat(AncestorPropInfos);
-        }
-    }
-    public IEnumerable<PropInfo> AncestorPropInfos
-    {
-        get
-        {
-            if (ParentCommandInfo is not null)
-            {
-                foreach (var parentProp in ParentCommandInfo.SelfAndAncestorPropInfos)
-                {
-                    yield return parentProp;
-                }
-            }
-        }
-    }
+
 }
 

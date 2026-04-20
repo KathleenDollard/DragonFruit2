@@ -19,4 +19,4 @@ internal class StubDataProvider : DataProvider<StubRootArgs>
 }
 
 
-public class StubRootArgs : ArgsRootBase<StubRootArgs> { }
+public class StubRootArgs : CommandRootBase<StubRootArgs> { }

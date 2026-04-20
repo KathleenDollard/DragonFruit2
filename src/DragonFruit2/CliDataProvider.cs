@@ -7,7 +7,7 @@ using System.Xml.Linq;
 namespace DragonFruit2;
 
 public class CliDataProvider<TRootArgs> : DataProvider<TRootArgs>, IActiveArgsProvider<TRootArgs>
-    where TRootArgs : ArgsRootBase<TRootArgs>
+    where TRootArgs : CommandRootBase<TRootArgs>
 {
     public CliDataProvider(Builder<TRootArgs> builder)
         : base(builder)

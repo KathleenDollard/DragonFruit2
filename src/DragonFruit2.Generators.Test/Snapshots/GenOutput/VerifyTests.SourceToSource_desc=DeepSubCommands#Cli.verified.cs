@@ -24,7 +24,7 @@ public class Cli
     /// <typeparam name="TRootArgs">The type containing the CLI definition, the root command if there are subcommands.</typeparam>
 
     public static Builder<TRootArgs>? CreateBuilder<TRootArgs>()
-          where TRootArgs : ArgsRootBase<TRootArgs>
+          where TRootArgs : CommandRootBase<TRootArgs>
     {
         if (typeof(TRootArgs) == typeof(MyArgs))
         {
@@ -46,7 +46,7 @@ public class Cli
     /// <param name="args">Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.</param>
 
     public static Result<TRootArgs> ParseArgs<TRootArgs>(string[]? args = null)
-          where TRootArgs : ArgsRootBase<TRootArgs>
+          where TRootArgs : CommandRootBase<TRootArgs>
     {
         var builder = CreateBuilder<TRootArgs>();
         if (builder is null)
@@ -70,7 +70,7 @@ public class Cli
     /// <exception cref="InvalidOperationException">To be implemented soon.</param>
 
     public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)
-          where TRootArgs : ArgsRootBase<TRootArgs>
+          where TRootArgs : CommandRootBase<TRootArgs>
     {
         result = ParseArgs<TRootArgs>(args);
         return result.IsValid;

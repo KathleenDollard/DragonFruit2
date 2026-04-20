@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
 
-namespace DragonFruit2.Generators;
+namespace DragonFruit2.Generators.Metadata;
 
 public static class PropInfoHelpers
 {

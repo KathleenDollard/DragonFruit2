@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using DragonFruit2.Generators.Metadata;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace DragonFruit2.Generators.Test;
@@ -90,20 +91,50 @@ public static class TestHelpers
         return compilation;
     }
 
-    public static IEnumerable<InvocationExpressionSyntax> GetParseArgsInvocations(SyntaxTree syntaxTree)
-        => [.. syntaxTree.GetRoot()
+    internal static CommandInfo? CommandInfoFromSource(string source, string appSource)
+    {
+        var compilation = GetCompilation(source, appSource);
+        var syntaxTree = compilation.SyntaxTrees.First();
+        SemanticModel semanticModel = compilation.GetSemanticModel(syntaxTree);
+        var classes = GetCommandClasses(syntaxTree, semanticModel);
+        Assert.Single(classes);
+
+        return CommandBuilder.GetCommandInfo(classes.Single(), semanticModel);
+    }
+
+
+    //public static IEnumerable<InvocationExpressionSyntax> GetParseArgsInvocations(SyntaxTree syntaxTree)
+    //    => [.. syntaxTree.GetRoot()
+    //        .DescendantNodes()
+    //        .OfType<InvocationExpressionSyntax>()
+    //        .Where(invocation =>
+    //            invocation.Expression switch
+    //            {
+    //                MemberAccessExpressionSyntax ma when ma.Name is GenericNameSyntax gns
+    //                    => DragonFruit2Builder.IsMethodNameOfInterest(gns.Identifier.ValueText) && gns.TypeArgumentList.Arguments.Count == 1,
+    //                GenericNameSyntax gns2
+    //                    => DragonFruit2Builder.IsMethodNameOfInterest(gns2.Identifier.ValueText) && gns2.TypeArgumentList.Arguments.Count == 1,
+    //                _ => false,
+    //            })];
+
+    public static IEnumerable<ClassDeclarationSyntax> GetCommandClasses(SyntaxTree syntaxTree, SemanticModel semanticModel)
+    {
+        return [.. syntaxTree.GetRoot()
             .DescendantNodes()
-            .OfType<InvocationExpressionSyntax>()
-            .Where(invocation =>
-                invocation.Expression switch
-                {
-                    MemberAccessExpressionSyntax ma when ma.Name is GenericNameSyntax gns
-                        => DragonFruit2Builder.IsMethodNameOfInterest(gns.Identifier.ValueText) && gns.TypeArgumentList.Arguments.Count == 1,
-                    GenericNameSyntax gns2
-                        => DragonFruit2Builder.IsMethodNameOfInterest(gns2.Identifier.ValueText) && gns2.TypeArgumentList.Arguments.Count == 1,
-                    _ => false,
-                })];
+            .OfType<ClassDeclarationSyntax>()
+            .Where(c=>HasCommandClassAttribute(c, semanticModel))];
 
-
+        static bool HasCommandClassAttribute(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
+        {
+            var symbol = semanticModel.GetDeclaredSymbol(classDeclaration);
+            if (symbol is null)
+            {
+                return false;
+            }
+            var attributes = symbol.GetAttributes();
+            var match = "DragonFruit2.CommandClassAttribute";
+            return attributes.Any(a => a.AttributeClass?.ToDisplayString() == match);
+        }
+    }
 }
 

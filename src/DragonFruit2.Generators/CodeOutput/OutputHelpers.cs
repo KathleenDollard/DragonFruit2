@@ -1,4 +1,4 @@
-﻿namespace DragonFruit2.Generators;
+﻿namespace DragonFruit2.Generators.CodeOutput;
 
 public class OutputHelpers
 {

@@ -8,16 +8,20 @@ using SampleConsoleApp;
 public class Cli
 {
     /// <summary>
-    /// Advanced: Creates a Builder, which can be configured, the System.CommandLine API can be accessed, 
-    /// and which can be reused (especially helpful in testing). 
+    /// Creates a Builder, which can be configured, the System.CommandLine API can be accessed, 
+    /// and which can be reused (especially helpful in testing).
     /// </summary>
     /// <remarks>
-    /// You may need to build after editing this line.
+    /// You may need to build after editing this line. 
+    /// <br/>
+    /// It is not currently clear how builders and configuration are the same and different
+    /// and thus expected changes in this space. Accessing it is currently difficult to 
+    /// avoid confusion.
     /// </remarks>
     /// <typeparam name="TRootArgs">The type containing the CLI definition</typeparam>
     /// <returns>A Result instance containing the hydrated args or error messages.</returns>
     public static Builder<TRootArgs>? CreateBuilder<TRootArgs>()
-        where TRootArgs : ArgsRootBase<TRootArgs>
+        where TRootArgs : CommandRootBase<TRootArgs>
     {
         if (typeof(TRootArgs) == typeof(MyArgs))
         {
@@ -42,7 +46,7 @@ public class Cli
     /// <param name="args">Optionaly pass the commandline args, if it is not passed, it will be retrieved from System.Environment.</param>
     /// <returns>A Result instance containing the hydrated args or error messages.</returns>
     public static Result<TRootArgs> ParseArgs<TRootArgs>(string[]? args = null)
-        where TRootArgs : ArgsRootBase<TRootArgs>
+        where TRootArgs : CommandRootBase<TRootArgs>
     {
         var builder = CreateBuilder<TRootArgs>();
         if (builder is null)
@@ -68,7 +72,7 @@ public class Cli
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
     public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)
-            where TRootArgs : ArgsRootBase<TRootArgs>
+            where TRootArgs : CommandRootBase<TRootArgs>
     {
         result = ParseArgs<TRootArgs>(args);
         return result.IsValid;

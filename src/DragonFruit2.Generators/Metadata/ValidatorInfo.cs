@@ -1,4 +1,4 @@
-﻿namespace DragonFruit2.Generators;
+﻿namespace DragonFruit2.Generators.Metadata;
 
 /// <summary>
 /// Info for the generator about validators based on attributes, registered validators are created at runtime via the Register method

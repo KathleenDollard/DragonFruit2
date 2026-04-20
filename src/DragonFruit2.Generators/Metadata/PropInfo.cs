@@ -1,7 +1,7 @@
 //using DragonFruit2.Common;
 using Microsoft.CodeAnalysis;
 
-namespace DragonFruit2.Generators;
+namespace DragonFruit2.Generators.Metadata;
 
 public record class PropInfo
 {

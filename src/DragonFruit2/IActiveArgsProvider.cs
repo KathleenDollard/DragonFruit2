@@ -3,7 +3,7 @@
 namespace DragonFruit2;
 
 internal interface IActiveArgsProvider<TRootArgs>
-        where TRootArgs : ArgsRootBase<TRootArgs>
+        where TRootArgs : CommandRootBase<TRootArgs>
 {
     bool TryGetActiveArgsDefinition(Result<TRootArgs> result,
                                     [NotNullWhen(true)] out CommandDataDefinition<TRootArgs> activeCommandDefition,

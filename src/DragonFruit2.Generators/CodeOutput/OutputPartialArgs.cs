@@ -1,20 +1,23 @@
-﻿namespace DragonFruit2.Generators;
+﻿using DragonFruit2.Generators.Metadata;
+
+namespace DragonFruit2.Generators.CodeOutput;
 
 internal class OutputPartialArgs
 {
-    internal static string GetSourcePartialArgs(CommandInfo commandInfo)
+    internal static string GetSourcePartialArgs(CommandNode commandNode)
     {
+        var commandInfo = commandNode.CommandInfo;
         var sb = new StringBuilderWrapper();
         FileOpening(sb);
         sb.OpenNamespace(commandInfo.NamespaceName);
 
         OpenClass(commandInfo, sb);
 
-        Constructors(sb, commandInfo);
-        RegisterCustomDefaultsPartialMethod(sb, commandInfo);
+        Constructors(sb, commandNode);
+        RegisterCustomDefaultsPartialMethod(sb, commandNode);
 
-        OutputDataDefinition.GetClass(sb, commandInfo);
-        OutputDataValues.GetClass(sb, commandInfo);
+        OutputDataDefinition.GetClass(sb, commandNode);
+        OutputDataValues.GetClass(sb, commandNode);
 
         sb.CloseClass();
         sb.CloseNamespace(commandInfo.NamespaceName);
@@ -36,7 +39,7 @@ internal class OutputPartialArgs
 
     internal static void OpenClass(CommandInfo commandInfo, StringBuilderWrapper sb)
     {
-        var baseType = commandInfo.BaseName ?? $"ArgsRootBase<{commandInfo.Name}>";
+        var baseType = commandInfo.BaseTypeName ?? $"CommandRootBase<{commandInfo.Name}>";
         sb.XmlSummary(
                 $"""Auto-generated partial class for building CLI commands for <see cref="{commandInfo.Name}"/>" and creating a new {commandInfo.Name} instance from a <see cref="System.CommandLine.ParseResult" />.""");
         // While we know the accessibility, we do not use it hear to improved the user experience if the implementing programmer changes the accessiblity.
@@ -44,8 +47,9 @@ internal class OutputPartialArgs
         sb.OpenClass($"partial class {commandInfo.Name} : {baseType}");
     }
 
-    private static void Constructors(StringBuilderWrapper sb, CommandInfo commandInfo)
+    private static void Constructors(StringBuilderWrapper sb, CommandNode commandNode)
     {
+        var commandInfo = commandNode.CommandInfo;
         // TODO: Can we allow both base setting of properties and respect for a user-created parameterles ctor? Maybe not.
         // TODO: Only generate the following constructor if the user does not create it
         if (commandInfo.PropInfos.Any())
@@ -56,10 +60,10 @@ internal class OutputPartialArgs
         sb.AppendLine();
 
         sb.Append("[SetsRequiredMembers()]");
-        var parameters = string.Join(", ", commandInfo.SelfAndAncestorPropInfos
+        var parameters = string.Join(", ", commandNode.SelfAndAncestorPropInfos
                          .Select(CtorParameter));
-        var calledCtor = commandInfo.AncestorPropInfos.Any()
-            ? $"base({string.Join(", ", commandInfo.AncestorPropInfos
+        var calledCtor = commandNode.AncestorPropInfos.Any()
+            ? $"base({string.Join(", ", commandNode.AncestorPropInfos
                         .Select(p => $"{p.Name.ToCamelCase()}DataValue"))})"
             : commandInfo.PropInfos.Any()
                 ? "this()"
@@ -141,17 +145,18 @@ internal class OutputPartialArgs
     //    sb.CloseMethod();
     //}
 
-    internal static void RegisterCustomDefaultsPartialMethod(StringBuilderWrapper sb, CommandInfo commandInfo)
+    internal static void RegisterCustomDefaultsPartialMethod(StringBuilderWrapper sb, CommandNode commandNode)
     {
+
         sb.AppendLine();
-        sb.Append($"static partial void RegisterCustomDefaults(Builder<{commandInfo.RootName}> builder, DefaultDataProvider<{commandInfo.RootName}> defaultDataProvider);");
+        sb.Append($"static partial void RegisterCustomDefaults(Builder<{commandNode.RootCommandName}> builder, DefaultDataProvider<{commandNode.RootCommandName}> defaultDataProvider);");
         sb.AppendLine();
     }
 
-    internal static void GetArgsBuilder(StringBuilderWrapper sb, CommandInfo commandInfo)
-    {
-        sb.OpenMethod($"public static ArgsBuilder<{commandInfo.RootName}> GetArgsBuilder(Builder<{commandInfo.RootName}> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)");
-        sb.AppendLine($"return new {commandInfo.Name}.{commandInfo.Name}ArgsBuilder(parentDataDefinition, rootDataDefinition);");
-        sb.CloseMethod();
-    }
+    //internal static void GetArgsBuilder(StringBuilderWrapper sb, CommandNode commandNode)
+    //{
+    //    sb.OpenMethod($"public static ArgsBuilder<{commandNode.RootCommandName}> GetArgsBuilder(Builder<{commandNode.RootCommandName}> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)");
+    //    sb.AppendLine($"return new {commandNode.RootCommandName}.{commandNode.RootCommandName}ArgsBuilder(parentDataDefinition, rootDataDefinition);");
+    //    sb.CloseMethod();
+    //}
 }

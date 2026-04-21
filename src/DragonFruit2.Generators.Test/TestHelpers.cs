@@ -66,7 +66,7 @@ public static class TestHelpers
         return (outputCompilation.SyntaxTrees.LastOrDefault()?.ToString(), diagnostics);
     }
 
-    public static Compilation GetCompilation(params string[] sources)
+    public static Compilation GetCompilation(params IEnumerable<string> sources)
     {
         var syntaxTrees = sources.Select(x => CSharpSyntaxTree.ParseText(x)).ToArray();
         return GetCompilation(syntaxTrees);
@@ -91,16 +91,29 @@ public static class TestHelpers
         return compilation;
     }
 
-    internal static CommandInfo? CommandInfoFromSource(string source, string appSource)
+    internal static IEnumerable<CommandInfo?> GetCommandInfos(string source, string appSource)
     {
         var compilation = GetCompilation(source, appSource);
         var syntaxTree = compilation.SyntaxTrees.First();
         SemanticModel semanticModel = compilation.GetSemanticModel(syntaxTree);
         var classes = GetCommandClasses(syntaxTree, semanticModel);
-        Assert.Single(classes);
-
-        return CommandBuilder.GetCommandInfo(classes.Single(), semanticModel);
+        return classes
+            .Select(c => CommandBuilder.GetCommandInfo(c, semanticModel))
+            .Where(i => i is not null)
+            .ToList();
     }
+
+    internal static CommandInfo? GetCommandInfo(string source, string appSource)
+    {
+        var commandInfos = GetCommandInfos(source, appSource).ToList();
+        return commandInfos switch
+        {
+            [] => null,
+            [_] => commandInfos.Single(),
+            _ => throw new InvalidOperationException("Multiple CommandInfos retrieved")
+        };
+    }
+
 
 
     //public static IEnumerable<InvocationExpressionSyntax> GetParseArgsInvocations(SyntaxTree syntaxTree)
@@ -135,6 +148,49 @@ public static class TestHelpers
             var match = "DragonFruit2.CommandClassAttribute";
             return attributes.Any(a => a.AttributeClass?.ToDisplayString() == match);
         }
+    }
+
+    internal static IEnumerable<CommandNode> GetCommandNodeInfos(string argsSource, string consoleSource)
+    {
+        var commandInfos = GetCommandInfos(argsSource, consoleSource);
+        return CommandBuilder.BuildCommandTree(commandInfos!);
+
+    }
+
+    internal static IEnumerable<CliInfo?> GetCliInfos(Compilation compilation)
+    {
+        return compilation.SyntaxTrees
+                .SelectMany(tree => CliInfoFromSyntaxTree(compilation, tree));
+
+        static IEnumerable<CliInfo> CliInfoFromSyntaxTree(Compilation compilation, SyntaxTree syntaxTree)
+        {
+            SemanticModel semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var invocations = GetCliInvocations(syntaxTree, semanticModel);
+            var cliInfos =invocations
+                .Select(i => CliBuilder.GetCliInfo(i, semanticModel))
+                .ToList();
+            return cliInfos
+                .Where(i => i is not null)!;
+
+        }
+    }
+
+    internal static IEnumerable<InvocationExpressionSyntax> GetCliInvocations(SyntaxTree syntaxTree, SemanticModel semanticModel)
+    {
+        return [..syntaxTree.GetRoot()
+                .DescendantNodes()
+                .OfType<InvocationExpressionSyntax>()
+                .Where(invocation =>
+                    invocation.Expression switch
+                    {
+                        MemberAccessExpressionSyntax ma when ma.Name is GenericNameSyntax gns
+                            => !(CliBuilder.IsMethodNameOfInterest(gns.Identifier.ValueText) || gns.TypeArgumentList.Arguments.Count != 1),
+                        GenericNameSyntax gns2
+                            => CliBuilder.IsMethodNameOfInterest(gns2.Identifier.ValueText) && gns2.TypeArgumentList.Arguments.Count == 1,
+                        _ => false,
+                    })];
+
+
     }
 }
 

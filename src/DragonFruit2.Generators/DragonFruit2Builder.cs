@@ -55,7 +55,7 @@ public class DragonFruit2Builder
             return context.Node switch
             {
                 InvocationExpressionSyntax invocationSyntax
-                       => CommandBuilder.CliInfoFromInvocation(invocationSyntax, context.SemanticModel),
+                       => CliBuilder.GetCliInfo(invocationSyntax, context.SemanticModel),
                 _ => null,
             };
         }

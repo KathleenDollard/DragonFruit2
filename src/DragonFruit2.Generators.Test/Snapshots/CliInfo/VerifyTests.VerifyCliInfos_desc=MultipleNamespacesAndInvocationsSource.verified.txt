@@ -1,0 +1,18 @@
+﻿[
+  {
+    RootTypeNamespace: ,
+    RootCommandName: MyArgs,
+    RootTypeFullName: .MyArgs
+  },
+  {
+    RootTypeNamespace: ,
+    RootCommandName: MyArgs2,
+    RootTypeFullName: .MyArgs2
+  },
+  {
+    RootTypeNamespace: MyArgsNamespace,
+    RootCommandName: MyArgs3,
+    RootTypeFullName: MyArgsNamespace.MyArgs3,
+    EntryPointNamespace: MyNamespace
+  }
+]

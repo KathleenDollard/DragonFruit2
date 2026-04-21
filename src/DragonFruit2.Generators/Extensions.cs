@@ -12,6 +12,7 @@ public static class Extensions
         {
             var attr = symbol.GetAttributes().FirstOrDefault(a =>
                     a.AttributeClass?.Name == attributeName ||
+                    // TODO: Review right side of next line
                     a.AttributeClass?.ToDisplayString() == $"{namespaceName}.{parameterName}");
 
             if (attr == null)

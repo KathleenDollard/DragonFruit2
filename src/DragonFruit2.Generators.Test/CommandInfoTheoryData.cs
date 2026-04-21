@@ -11,10 +11,11 @@ public class CommandInfoTheoryData : TheoryData<string, string, string>
 
     public CommandInfoTheoryData()
     {
-        AddTheoryData("DeepSubCommands",
+        AddTheoryData("MultipleCallsOneNamespace",
                 argsSource:
                     """
                     using DragonFruit2;
+
 
                     namespace MyNamespace
                     {

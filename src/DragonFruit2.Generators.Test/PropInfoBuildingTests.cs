@@ -20,7 +20,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Options);
@@ -42,7 +42,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Arguments);
@@ -64,7 +64,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Options);
@@ -85,7 +85,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Options);
@@ -106,7 +106,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Options);
@@ -127,7 +127,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Options);
@@ -149,7 +149,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Options);
@@ -171,7 +171,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Options);
@@ -192,7 +192,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Options);
@@ -213,7 +213,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Options);
@@ -234,7 +234,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Options);
@@ -255,7 +255,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Options);
@@ -276,7 +276,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Options);
@@ -298,7 +298,7 @@ public class PropInfoBuildingTests
         }
         """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Single(commandInfo.Options);

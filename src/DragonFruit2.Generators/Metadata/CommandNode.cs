@@ -2,45 +2,37 @@
 
 public record class CommandNode
 {
-    public required CommandInfo CommandInfo { get; init; }
-    public CommandNode? RootCommandNode { get; init; }
-    public string RootCommandName
-    { get
+    public string Name => CommandInfo.Name;
+    public string? ParendCommandFullName => ParentCommand?.CommandInfo.FullName;
+    public string RootCommandFullName
+    {
+        get
         {
             var rootCommandNode = RootCommandNode switch
             {
                 null => this,
                 _ => RootCommandNode
             };
-            return rootCommandNode.CommandInfo.Name;
+            return rootCommandNode.CommandInfo.FullName;
         }
     }
-    public CommandNode? Parent { get; internal set; }
-    public List<CommandNode> SubCommands
+
+    public List<CommandNode> SubCommands => field ??= [];
+
+
+    public CommandNode? RootCommandNode { get; init; }
+    public required CommandInfo CommandInfo { get; init; }
+    public CommandNode? ParentCommand { get; internal set; }
+    public IEnumerable<PropInfo> GetSelfAndAncestorPropInfos()
+        => CommandInfo.GetOptionsAndArguments().Concat(GetAncestorPropInfos());
+
+    public IEnumerable<PropInfo> GetAncestorPropInfos()
     {
-        get
+        if (ParentCommand is not null)
         {
-            field ??= [];
-            return field;
-        }
-    }
-    public IEnumerable<PropInfo> SelfAndAncestorPropInfos
-    {
-        get
-        {
-            return CommandInfo.PropInfos.Concat(AncestorPropInfos);
-        }
-    }
-    public IEnumerable<PropInfo> AncestorPropInfos
-    {
-        get
-        {
-            if (Parent is not null)
+            foreach (var parentProp in ParentCommand.GetSelfAndAncestorPropInfos())
             {
-                foreach (var parentProp in Parent.SelfAndAncestorPropInfos)
-                {
-                    yield return parentProp;
-                }
+                yield return parentProp;
             }
         }
     }

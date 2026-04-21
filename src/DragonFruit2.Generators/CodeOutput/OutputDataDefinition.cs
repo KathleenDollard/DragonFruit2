@@ -21,7 +21,7 @@ public class OutputDataDefinition
     {
         sb.AppendLine();
         sb.XmlSummary(" The data definition is available to data providers and are used for initialization.");
-        sb.OpenClass($"public partial class {commandNode .CommandInfo.Name}DataDefinition : CommandDataDefinition<{commandNode.RootCommandName}>");
+        sb.OpenClass($"public partial class {commandNode .CommandInfo.Name}DataDefinition : CommandDataDefinition<{commandNode.RootCommandFullName}>");
     }
 
     private static void Constructor(StringBuilderWrapper sb, CommandNode commandNode)
@@ -100,7 +100,7 @@ public class OutputDataDefinition
 
     private static void Properties(StringBuilderWrapper sb, CommandNode commandNode)
     {
-        foreach (var propInfo in commandNode.CommandInfo.PropInfos)
+        foreach (var propInfo in commandNode.CommandInfo.GetOptionsAndArguments())
         {
             sb.AppendLine($"public OptionDataDefinition<{propInfo.TypeName}> {propInfo.Name} {{ get; }}");
 
@@ -113,7 +113,7 @@ public class OutputDataDefinition
 
         sb.AppendLine("return memberName switch");
         sb.OpenCurly();
-        foreach (var propInfo in commandNode.CommandInfo.PropInfos)
+        foreach (var propInfo in commandNode.CommandInfo.GetOptionsAndArguments())
         {
             sb.AppendLine($"nameof({propInfo.Name}) => {propInfo.Name},");
         }
@@ -126,10 +126,10 @@ public class OutputDataDefinition
     private static void Operate(StringBuilderWrapper sb, CommandNode commandNode)
     {
         sb.OpenMethod("public override IEnumerable<TReturn> Operate<TReturn> (IOperationOnMemberDefinition<TReturn> operationContainer)");
-        sb.AppendLine($"var retValues = new TReturn[{commandNode.CommandInfo.PropInfos.Count()}];");
+        sb.AppendLine($"var retValues = new TReturn[{commandNode.CommandInfo.GetOptionsAndArguments().Count()}];");
 
         var i = 0;
-        foreach (var propInfo in commandNode.CommandInfo.PropInfos)
+        foreach (var propInfo in commandNode.CommandInfo.GetOptionsAndArguments())
         {
             sb.AppendLine($"retValues[{i}] = operationContainer.Operate({propInfo.Name});");
             i++;

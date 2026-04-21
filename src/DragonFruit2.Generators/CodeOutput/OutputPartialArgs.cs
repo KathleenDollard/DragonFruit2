@@ -52,7 +52,7 @@ internal class OutputPartialArgs
         var commandInfo = commandNode.CommandInfo;
         // TODO: Can we allow both base setting of properties and respect for a user-created parameterles ctor? Maybe not.
         // TODO: Only generate the following constructor if the user does not create it
-        if (commandInfo.PropInfos.Any())
+        if (commandInfo.GetOptionsAndArguments().Any())
         {
             sb.OpenMethod($"public {commandInfo.Name}()");
             sb.CloseMethod();
@@ -60,24 +60,24 @@ internal class OutputPartialArgs
         sb.AppendLine();
 
         sb.Append("[SetsRequiredMembers()]");
-        var parameters = string.Join(", ", commandNode.SelfAndAncestorPropInfos
+        var parameters = string.Join(", ", commandNode.GetSelfAndAncestorPropInfos()
                          .Select(CtorParameter));
-        var calledCtor = commandNode.AncestorPropInfos.Any()
-            ? $"base({string.Join(", ", commandNode.AncestorPropInfos
+        var calledCtor = commandNode.GetAncestorPropInfos().Any()
+            ? $"base({string.Join(", ", commandNode.GetAncestorPropInfos()
                         .Select(p => $"{p.Name.ToCamelCase()}DataValue"))})"
-            : commandInfo.PropInfos.Any()
+            : commandInfo.GetOptionsAndArguments().Any()
                 ? "this()"
                 : null;
         sb.OpenConstructor($"protected {commandInfo.Name}({string.Join(", ", parameters)})", calledCtor);
 
-        foreach (var propInfo in commandInfo.PropInfos)
+        foreach (var propInfo in commandInfo.GetOptionsAndArguments())
         {
 
             string dataValueName = $"{propInfo.Name.ToCamelCase()}DataValue";
             sb.AppendLine($"""if (ValueIsAvailable({dataValueName})) {propInfo.Name} = {dataValueName}.Value;""");
         }
 
-        if (commandInfo.PropInfos.Any())
+        if (commandInfo.GetOptionsAndArguments().Any())
         {
             sb.OpenMethod("static bool ValueIsAvailable<T>([NotNullWhen(true)] DataValue<T>? dataValue)");
             sb.Comment("This is generated because it should not be used outside the constructor.");
@@ -102,7 +102,7 @@ internal class OutputPartialArgs
         sb.AppendLine("var failures = new List<Diagnostic>();");
         sb.AppendLine("InitializeValidators();");
         sb.AppendLine();
-        foreach (var prop in commandInfo.PropInfos)
+        foreach (var prop in commandInfo.GetOptionsAndArguments())
         {
             if (prop.Validators is not null && prop.Validators.Any())
             {
@@ -149,7 +149,7 @@ internal class OutputPartialArgs
     {
 
         sb.AppendLine();
-        sb.Append($"static partial void RegisterCustomDefaults(Builder<{commandNode.RootCommandName}> builder, DefaultDataProvider<{commandNode.RootCommandName}> defaultDataProvider);");
+        sb.Append($"static partial void RegisterCustomDefaults(Builder<{commandNode.RootCommandFullName}> builder, DefaultDataProvider<{commandNode.RootCommandFullName}> defaultDataProvider);");
         sb.AppendLine();
     }
 

@@ -12,13 +12,40 @@ public class VerifyTests
 
     [Theory]
     [ClassData(typeof(CommandInfoTheoryData))]
-    public Task CommandInfo(string desc, string argsSource, string consoleSource)
+    public Task VerifyCommandInfo(string desc, string argsSource, string consoleSource)
     {
-        var commandInfo = TestHelpers.CommandInfoFromSource(argsSource, consoleSource);
+        var commandInfos = TestHelpers.GetCommandInfos(argsSource, consoleSource);
 
         var verifySettings = new VerifySettings();
         verifySettings.UseDirectory("Snapshots/CommandInfo");
-        return Verify(commandInfo, verifySettings).UseParameters(desc);
+        return Verify(commandInfos, verifySettings).UseParameters(desc);
+    }
+
+
+    [Theory]
+    [ClassData(typeof(CommandInfoTheoryData))]
+    public Task VerifyCommandNode(string desc, string argsSource, string consoleSource)
+    {
+        var commandNodes = TestHelpers.GetCommandNodeInfos(argsSource, consoleSource);
+
+        var verifySettings = new VerifySettings();
+        verifySettings.UseDirectory("Snapshots/CommandNode");
+        verifySettings.DontIgnoreEmptyCollections();
+        verifySettings.IgnoreMembersWithType<CommandNode>();
+        //verifySettings.AddExtraSettings(s => s.Converters.Add(new VerifyCommandNodeSerializer()));
+        return Verify(commandNodes, verifySettings).UseParameters(desc);
+    }
+
+    [Theory]
+    [ClassData(typeof(CliInfoTheoryData))]
+    public Task VerifyCliInfos(string desc, IEnumerable<string> consoleSources)
+    {
+        var compilation = TestHelpers.GetCompilation(consoleSources);
+        var cliInfos = TestHelpers.GetCliInfos(compilation);
+
+        var verifySettings = new VerifySettings();
+        verifySettings.UseDirectory("Snapshots/CliInfo");
+        return Verify(cliInfos, verifySettings).UseParameters(desc);
     }
 
     /// <summary>

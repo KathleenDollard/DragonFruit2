@@ -6,28 +6,23 @@ namespace DragonFruit2.Generators.Metadata;
 /// </summary>
 public record class CommandInfo
 {
-    private string? simpleName;
-
     public required string Name { get; init; }
     public string? NamespaceName { get; init; }
-    public string FullName
-        => NamespaceName is null
-            ? Name
-            : $"{NamespaceName}.{Name}";
-    //public string? CliNamespaceName { get; init; }
     public required string Accessibility {  get; init; }
+
+    // The base info is used to create the CommandNode tree
     public required string? BaseTypeName { get; init; }
     public required string? BaseTypeNamespace { get; init; }
-    //public required string? RootName { get; init; }
-
+    public string? BaseTypeFullName => (BaseTypeNamespace, BaseTypeName).FullName;
+   
     public string? SimpleName
     {
-        get => simpleName switch
+        get => field switch
         {
             null => $"{ToSimpleName(Name)}",
-            _ => simpleName
+            _ => field
         };
-        init => simpleName = value;
+        init;
     }
 
     private string ToSimpleName(string name)
@@ -37,13 +32,12 @@ public record class CommandInfo
                : Name;
         return name.ToKebabCase();
     }
-    //public CommandInfo? ParentCommandInfo { get; set; } = null;
 
     public List<PropInfo> Arguments => field ??= [];
 
     public List<PropInfo> Options => field ??= [];
 
-    public IEnumerable<PropInfo> PropInfos => Options.Concat(Arguments);
+    public IEnumerable<PropInfo> GetOptionsAndArguments() => Options.Concat(Arguments);
 
 }
 

@@ -5,16 +5,12 @@ namespace DragonFruit2.Generators.Metadata;
 /// <summary>
 /// Info that is per command tree
 /// </summary>
-public class CliInfo
+public record class CliInfo
 {
     // Roslyn treats the global namespace as a null, and this class does the same
 
     public required string? RootTypeNamespace {  get; init; }
     public required string RootCommandName { get; init; }
-    public string RootTypeFullName
-        => RootCommandName is null
-            ? RootCommandName! // quiet null ref warning
-            : $"{RootTypeNamespace}.{RootCommandName}";
 
     public required string? EntryPointNamespace { get; init; }
 

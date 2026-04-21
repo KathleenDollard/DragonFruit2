@@ -16,7 +16,7 @@ public class CommandInfoTests
             { }
             """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.Equal("MyArgs", commandInfo?.Name);
     }
@@ -35,7 +35,7 @@ public class CommandInfoTests
             }
             """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCodeWithArgsMyNamespace);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCodeWithArgsMyNamespace);
 
         Assert.NotNull(commandInfo);
         Assert.Equal("MyNamespace", commandInfo?.NamespaceName);
@@ -53,7 +53,7 @@ public class CommandInfoTests
             { }
             """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCodeWithArgsMyNamespace);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCodeWithArgsMyNamespace);
 
         Assert.NotNull(commandInfo);
         Assert.Equal("MyNamespace", commandInfo?.NamespaceName);
@@ -70,7 +70,7 @@ public class CommandInfoTests
             { }
             """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Equal("public", commandInfo?.Accessibility);
@@ -88,7 +88,7 @@ public class CommandInfoTests
             { }
             """;
 
-        var commandInfo = TestHelpers.CommandInfoFromSource(sourceText, TestHelpers.EmptyConsoleAppCode);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
         Assert.NotNull(commandInfo);
         Assert.Equal("protected internal", commandInfo?.Accessibility);
@@ -111,7 +111,7 @@ public class CommandInfoTests
             { }
             """;
 
-        var result = TestHelpers.CommandInfoFromSource(source, "");
+        var result = TestHelpers.GetCommandInfo(source, "");
 
         Assert.Equal(expectedAccessibility, result?.Accessibility);
     }
@@ -129,7 +129,7 @@ public class CommandInfoTests
             { }
             """;
 
-        var result = TestHelpers.CommandInfoFromSource(source, "");
+        var result = TestHelpers.GetCommandInfo(source, "");
 
         Assert.Null(result?.NamespaceName);
     }

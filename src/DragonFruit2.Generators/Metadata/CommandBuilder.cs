@@ -7,27 +7,6 @@ namespace DragonFruit2.Generators.Metadata;
 
 public class CommandBuilder
 {
-    internal static CliInfo? CliInfoFromInvocation(InvocationExpressionSyntax invocationSyntax, SemanticModel semanticModel)
-    {
-        if (invocationSyntax is null) return null;
-
-        var cliNamespaceName = invocationSyntax.GetNamespace();
-
-        var genericNameSyntax = invocationSyntax.GetGenericNameSyntax();
-        if (genericNameSyntax is null) return null;
-
-        var rootTypeSymbol = semanticModel.GetTypeArgumentSymbol(genericNameSyntax);
-        if (rootTypeSymbol is null) return null; // This occurs when the root arg type does not yet exist
-
-        return new CliInfo
-        {
-            RootCommandName = rootTypeSymbol.Name,
-            RootTypeNamespace = rootTypeSymbol.GetNamespace() ?? "",
-            EntryPointNamespace = cliNamespaceName,
-
-        };
-    }
-
     internal static CommandInfo? GetCommandInfo(ClassDeclarationSyntax classDeclarationSyntax,
                                                 SemanticModel semanticModel)
     {
@@ -71,9 +50,10 @@ public class CommandBuilder
     /// <returns>A collection of CommandNode objects that correspond to all of the command roots in the compilation</returns>
     internal static IEnumerable<CommandNode> BuildCommandTree(IEnumerable<CommandInfo> commandInfos)
     {
-        var commandNodes = commandInfos.Select(info => new CommandNode { CommandInfo = info });
+        var commandNodes = commandInfos
+                .Select(info => new CommandNode { CommandInfo = info }).ToList();
 
-        var lookup = commandNodes.ToLookup(node => node.CommandInfo.BaseTypeName);
+        var lookup = commandNodes.ToLookup(node => node.CommandInfo.BaseTypeFullName);
 
         foreach (var node in commandNodes)
         {
@@ -83,11 +63,11 @@ public class CommandBuilder
             node.SubCommands.AddRange(subCommands);
             foreach (var subCommand in subCommands)
             {
-                subCommand.Parent = node;
+                subCommand.ParentCommand = node;
             }
         }
 
-        return commandNodes.Where(node => node.Parent is null);
+        return commandNodes.Where(node => node.ParentCommand is null);
     }
 
     internal static IEnumerable<IGrouping<string?, CliInfo>> CreateHierarchyAndGroup((ImmutableArray<CliInfo> Left, IEnumerable<CommandNode> Right) tuple,
@@ -97,7 +77,7 @@ public class CommandBuilder
 
         foreach (var cliInfo in cliInfos)
         {
-            cliInfo.RootCommandNode = commandNodes.Single(node => node.CommandInfo.FullName == cliInfo.RootTypeFullName);
+            cliInfo.RootCommandNode = commandNodes.Single(node => node.CommandInfo.FullName == cliInfo.RootCommandNode?.CommandInfo.FullName);
         }
         var grouped = cliInfos.GroupBy(cliInfo => cliInfo.EntryPointNamespace);
         return grouped;

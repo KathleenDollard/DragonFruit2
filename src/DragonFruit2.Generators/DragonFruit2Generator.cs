@@ -31,19 +31,18 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
             .Collect()
             .WithTrackingName(TrackingNames.Extract);
 
+        // Lambda's are used to allow IEnumerable parameters for testing. If this is identified 
+        // as a perf issue, an extra call can be made, or tests can create ImmutableArrays.
         var commandRootsWithTrees = commandInfos
-            .Select((infos, ctx) => CommandBuilder.BuildCommandTree(infos))
+            .Select((infos, ctx) => CommandBuilder.BuildCommandTree(infos, ctx))
             .WithTrackingName(TrackingNames.BuildTrees);
 
-        var cliInfosWithTrees = cliInfos
-            .Combine(commandRootsWithTrees)
-            .Select(CommandBuilder.CreateHierarchyAndGroup)
-            .WithTrackingName(TrackingNames.BuildTrees);
+        var cliInfosGroups = cliInfos
+            .Select((infos, ctx) => CommandBuilder.GetCliInfoGroups(infos, ctx))
+            .WithTrackingName(TrackingNames.BuildCliInfoGroups);
 
-        var spreadCliInfoGroups = cliInfosWithTrees
-            .SelectMany(CommandBuilder.SpreadCliInfos);
-
-        // TODO: Group by namespace and SelectMany for separate files for each
+        var spreadCliInfoGroups = cliInfosGroups
+            .SelectMany((x, ctx) => x);
 
         // This allows generating a file per command 
         var individualCommands = commandRootsWithTrees

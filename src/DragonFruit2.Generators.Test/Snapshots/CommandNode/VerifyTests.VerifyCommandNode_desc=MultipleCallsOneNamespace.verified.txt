@@ -1,1 +1,27 @@
-﻿
+﻿[
+  {
+    Name: MyArgs,
+    RootCommandName: MyNamespace.MyArgs,
+    SubCommands: [
+      {
+        Name: MorningGreetingArgs,
+        ParentCommandFullName: MyNamespace.MyArgs,
+        RootCommandName: MyNamespace.MorningGreetingArgs,
+        SubCommands: []
+      },
+      {
+        Name: EveningGreetingArgs,
+        ParentCommandFullName: MyNamespace.MyArgs,
+        RootCommandName: MyNamespace.EveningGreetingArgs,
+        SubCommands: [
+          {
+            Name: Bar,
+            ParentCommandFullName: MyNamespace.EveningGreetingArgs,
+            RootCommandName: MyNamespace.Bar,
+            SubCommands: []
+          }
+        ]
+      }
+    ]
+  }
+]

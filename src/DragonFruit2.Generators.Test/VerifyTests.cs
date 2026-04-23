@@ -5,6 +5,14 @@ namespace DragonFruit2.Generators.Test;
 
 public class VerifyTests
 {
+    private VerifySettings VerifySettings(string directory) 
+        {
+            var verifySettings = new VerifySettings();
+            verifySettings.UseDirectory($"Snapshots/{directory}");
+            verifySettings.DontIgnoreEmptyCollections();
+            verifySettings.AddExtraSettings(s => s.Converters.Add(new VerifyCommandNodeEnumerableSerializer()));
+            return verifySettings;
+        } 
 
     [Fact]
     public Task VerifyCheck() =>
@@ -17,8 +25,7 @@ public class VerifyTests
         var commandInfos = TestHelpers.GetCommandInfos(argsSource, consoleSource);
 
         var verifySettings = new VerifySettings();
-        verifySettings.UseDirectory("Snapshots/CommandInfo");
-        return Verify(commandInfos, verifySettings).UseParameters(desc);
+        return Verify(commandInfos, VerifySettings("CommandInfo")).UseParameters(desc);
     }
 
 
@@ -28,24 +35,29 @@ public class VerifyTests
     {
         var commandNodes = TestHelpers.GetCommandNodeInfos(argsSource, consoleSource);
 
-        var verifySettings = new VerifySettings();
-        verifySettings.UseDirectory("Snapshots/CommandNode");
-        verifySettings.DontIgnoreEmptyCollections();
-        verifySettings.IgnoreMembersWithType<CommandNode>();
-        //verifySettings.AddExtraSettings(s => s.Converters.Add(new VerifyCommandNodeSerializer()));
-        return Verify(commandNodes, verifySettings).UseParameters(desc);
+        return Verify(commandNodes, VerifySettings("CommandNode")).UseParameters(desc);
     }
 
     [Theory]
     [ClassData(typeof(CliInfoTheoryData))]
-    public Task VerifyCliInfos(string desc, IEnumerable<string> consoleSources)
+    public Task VerifyCliInfo(string desc, IEnumerable<string> consoleSources)
     {
         var compilation = TestHelpers.GetCompilation(consoleSources);
         var cliInfos = TestHelpers.GetCliInfos(compilation);
 
-        var verifySettings = new VerifySettings();
-        verifySettings.UseDirectory("Snapshots/CliInfo");
-        return Verify(cliInfos, verifySettings).UseParameters(desc);
+        return Verify(cliInfos, VerifySettings("CliInfo")).UseParameters(desc);
+    }
+
+
+    [Theory]
+    [ClassData(typeof(CliInfoTheoryData))]
+    public Task VerifyCliInfoGroup(string desc, IEnumerable<string> consoleSources)
+    {
+        var compilation = TestHelpers.GetCompilation(consoleSources);
+        var cliInfos = TestHelpers.GetCliInfos(compilation);
+        var cliInfoGroup = CommandBuilder.GetCliInfoGroups(cliInfos, new System.Threading.CancellationToken());
+
+        return Verify(cliInfoGroup, VerifySettings("CliInfoGroup")).UseParameters(desc);
     }
 
     /// <summary>

@@ -153,8 +153,7 @@ public static class TestHelpers
     internal static IEnumerable<CommandNode> GetCommandNodeInfos(string argsSource, string consoleSource)
     {
         var commandInfos = GetCommandInfos(argsSource, consoleSource);
-        return CommandBuilder.BuildCommandTree(commandInfos!);
-
+        return CommandBuilder.BuildCommandTree(commandInfos!, new System.Threading.CancellationToken());
     }
 
     internal static IEnumerable<CliInfo?> GetCliInfos(Compilation compilation)

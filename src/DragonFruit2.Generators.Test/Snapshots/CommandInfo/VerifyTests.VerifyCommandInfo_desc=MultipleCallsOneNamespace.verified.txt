@@ -1,1 +1,78 @@
-﻿
+﻿[
+  {
+    Name: MyArgs,
+    NamespaceName: MyNamespace,
+    Accessibility: public,
+    BaseTypeName: CommandRootBase,
+    BaseTypeNamespace: DragonFruit2,
+    BaseTypeFullName: DragonFruit2.CommandRootBase,
+    SimpleName: my,
+    Arguments: [],
+    Options: [
+      {
+        Name: Name,
+        CliName: --name,
+        TypeName: string,
+        ContainingTypeName: MyArgs,
+        IsValueType: false,
+        HasRequiredModifier: true,
+        HasArgumentAttribute: false,
+        IsArgument: false,
+        HasInitializer: false,
+        IsRequiredForCli: true,
+        Validators: [],
+        Defaults: []
+      }
+    ]
+  },
+  {
+    Name: MorningGreetingArgs,
+    NamespaceName: MyNamespace,
+    Accessibility: public,
+    BaseTypeName: MyArgs,
+    BaseTypeNamespace: MyNamespace,
+    BaseTypeFullName: MyNamespace.MyArgs,
+    SimpleName: morning-greeting,
+    Arguments: [],
+    Options: []
+  },
+  {
+    Name: EveningGreetingArgs,
+    NamespaceName: MyNamespace,
+    Accessibility: public,
+    BaseTypeName: MyArgs,
+    BaseTypeNamespace: MyNamespace,
+    BaseTypeFullName: MyNamespace.MyArgs,
+    SimpleName: evening-greeting,
+    Arguments: [],
+    Options: [
+      {
+        Name: Age,
+        CliName: --age,
+        TypeName: int,
+        ContainingTypeName: EveningGreetingArgs,
+        IsValueType: true,
+        NullableAnnotation: NotAnnotated,
+        HasRequiredModifier: false,
+        HasArgumentAttribute: false,
+        IsArgument: false,
+        HasInitializer: true,
+        InitializerText: 1,
+        IsRequiredForCli: false,
+        Validators: [],
+        Defaults: []
+      }
+    ]
+  },
+  {
+    Name: Bar,
+    NamespaceName: MyNamespace,
+    Accessibility: public,
+    BaseTypeName: EveningGreetingArgs,
+    BaseTypeNamespace: MyNamespace,
+    BaseTypeFullName: MyNamespace.EveningGreetingArgs,
+    SimpleName: bar,
+    Arguments: [],
+    Options: []
+  }
+]

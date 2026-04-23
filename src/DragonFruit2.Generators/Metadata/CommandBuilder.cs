@@ -48,7 +48,7 @@ public class CommandBuilder
     /// </remarks>
     /// <param name="commandInfos"></param>
     /// <returns>A collection of CommandNode objects that correspond to all of the command roots in the compilation</returns>
-    internal static IEnumerable<CommandNode> BuildCommandTree(IEnumerable<CommandInfo> commandInfos)
+    internal static IEnumerable<CommandNode> BuildCommandTree(IEnumerable<CommandInfo> commandInfos, CancellationToken ctx)
     {
         var commandNodes = commandInfos
                 .Select(info => new CommandNode { CommandInfo = info }).ToList();
@@ -70,17 +70,11 @@ public class CommandBuilder
         return commandNodes.Where(node => node.ParentCommand is null);
     }
 
-    internal static IEnumerable<IGrouping<string?, CliInfo>> CreateHierarchyAndGroup((ImmutableArray<CliInfo> Left, IEnumerable<CommandNode> Right) tuple,
-                                                                 CancellationToken token)
+    internal static IEnumerable<CliInfoGroup> GetCliInfoGroups(IEnumerable<CliInfo> cliInfos, CancellationToken token)
     {
-        var (cliInfos, commandNodes) = tuple;
-
-        foreach (var cliInfo in cliInfos)
-        {
-            cliInfo.RootCommandNode = commandNodes.Single(node => node.CommandInfo.FullName == cliInfo.RootCommandNode?.CommandInfo.FullName);
-        }
         var grouped = cliInfos.GroupBy(cliInfo => cliInfo.EntryPointNamespace);
-        return grouped;
+
+        return grouped.Select(g => new CliInfoGroup(g)).ToList();
     }
 
     internal static IEnumerable<CommandNode> FlattenHierarchy(IEnumerable<CommandNode> commandNodes, CancellationToken ctx)

@@ -95,12 +95,12 @@ public class DragonFruit2Builder
         }
     }
 
-    public void OutputCliSource(SourceProductionContext context,IGrouping<string?, CliInfo> cliInfoGroup)
+    public void OutputCliSource(SourceProductionContext context, CliInfoGroup cliInfoGroup)
     {
         try
         {
             
-                context.AddSource("Cli", OutputCli.GetSource(cliInfoGroup.Key, cliInfoGroup));
+                context.AddSource("Cli", OutputCli.GetSource(cliInfoGroup.EntryPointNamespace, cliInfoGroup.CliInfos));
         }
         catch
         {

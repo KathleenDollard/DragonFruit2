@@ -38,6 +38,15 @@ public class CliInfoTheoryData
                     """
                     using DragonFruit2;
 
+                    namespace MyArgsNamespace2;
+
+                    [CommandClass] public class MyArgs4
+                    {}
+                    """,
+
+                    """
+                    using DragonFruit2;
+
                     namespace MyNamespace;
 
                     public class OtherEntryPoints
@@ -45,6 +54,7 @@ public class CliInfoTheoryData
                        public void OtherCalls(string[] args)
                        {
                           var myArgsDataValues = Cli.ParseArgs<MyArgsNamespace.MyArgs3>(args);
+                          var myArgsDataValues = Cli.ParseArgs<MyArgsNamespace2.MyArgs4>(args);
                        }
                     }
                     """,

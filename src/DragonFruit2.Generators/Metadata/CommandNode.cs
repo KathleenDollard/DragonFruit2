@@ -3,7 +3,7 @@
 public record class CommandNode
 {
     public string Name => CommandInfo.Name;
-    public string? ParendCommandFullName => ParentCommand?.CommandInfo.FullName;
+    public string? ParentCommandFullName => ParentCommand?.CommandInfo.FullName;
     public string RootCommandFullName
     {
         get

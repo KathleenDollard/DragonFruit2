@@ -40,10 +40,13 @@ public class CommandInfoTheoryData : TheoryData<string, string, string>
                         {
                         }
                     }
+
                     """,
                 consoleSource: TestHelpers.EmptyConsoleAppCodeWithArgsMyNamespace);
 
     }
 
 }
+
+
 

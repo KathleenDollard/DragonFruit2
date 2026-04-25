@@ -10,6 +10,10 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        // Lambda's are used to allow IEnumerable parameters for testing. If this is identified 
+        // as a perf issue, an extra call can be made, or tests can create ImmutableArrays.
+        // (If the signature matched exactly, method groups can be used instead of lambdas)
+
         var cliInfos = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: builder.InitialEntryPointFilter,
@@ -20,9 +24,23 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
             .Collect()
             .WithTrackingName(TrackingNames.Extract);
 
+        var cliInfosGroups = cliInfos
+            .Select((infos, ctx) => CommandBuilder.GetCliInfoGroups(infos, ctx))
+            .WithTrackingName(TrackingNames.BuildCliInfoGroups);
+
+        var spreadCliInfoGroups = cliInfosGroups
+            .SelectMany((x, ctx) => x);
+
+        context.RegisterSourceOutput(spreadCliInfoGroups,
+                static (spc, groupedCli) =>
+                {
+                    builder.OutputCliSource(spc, groupedCli);
+                });
+
+
         var commandInfos = context.SyntaxProvider
             .ForAttributeWithMetadataName(
-                fullyQualifiedMetadataName: "DragonFruit2.CommandClass",
+                fullyQualifiedMetadataName: "DragonFruit2.CommandClassAttribute",
                 predicate: static (node, _) => true,
                 transform: static (ctx, _) => builder.TransformCommandClasses(ctx))
             .WithTrackingName("ParseArgsInvocations")
@@ -31,29 +49,14 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
             .Collect()
             .WithTrackingName(TrackingNames.Extract);
 
-        // Lambda's are used to allow IEnumerable parameters for testing. If this is identified 
-        // as a perf issue, an extra call can be made, or tests can create ImmutableArrays.
         var commandRootsWithTrees = commandInfos
             .Select((infos, ctx) => CommandBuilder.BuildCommandTree(infos, ctx))
             .WithTrackingName(TrackingNames.BuildTrees);
-
-        var cliInfosGroups = cliInfos
-            .Select((infos, ctx) => CommandBuilder.GetCliInfoGroups(infos, ctx))
-            .WithTrackingName(TrackingNames.BuildCliInfoGroups);
-
-        var spreadCliInfoGroups = cliInfosGroups
-            .SelectMany((x, ctx) => x);
 
         // This allows generating a file per command 
         var individualCommands = commandRootsWithTrees
             .SelectMany((commandNodes, ctx) => CommandBuilder.FlattenHierarchy(commandNodes, ctx))
             .WithTrackingName(TrackingNames.FlattenHierarchy);
-
-        context.RegisterSourceOutput(spreadCliInfoGroups,
-                static (spc, groupedCli) =>
-                {
-                    builder.OutputCliSource(spc, groupedCli);
-                });
 
         context.RegisterSourceOutput(individualCommands,
             static (spc, commandClass) =>

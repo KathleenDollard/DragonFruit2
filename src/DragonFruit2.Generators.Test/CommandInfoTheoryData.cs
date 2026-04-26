@@ -11,7 +11,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string>
 
     public CommandInfoTheoryData()
     {
-        AddTheoryData("MultipleCallsOneNamespace",
+        AddTheoryData("DeepSubCommands",
                 argsSource:
                     """
                     using DragonFruit2;

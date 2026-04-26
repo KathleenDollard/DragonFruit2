@@ -48,7 +48,7 @@ public class CommandBuilder
     /// </remarks>
     /// <param name="commandInfos"></param>
     /// <returns>A collection of CommandNode objects that correspond to all of the command roots in the compilation</returns>
-    internal static IEnumerable<CommandNode> BuildCommandTree(IEnumerable<CommandInfo> commandInfos, CancellationToken ctx)
+    internal static IEnumerable<CommandNode> BuildCommandNodes(IEnumerable<CommandInfo> commandInfos, CancellationToken ctx)
     {
         var commandNodes = commandInfos
                 .Select(info => new CommandNode { CommandInfo = info }).ToList();
@@ -63,11 +63,16 @@ public class CommandBuilder
             node.SubCommands.AddRange(subCommands);
             foreach (var subCommand in subCommands)
             {
-                subCommand.ParentCommand = node;
+                subCommand.ParentCommandNode = node;
             }
         }
 
-        return commandNodes.Where(node => node.ParentCommand is null);
+        foreach (var commandNode in commandNodes)
+        {
+            commandNode.SetRootCommandNode();
+        }
+
+        return commandNodes;
     }
 
     internal static IEnumerable<CliInfoGroup> GetCliInfoGroups(IEnumerable<CliInfo> cliInfos, CancellationToken token)

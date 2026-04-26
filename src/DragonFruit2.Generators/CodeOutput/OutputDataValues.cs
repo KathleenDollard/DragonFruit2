@@ -21,7 +21,7 @@ internal class OutputDataValues
     private static void OpenClass( CommandNode  commandNode, StringBuilderWrapper sb)
     {
         sb.AppendLine();
-        sb.OpenClass($"public class { commandNode.CommandInfo.Name}DataValues : DataValues<{ commandNode.RootCommandFullName}>");
+        sb.OpenClass($"public class { commandNode.CommandInfo.Name}DataValues : DataValues<{ commandNode.RootCommandNode?.FullName}>");
     }
 
     private static void Constructor(StringBuilderWrapper sb,  CommandNode  commandNode)
@@ -38,7 +38,7 @@ internal class OutputDataValues
 
     private static void Operate(StringBuilderWrapper sb,  CommandNode  commandNode)
     {
-        sb.OpenMethod($" public override bool Operate<TReturn>(IOperateOnDataValue<{ commandNode.RootCommandNode}, TReturn> operationContainer)");
+        sb.OpenMethod($" public override bool Operate<TReturn>(IOperateOnDataValue<{ commandNode.RootCommandNode?.FullName}, TReturn> operationContainer)");
         sb.OpenTry();
         foreach (var propInfo in  commandNode.GetSelfAndAncestorPropInfos())
         {

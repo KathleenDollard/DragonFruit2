@@ -16,53 +16,40 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
 
         var cliInfos = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: builder.InitialEntryPointFilter,
-                transform: static (context, cancelToken) => builder.TransformEntryPoint(context, cancelToken))
+                predicate: DragonFruit2Builder.InitialEntryPointFilter,
+                transform: DragonFruit2Builder.TransformEntryPoint)
             .WithTrackingName("ParseArgsInvocations")
             .Where(static s => s is not null)
             .Select(static (s, _) => s!) // Quiet nullability warning
-            .Collect()
-            .WithTrackingName(TrackingNames.Extract);
+            .WithTrackingName(TrackingNames.ExtractEntryPoint);
 
-        var cliInfosGroups = cliInfos
+        var cliInfosByNamespace = cliInfos
+            .Collect()
             .Select((infos, ctx) => CommandBuilder.GetCliInfoGroups(infos, ctx))
+            .SelectMany((x, ctx) => x)
             .WithTrackingName(TrackingNames.BuildCliInfoGroups);
 
-        var spreadCliInfoGroups = cliInfosGroups
-            .SelectMany((x, ctx) => x);
-
-        context.RegisterSourceOutput(spreadCliInfoGroups,
-                static (spc, groupedCli) =>
-                {
-                    builder.OutputCliSource(spc, groupedCli);
-                });
-
+        context.RegisterSourceOutput(cliInfosByNamespace,
+                                     DragonFruit2Builder.OutputCliSource);
 
         var commandInfos = context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 fullyQualifiedMetadataName: "DragonFruit2.CommandClassAttribute",
-                predicate: static (node, _) => true,
-                transform: static (ctx, _) => builder.TransformCommandClasses(ctx))
+                predicate: DragonFruit2Builder.FilterForClassDeclarations,
+                transform: DragonFruit2Builder.TransformCommandClasses)
             .WithTrackingName("ParseArgsInvocations")
             .Where(static s => s is not null)
             .Select(static (s, _) => s!) // Quiet nullability warning
+            .WithTrackingName(TrackingNames.ExtractCommandClasses);
+
+        var commandNodes = commandInfos
             .Collect()
-            .WithTrackingName(TrackingNames.Extract);
+            .Select((infos, ctx) => CommandBuilder.BuildCommandNodes(infos, ctx))
+            .SelectMany((x, ctx) => x)
+            .WithTrackingName(TrackingNames.BuildCommandNodes);
 
-        var commandRootsWithTrees = commandInfos
-            .Select((infos, ctx) => CommandBuilder.BuildCommandTree(infos, ctx))
-            .WithTrackingName(TrackingNames.BuildTrees);
-
-        // This allows generating a file per command 
-        var individualCommands = commandRootsWithTrees
-            .SelectMany((commandNodes, ctx) => CommandBuilder.FlattenHierarchy(commandNodes, ctx))
-            .WithTrackingName(TrackingNames.FlattenHierarchy);
-
-        context.RegisterSourceOutput(individualCommands,
-            static (spc, commandClass) =>
-        {
-            builder.OutputCommandPartialSource(spc, commandClass);
-        });
+        context.RegisterSourceOutput(commandNodes,
+            DragonFruit2Builder.OutputCommandPartialSource);
     }
 
 }

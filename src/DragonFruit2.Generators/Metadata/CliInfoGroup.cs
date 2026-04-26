@@ -12,7 +12,7 @@ namespace DragonFruit2.Generators.Metadata;
 public record class CliInfoGroup
 {
     [SetsRequiredMembers]
-    internal CliInfoGroup(System.Linq.IGrouping<string, CliInfo> group)
+    internal CliInfoGroup(System.Linq.IGrouping<string?, CliInfo> group)
     {
         CliInfos = group.ToList();
         EntryPointNamespace = group.Key;

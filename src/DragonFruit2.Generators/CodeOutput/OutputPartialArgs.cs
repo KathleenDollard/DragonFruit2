@@ -149,7 +149,7 @@ internal class OutputPartialArgs
     {
 
         sb.AppendLine();
-        sb.Append($"static partial void RegisterCustomDefaults(Builder<{commandNode.RootCommandFullName}> builder, DefaultDataProvider<{commandNode.RootCommandFullName}> defaultDataProvider);");
+        sb.Append($"static partial void RegisterCustomDefaults(Builder<{commandNode.RootCommandNode?.FullName}> builder, DefaultDataProvider<{commandNode.RootCommandNode?.FullName}> defaultDataProvider);");
         sb.AppendLine();
     }
 

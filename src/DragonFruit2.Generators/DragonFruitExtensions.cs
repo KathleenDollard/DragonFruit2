@@ -11,6 +11,13 @@ public static class DragonFruitExtensions
         public string? FullName
             => (commandInfo.NamespaceName, commandInfo.Name).FullName;
     }
+    extension(CommandNode commandNode)
+    {
+        [NotNullIfNotNull("Name")]
+        public string? FullName
+            => commandNode.CommandInfo.FullName;
+    }
+
     extension((string? NamespaceName, string? Name) tuple)
     {
         [NotNullIfNotNull("Name")]

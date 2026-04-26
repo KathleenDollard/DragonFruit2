@@ -1,18 +1,20 @@
-﻿using DragonFruit2.Generators.Metadata;
+﻿using Argon;
+using DragonFruit2.Generators.Metadata;
 
 namespace DragonFruit2.Generators.Test;
 #pragma warning disable xUnit1026 // Theory is reused in several tests that use different properties/parameters
 
 public class VerifyTests
 {
-    private VerifySettings VerifySettings(string directory) 
-        {
-            var verifySettings = new VerifySettings();
-            verifySettings.UseDirectory($"Snapshots/{directory}");
-            verifySettings.DontIgnoreEmptyCollections();
-            verifySettings.AddExtraSettings(s => s.Converters.Add(new VerifyCommandNodeEnumerableSerializer()));
-            return verifySettings;
-        } 
+    private VerifySettings VerifySettings(string directory)
+    {
+        var verifySettings = new VerifySettings();
+        verifySettings.UseDirectory($"Snapshots/{directory}");
+        verifySettings.DontIgnoreEmptyCollections();
+        verifySettings.AddExtraSettings(s => s.Converters.Add(new VerifyCommandNodeEnumerableSerializer()));
+        verifySettings.AddExtraSettings(s => s.NullValueHandling = NullValueHandling.Include);
+        return verifySettings;
+    }
 
     [Fact]
     public Task VerifyCheck() =>
@@ -24,7 +26,6 @@ public class VerifyTests
     {
         var commandInfos = TestHelpers.GetCommandInfos(argsSource, consoleSource);
 
-        var verifySettings = new VerifySettings();
         return Verify(commandInfos, VerifySettings("CommandInfo")).UseParameters(desc);
     }
 

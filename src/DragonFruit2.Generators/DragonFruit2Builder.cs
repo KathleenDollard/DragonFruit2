@@ -20,7 +20,7 @@ public class DragonFruit2Builder
     /// </summary>
     /// <param name="node">The syntax node to evaluate.</param>
     /// <returns>true if the node is an invocation of 'ParseArgs' with a single type argument; otherwise, false.</returns>
-    public bool InitialEntryPointFilter(SyntaxNode node, CancellationToken _)
+    public static bool InitialEntryPointFilter(SyntaxNode node, CancellationToken _)
     {
         if (node is null) return false;
 
@@ -47,7 +47,7 @@ public class DragonFruit2Builder
         }
     }
 
-    public CliInfo? TransformEntryPoint(GeneratorSyntaxContext context, CancellationToken _)
+    public static CliInfo? TransformEntryPoint(GeneratorSyntaxContext context, CancellationToken _)
     {
         try
         {
@@ -65,7 +65,10 @@ public class DragonFruit2Builder
         }
     }
 
-    public CommandInfo? TransformCommandClasses(GeneratorAttributeSyntaxContext context)
+    internal static bool FilterForClassDeclarations(SyntaxNode node, CancellationToken _)
+        => node is ClassDeclarationSyntax;
+
+    public static CommandInfo? TransformCommandClasses(GeneratorAttributeSyntaxContext context, CancellationToken _)
     {
         try
         {
@@ -83,19 +86,19 @@ public class DragonFruit2Builder
         }
     }
 
-    public void OutputCommandPartialSource(SourceProductionContext context, CommandNode commandNode)
+    public static  void OutputCommandPartialSource(SourceProductionContext context, CommandNode commandNode)
     {
         try
         {
             context.AddSource(commandNode.CommandInfo.Name, OutputPartialArgs.GetSourcePartialArgs(commandNode));
         }
-        catch
+        catch 
         {
             throw;
         }
     }
 
-    public void OutputCliSource(SourceProductionContext context, CliInfoGroup cliInfoGroup)
+    public static void OutputCliSource(SourceProductionContext context, CliInfoGroup cliInfoGroup)
     {
         try
         {
@@ -107,4 +110,5 @@ public class DragonFruit2Builder
             throw;
         }
     }
+
 }

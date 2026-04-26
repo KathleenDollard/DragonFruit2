@@ -2,38 +2,42 @@
 
 public record class CommandNode
 {
+    private CommandNode? _rootCommandNode = null;
+
     public string Name => CommandInfo.Name;
-    public string? ParentCommandFullName => ParentCommand?.CommandInfo.FullName;
-    public string RootCommandFullName
-    {
-        get
-        {
-            var rootCommandNode = RootCommandNode switch
-            {
-                null => this,
-                _ => RootCommandNode
-            };
-            return rootCommandNode.CommandInfo.FullName;
-        }
-    }
 
     public List<CommandNode> SubCommands => field ??= [];
 
+    // This is not required because it is set after the tree is built
+    public CommandNode? RootCommandNode => _rootCommandNode;
 
-    public CommandNode? RootCommandNode { get; init; }
     public required CommandInfo CommandInfo { get; init; }
-    public CommandNode? ParentCommand { get; internal set; }
+    public CommandNode? ParentCommandNode { get; internal set; }
     public IEnumerable<PropInfo> GetSelfAndAncestorPropInfos()
         => CommandInfo.GetOptionsAndArguments().Concat(GetAncestorPropInfos());
 
     public IEnumerable<PropInfo> GetAncestorPropInfos()
     {
-        if (ParentCommand is not null)
+        if (ParentCommandNode is not null)
         {
-            foreach (var parentProp in ParentCommand.GetSelfAndAncestorPropInfos())
+            foreach (var parentProp in ParentCommandNode.GetSelfAndAncestorPropInfos())
             {
                 yield return parentProp;
             }
+        }
+    }
+
+    internal void SetRootCommandNode()
+        => _rootCommandNode = GetAncestorsAndSelf().Last();
+
+    public IEnumerable<CommandNode> GetAncestorsAndSelf()
+    { 
+        yield return this;
+        var current = ParentCommandNode;
+        while (current != null)
+        {
+            yield return current;
+            current = current.ParentCommandNode;
         }
     }
 }

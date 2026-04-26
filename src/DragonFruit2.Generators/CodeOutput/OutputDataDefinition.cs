@@ -21,7 +21,7 @@ public class OutputDataDefinition
     {
         sb.AppendLine();
         sb.XmlSummary(" The data definition is available to data providers and are used for initialization.");
-        sb.OpenClass($"public partial class {commandNode .CommandInfo.Name}DataDefinition : CommandDataDefinition<{commandNode.RootCommandFullName}>");
+        sb.OpenClass($"public partial class {commandNode .CommandInfo.Name}DataDefinition : CommandDataDefinition<{commandNode.RootCommandNode?.FullName}>");
     }
 
     private static void Constructor(StringBuilderWrapper sb, CommandNode commandNode)

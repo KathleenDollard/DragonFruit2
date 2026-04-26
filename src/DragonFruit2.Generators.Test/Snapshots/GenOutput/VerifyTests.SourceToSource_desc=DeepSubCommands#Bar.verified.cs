@@ -21,12 +21,12 @@ namespace MyNamespace
         {
         }
 
-        static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
+        static partial void RegisterCustomDefaults(Builder<MyNamespace.MyArgs> builder, DefaultDataProvider<MyNamespace.MyArgs> defaultDataProvider);
 
         /// <summary>
         ///  The data definition is available to data providers and are used for initialization.
         /// </summary>
-        public partial class BarDataDefinition : CommandDataDefinition<MyArgs>
+        public partial class BarDataDefinition : CommandDataDefinition<MyNamespace.MyArgs>
         {
 
             public BarDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
@@ -51,7 +51,7 @@ namespace MyNamespace
 
         }
 
-        public class BarDataValues : DataValues<MyArgs>
+        public class BarDataValues : DataValues<MyNamespace.MyArgs>
         {
 
             public BarDataValues(BarDataDefinition commandDefinition)
@@ -59,7 +59,7 @@ namespace MyNamespace
             {
             }
 
-             public override bool Operate<TReturn>(IOperateOnDataValue<MyArgs, TReturn> operationContainer)
+             public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyArgs, TReturn> operationContainer)
             {
                 try
                 {

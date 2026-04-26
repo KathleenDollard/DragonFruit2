@@ -12,19 +12,21 @@ using MyNamespace;
 public class Cli
 {
     /// <summary>
-    /// Advanced: Creates a Builder, which can be configured, the System.CommandLine API can be accessed, and which can be reused (especially helpful in testing). 
+    /// Creates a Builder, which can be configured, the System.CommandLine API can be accessed, and which can be reused (especially helpful in testing). 
     /// </summary>
     /// <remarks>
     /// The args class specified as the type argument must be public.
     /// </remarks>
-    /// <br/>
     /// <remarks>
     /// You may need to build after editing this line.
+    /// </remarks>
+    /// <remarks>
+    /// It is not currently clear how builders and configuration are the same and different and thus expected changes in this space. Accessing it is currently difficult to avoid confusion.
     /// </remarks>
     /// <typeparam name="TRootArgs">The type containing the CLI definition, the root command if there are subcommands.</typeparam>
 
     public static Builder<TRootArgs>? CreateBuilder<TRootArgs>()
-          where TRootArgs : ArgsRootBase<TRootArgs>
+          where TRootArgs : CommandRootBase<TRootArgs>
     {
         if (typeof(TRootArgs) == typeof(MyArgs))
         {
@@ -46,7 +48,7 @@ public class Cli
     /// <param name="args">Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.</param>
 
     public static Result<TRootArgs> ParseArgs<TRootArgs>(string[]? args = null)
-          where TRootArgs : ArgsRootBase<TRootArgs>
+          where TRootArgs : CommandRootBase<TRootArgs>
     {
         var builder = CreateBuilder<TRootArgs>();
         if (builder is null)
@@ -70,7 +72,7 @@ public class Cli
     /// <exception cref="InvalidOperationException">To be implemented soon.</param>
 
     public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)
-          where TRootArgs : ArgsRootBase<TRootArgs>
+          where TRootArgs : CommandRootBase<TRootArgs>
     {
         result = ParseArgs<TRootArgs>(args);
         return result.IsValid;

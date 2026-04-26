@@ -12,6 +12,7 @@ public static class Extensions
         {
             var attr = symbol.GetAttributes().FirstOrDefault(a =>
                     a.AttributeClass?.Name == attributeName ||
+                    // TODO: Review right side of next line
                     a.AttributeClass?.ToDisplayString() == $"{namespaceName}.{parameterName}");
 
             if (attr == null)
@@ -40,16 +41,40 @@ public static class Extensions
             }
         }
 
-    extension(SyntaxNode syntax)
+    extension(SyntaxNode syntaxNode)
     {
         public string? GetNamespace()
         {
-            var namespaceNames = syntax.Ancestors()
+            var namespaceNames = syntaxNode.Ancestors()
                     .OfType<BaseNamespaceDeclarationSyntax>()
                     .Select(s => s.Name.ToString());
             return namespaceNames.Any()
                 ? string.Join(".", namespaceNames)
                 : null;
+        }
+    }
+
+    extension(InvocationExpressionSyntax syntaxNode)
+    {
+        public GenericNameSyntax? GetGenericNameSyntax()
+        {
+            return syntaxNode.Expression switch
+            {
+                MemberAccessExpressionSyntax ma when ma.Name is GenericNameSyntax gns
+                    => gns,
+                GenericNameSyntax gns
+                    => gns,
+                _ => null,
+            };
+        }
+    }
+
+    extension(SemanticModel semanticModel)
+    {
+        public INamedTypeSymbol? GetTypeArgumentSymbol(GenericNameSyntax genericName)
+        {
+            var typeArgSyntax = genericName.TypeArgumentList.Arguments[0];
+            return semanticModel.GetSymbolInfo(typeArgSyntax).Symbol as INamedTypeSymbol;
         }
     }
 }

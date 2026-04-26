@@ -1,0 +1,29 @@
+﻿[
+  {
+    CliInfos: [
+      {
+        RootTypeNamespace: ,
+        RootCommandName: MyArgs
+      },
+      {
+        RootTypeNamespace: ,
+        RootCommandName: MyArgs2
+      }
+    ]
+  },
+  {
+    EntryPointNamespace: MyNamespace,
+    CliInfos: [
+      {
+        RootTypeNamespace: MyArgsNamespace,
+        RootCommandName: MyArgs3,
+        EntryPointNamespace: MyNamespace
+      },
+      {
+        RootTypeNamespace: MyArgsNamespace2,
+        RootCommandName: MyArgs4,
+        EntryPointNamespace: MyNamespace
+      }
+    ]
+  }
+]

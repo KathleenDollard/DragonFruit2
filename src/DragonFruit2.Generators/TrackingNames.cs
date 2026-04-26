@@ -2,9 +2,8 @@
 
 public class TrackingNames
 {
-    public const string Extract = "DagonFruit2.Extract";
-    public const string BindParentsAndRemoveDuplicates = "DragonFruit2.BindParentsAndRemoveDuplicates";
-    public const string FlattenHierarchy = "DragonFruit2.FlattenHierarchy";
-    public const string OutputCiSource = "DragonFruit2.OutputCiSource";
-    public const string OutputArgsSources = "DragonFruit2.OutputArgsSources";
+    public const string ExtractEntryPoint = "DagonFruit2.ExtractEntryPoint";
+    public const string ExtractCommandClasses = "DragonFruit2.ExtractCommandClasses";
+    public const string BuildCommandNodes = "DragonFruit2.BuildCommandNodes";
+    public const string BuildCliInfoGroups = "DragonFruit2.CliInfoGroups";
 }

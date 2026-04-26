@@ -12,7 +12,7 @@ namespace MyNamespace
     /// <summary>
     /// Auto-generated partial class for building CLI commands for <see cref="MyArgs"/>" and creating a new MyArgs instance from a <see cref="System.CommandLine.ParseResult" />.
     /// </summary>
-    partial class MyArgs : ArgsRootBase<MyArgs>
+    partial class MyArgs : CommandRootBase
     {
 
         public MyArgs()
@@ -37,12 +37,12 @@ namespace MyNamespace
             }
         }
 
-        static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
+        static partial void RegisterCustomDefaults(Builder<MyNamespace.MyArgs> builder, DefaultDataProvider<MyNamespace.MyArgs> defaultDataProvider);
 
         /// <summary>
         ///  The data definition is available to data providers and are used for initialization.
         /// </summary>
-        public partial class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
+        public partial class MyArgsDataDefinition : CommandDataDefinition<MyNamespace.MyArgs>
         {
 
             public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
@@ -84,7 +84,7 @@ namespace MyNamespace
 
         }
 
-        public class MyArgsDataValues : DataValues<MyArgs>
+        public class MyArgsDataValues : DataValues<MyNamespace.MyArgs>
         {
 
             public MyArgsDataValues(MyArgsDataDefinition commandDefinition)
@@ -94,7 +94,7 @@ namespace MyNamespace
                 Add(Name);
             }
 
-             public override bool Operate<TReturn>(IOperateOnDataValue<MyArgs, TReturn> operationContainer)
+             public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyArgs, TReturn> operationContainer)
             {
                 try
                 {

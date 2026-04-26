@@ -6,7 +6,7 @@ public abstract record class DataValue
 {
     public abstract bool Validate();
     //protected internal abstract bool TrySetDefaultValue<TRootArgs>(DefaultDefinition defaultDefinition)
-    //    where TRootArgs : ArgsRootBase<TRootArgs>;
+    //    where TRootArgs : CommandRootBase<TRootArgs>;
     private protected abstract IEnumerable<Diagnostic>? UntypedDiagnostics { get; }
     public IEnumerable<Diagnostic>? Diagnostics => UntypedDiagnostics;
 

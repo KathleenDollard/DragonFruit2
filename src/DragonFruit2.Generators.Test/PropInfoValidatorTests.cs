@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using DragonFruit2.Generators.Metadata;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace DragonFruit2.Generators.Test;

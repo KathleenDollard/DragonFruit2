@@ -3,9 +3,9 @@
     Name: MyArgs,
     NamespaceName: MyNamespace,
     Accessibility: public,
-    BaseTypeName: CommandRootBase,
-    BaseTypeNamespace: DragonFruit2,
-    BaseTypeFullName: DragonFruit2.CommandRootBase,
+    BaseTypeName: Object,
+    BaseTypeNamespace: System,
+    BaseTypeFullName: System.Object,
     SimpleName: my,
     Arguments: [],
     Options: [

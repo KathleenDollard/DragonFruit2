@@ -1,16 +1,21 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+# Packaging
+
+Your generator will be part of your library package, or a package on it's own. DragonFruit2 project file, with some parts omitted for brevity is:
+
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+        <!-- I want the underlying library to reach the broadest audience -->
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<!--<TargetFramework>net10</TargetFramework>-->
 		<LangVersion>14.0</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+
 		<IsPackable>true</IsPackable>
-
-		<!--<IncludeBuildOutput>false</IncludeBuildOutput>-->
-
 		<PackageId>DragonFruit2</PackageId>
+		<Version>0.1.0-beta-0012</Version>
 		<Authors>Kathleen Dollard</Authors>
 		<Description>Source generator and analyzers for DragonFruit2 including required runtime dependencies.</Description>
 		<RepositoryUrl>https://github.com/your/repo</RepositoryUrl>
@@ -36,3 +41,4 @@
 		<None Include="$(OutputPath)\DragonFruit2.Generators.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 </Project>
+```

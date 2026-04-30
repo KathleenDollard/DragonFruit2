@@ -88,6 +88,14 @@ public static class TestHelpers
             syntaxTrees: syntaxTrees,
             references: references);
 
+        var errors = compilation.GetDiagnostics()
+                                .Where(d => d.Severity == DiagnosticSeverity.Error || d.Severity == DiagnosticSeverity.Warning)
+                                .Select(d => d.ToString());
+        //if (errors.Any())
+        //{
+        //    throw new InvalidOperationException($"Compilation failed with errors: {string.Join(Environment.NewLine, errors)}");
+        //}
+
         return compilation;
     }
 
@@ -113,22 +121,6 @@ public static class TestHelpers
             _ => throw new InvalidOperationException("Multiple CommandInfos retrieved")
         };
     }
-
-
-
-    //public static IEnumerable<InvocationExpressionSyntax> GetParseArgsInvocations(SyntaxTree syntaxTree)
-    //    => [.. syntaxTree.GetRoot()
-    //        .DescendantNodes()
-    //        .OfType<InvocationExpressionSyntax>()
-    //        .Where(invocation =>
-    //            invocation.Expression switch
-    //            {
-    //                MemberAccessExpressionSyntax ma when ma.Name is GenericNameSyntax gns
-    //                    => DragonFruit2Builder.IsMethodNameOfInterest(gns.Identifier.ValueText) && gns.TypeArgumentList.Arguments.Count == 1,
-    //                GenericNameSyntax gns2
-    //                    => DragonFruit2Builder.IsMethodNameOfInterest(gns2.Identifier.ValueText) && gns2.TypeArgumentList.Arguments.Count == 1,
-    //                _ => false,
-    //            })];
 
     public static IEnumerable<ClassDeclarationSyntax> GetCommandClasses(SyntaxTree syntaxTree, SemanticModel semanticModel)
     {
@@ -165,7 +157,7 @@ public static class TestHelpers
         {
             SemanticModel semanticModel = compilation.GetSemanticModel(syntaxTree);
             var invocations = GetCliInvocations(syntaxTree, semanticModel);
-            var cliInfos =invocations
+            var cliInfos = invocations
                 .Select(i => CliBuilder.GetCliInfo(i, semanticModel))
                 .ToList();
             return cliInfos

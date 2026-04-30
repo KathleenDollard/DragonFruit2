@@ -66,7 +66,7 @@ public class OutputCli
         sb.XmlRemarks("It is not currently clear how builders and configuration are the same and different and thus expected changes in this space. Accessing it is currently difficult to avoid confusion.");
         sb.XmlTypeParam("TRootArgs", "The type containing the CLI definition, the root command if there are subcommands.");
 
-        sb.OpenMethod($"public static Builder<TRootArgs>? CreateBuilder<TRootArgs>()", "TRootArgs : CommandRootBase<TRootArgs>");
+        sb.OpenMethod($"public static Builder<TRootArgs>? CreateBuilder<TRootArgs>()");
 
         foreach (var cliInfo in cliInfos)
         {
@@ -92,8 +92,7 @@ public class OutputCli
         sb.XmlTypeParam("TRootArgs", "The type containing the CLI definition.");
         sb.XmlParam("args", "Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.");
 
-        sb.OpenMethod($"public static Result<TRootArgs> ParseArgs<TRootArgs>(string[]? args = null)",
-            constraints: $"TRootArgs : CommandRootBase<TRootArgs>");
+        sb.OpenMethod($"public static Result<TRootArgs> ParseArgs<TRootArgs>(string[]? args = null)");
 
         sb.AppendLine("var builder = CreateBuilder<TRootArgs>();");
         sb.OpenIf("builder is null");
@@ -117,8 +116,7 @@ public class OutputCli
         sb.XmlParam("args", "Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.");
         sb.XmlException("InvalidOperationException", "To be implemented soon.");
 
-        sb.OpenMethod($"public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)",
-            constraints: $"TRootArgs : CommandRootBase<TRootArgs>");
+        sb.OpenMethod($"public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)");
 
         sb.AppendLine($"result = ParseArgs<TRootArgs>(args);");
         sb.Return("result.IsValid");

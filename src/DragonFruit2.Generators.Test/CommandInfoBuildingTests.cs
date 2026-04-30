@@ -12,7 +12,7 @@ public class CommandInfoTests
             using DragonFruit2;
 
             [CommandClass] 
-            public partial class MyArgs: CommandRootBase<MyArgs>
+            public partial class MyArgs
             { }
             """;
 
@@ -30,7 +30,7 @@ public class CommandInfoTests
             namespace MyNamespace
             {
                 [CommandClass] 
-                public partial class MyArgs: CommandRootBase<MyArgs>
+                public partial class MyArgs
                 { }
             }
             """;
@@ -49,7 +49,7 @@ public class CommandInfoTests
             
             namespace MyNamespace;
             [CommandClass] 
-            public partial class MyArgs: CommandRootBase<MyArgs>
+            public partial class MyArgs
             { }
             """;
 
@@ -66,7 +66,7 @@ public class CommandInfoTests
             using DragonFruit2;
             
             [CommandClass] 
-            public partial class MyArgs: CommandRootBase<MyArgs>
+            public partial class MyArgs
             { }
             """;
 
@@ -84,7 +84,7 @@ public class CommandInfoTests
             using DragonFruit2;
             
             [CommandClass] 
-            protected internal partial class MyArgs: CommandRootBase<MyArgs>
+            protected internal partial class MyArgs
             { }
             """;
 
@@ -107,7 +107,7 @@ public class CommandInfoTests
             
             namespace TestNamespace; 
             [CommandClass] 
-            {{accessibility}} class MyArgs  : CommandRootBase<MyArgs>
+            {{accessibility}} class MyArgs  
             { }
             """;
 
@@ -125,7 +125,7 @@ public class CommandInfoTests
             using DragonFruit2; 
 
             [CommandClass] 
-            public class MyArgs  : CommandRootBase<MyArgs>
+            public class MyArgs  
             { }
             """;
 

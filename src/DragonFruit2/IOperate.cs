@@ -6,7 +6,6 @@ public interface IOperationOnMemberDefinition<TReturn>
 }
 
 public interface IOperateOnDataValue<TRootArgs, TReturn>
-    where TRootArgs : CommandRootBase<TRootArgs>
 {
     bool TryOperate<TValue>(DataValue<TValue> dataValue,IOperateOnDataValue<TRootArgs, TReturn> operation, out TReturn returnValue);
     Result<TRootArgs> Result { get; }

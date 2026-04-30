@@ -20,7 +20,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string>
                     namespace MyNamespace
                     {
                         [CommandClass]
-                        public partial class MyArgs : CommandRootBase<MyArgs>
+                        public partial class MyArgs 
                         {
                             public required string Name { get; set; }
                         }

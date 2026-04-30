@@ -5,7 +5,6 @@ public abstract class DataProvider
 }
 
 public abstract class DataProvider<TRootArgs> : DataProvider
-    where TRootArgs : CommandRootBase<TRootArgs>
 {
     protected DataProvider(Builder<TRootArgs> builder)
     {

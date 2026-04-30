@@ -14,7 +14,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
         
         [CommandClass] 
-        public partial class MyArgs : CommandRootBase<MyArgs>
+        public partial class MyArgs 
         { 
             public required string Name { get; set; }
         }

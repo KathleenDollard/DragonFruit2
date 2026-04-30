@@ -41,6 +41,55 @@ public record class PropInfo
 
     public List<ValidatorInfo> Validators { get; init; } = [];
     public List<DefaultInfo> Defaults { get; init; } = [];
+
+    public virtual bool Equals(PropInfo? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        // Compare the properties of PropInfo
+        return Name == other.Name
+            && CliName == other.CliName
+            && TypeName == other.TypeName
+            && ContainingTypeName == other.ContainingTypeName
+            && IsValueType == other.IsValueType
+            && NullableAnnotation == other.NullableAnnotation
+            && HasRequiredModifier == other.HasRequiredModifier
+            && Description == other.Description
+            && HasArgumentAttribute == other.HasArgumentAttribute
+            && IsArgument == other.IsArgument
+            && Position == other.Position
+            && HasInitializer == other.HasInitializer
+            && InitializerText == other.InitializerText
+            && Validators.SequenceEqual(other.Validators)
+            && Defaults.SequenceEqual(other.Defaults);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = new System.HashCode();
+        hashCode.Add(Name);
+        hashCode.Add(CliName);
+        hashCode.Add(TypeName);
+        hashCode.Add(ContainingTypeName);
+        hashCode.Add(IsValueType);
+        hashCode.Add(NullableAnnotation);
+        hashCode.Add(HasRequiredModifier);
+        hashCode.Add(Description);
+        hashCode.Add(HasArgumentAttribute);
+        hashCode.Add(IsArgument);
+        hashCode.Add(Position);
+        hashCode.Add(HasInitializer);
+        hashCode.Add(InitializerText);
+        foreach (var validator in Validators)
+        {
+            hashCode.Add(validator);
+        }
+        foreach (var defaultInfo in Defaults)
+        {
+            hashCode.Add(defaultInfo);
+        }
+        return hashCode.ToHashCode();
+    }
 }
 
 

@@ -2,18 +2,19 @@
 
 namespace DragonFruit2.Generators.Test;
 
+[Serializable]
 public class CliInfoTheoryData
     : TheoryData<string, IEnumerable<string>>
 {
-    private void AddTheoryData(string name,  string[] consoleSources)
+    private void AddTheoryData(string name,  string[] sources)
     {
-        Add(name, consoleSources);
+        Add(name, sources);
     }
 
     public CliInfoTheoryData()
     {
         AddTheoryData("MultipleNamespacesAndInvocationsSource",
-                consoleSources:
+                sources:
                    [ """
                     using DragonFruit2;
 

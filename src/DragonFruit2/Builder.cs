@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 namespace DragonFruit2;
 
 public class Builder<TRootArgs>
-    where TRootArgs : CommandRootBase<TRootArgs>
 {
 
     public Builder(CommandDataDefinition<TRootArgs> rootCommandDefinition, DragonFruit2Configuration? configuration = null)

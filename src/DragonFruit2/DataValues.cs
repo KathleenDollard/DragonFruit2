@@ -42,7 +42,6 @@ public abstract class DataValues : IEnumerable<DataValue>
 }
 
 public abstract class DataValues<TRootArgs> : DataValues
-    where TRootArgs : CommandRootBase<TRootArgs>
 {
     protected DataValues(CommandDataDefinition commandDefinition)
         : base(commandDefinition)

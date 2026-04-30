@@ -21,7 +21,6 @@ public class Cli
     /// <typeparam name="TRootArgs">The type containing the CLI definition</typeparam>
     /// <returns>A Result instance containing the hydrated args or error messages.</returns>
     public static Builder<TRootArgs>? CreateBuilder<TRootArgs>()
-        where TRootArgs : CommandRootBase<TRootArgs>
     {
         if (typeof(TRootArgs) == typeof(MyArgs))
         {
@@ -46,7 +45,6 @@ public class Cli
     /// <param name="args">Optionaly pass the commandline args, if it is not passed, it will be retrieved from System.Environment.</param>
     /// <returns>A Result instance containing the hydrated args or error messages.</returns>
     public static Result<TRootArgs> ParseArgs<TRootArgs>(string[]? args = null)
-        where TRootArgs : CommandRootBase<TRootArgs>
     {
         var builder = CreateBuilder<TRootArgs>();
         if (builder is null)
@@ -72,7 +70,6 @@ public class Cli
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
     public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)
-            where TRootArgs : CommandRootBase<TRootArgs>
     {
         result = ParseArgs<TRootArgs>(args);
         return result.IsValid;

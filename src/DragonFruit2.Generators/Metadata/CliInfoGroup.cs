@@ -14,12 +14,35 @@ public record class CliInfoGroup
     [SetsRequiredMembers]
     internal CliInfoGroup(System.Linq.IGrouping<string?, CliInfo> group)
     {
-        CliInfos = group.ToList();
-        EntryPointNamespace = group.Key;
+        if (group is not null) // a test passes null
+        {
+            CliInfos = group.ToList();
+            EntryPointNamespace = group.Key;
+        }
     }
 
     public required string? EntryPointNamespace { get; init; }
 
-    public IEnumerable<CliInfo> CliInfos { get; } = [];
+    public List<CliInfo> CliInfos { get; } = [];
+
+    public virtual bool Equals(CliInfoGroup? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        // Compare the properties of CliInfoGroup
+        return EntryPointNamespace == other.EntryPointNamespace
+            && CliInfos.SequenceEqual(other.CliInfos);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = new System.HashCode();
+        hashCode.Add(EntryPointNamespace);
+        foreach (var cliInfo in CliInfos)
+        {
+            hashCode.Add(cliInfo);
+        }
+        return hashCode.ToHashCode();
+    }
 
 }

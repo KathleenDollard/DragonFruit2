@@ -6,6 +6,13 @@ namespace DragonFruit2.Generators.Test;
 
 public class VerifyTests
 {
+    private static readonly string[] _expectedDragonFruit2TrackingNames = [
+                        "DragonFruit2.ExtractEntryPoint",
+                        "DragonFruit2.ExtractCommandClasses",
+                        "DragonFruit2.BuildCommandNodes",
+                        "DragonFruit2.CliInfoGroups",
+                        ];
+
     private VerifySettings VerifySettings(string directory)
     {
         var verifySettings = new VerifySettings();
@@ -56,7 +63,7 @@ public class VerifyTests
     {
         var compilation = TestHelpers.GetCompilation(consoleSources);
         var cliInfos = TestHelpers.GetCliInfos(compilation);
-        var cliInfoGroup = CommandBuilder.GetCliInfoGroups(cliInfos, new System.Threading.CancellationToken());
+        var cliInfoGroup = CommandBuilder.GetCliInfoGroups(cliInfos, new CancellationToken());
 
         return Verify(cliInfoGroup, VerifySettings("CliInfoGroup")).UseParameters(desc);
     }
@@ -64,21 +71,41 @@ public class VerifyTests
     /// <summary>
     /// </summary>
     /// <param name="desc">Used as part of file name, so keep it short</param>
-    /// <param name="_">Not used</param>
-    /// <param name="__">Not used</param>
-    /// <param name="commandInfo">The CommandInfo to use for generation (from theory)</param>
-    /// <param name="___">Not used</param>
+    /// <param name="argsSource">The source code for the command classes</param>
+    /// <param name="consoleSource">The source code for the console application with the CLI entry point call</param>
     /// <returns></returns>
     [Theory]
     [ClassData(typeof(CommandInfoTheoryData))]
     public Task SourceToSource(string desc, string argsSource, string consoleSource)
     {
-        var driver = VerifyHelpers.GetDriver(argsSource, consoleSource);
-
-        var runResult = driver.GetRunResult();
+        var compilation = TestHelpers.GetCompilation(argsSource, consoleSource);
+        var driver = VerifyHelpers.GetGeneratorDriver<DragonFruit2Generator>(compilation);
 
         var verifySettings = new VerifySettings();
         verifySettings.UseDirectory("Snapshots/GenOutput");
         return Verify(driver, verifySettings).UseParameters(desc);
     }
+
+    /// <summary>
+    /// </summary>
+    /// <param name="desc">Used as part of file name, so keep it short</param>
+    /// <param name="argsSource">The source code for the command classes</param>
+    /// <param name="consoleSource">The source code for the console application with the CLI entry point call</param>
+    /// <returns></returns>
+    [Theory]
+    [ClassData(typeof(CommandInfoTheoryData))]
+    public void ConfirmCaching(string desc, string argsSource, string consoleSource)
+    {
+        var compilation = TestHelpers.GetCompilation(argsSource, consoleSource);
+        var clonedCompilation = compilation.Clone();
+       
+        var firstRunResult = VerifyHelpers.GetGeneratorDriver<DragonFruit2Generator>(compilation).GetRunResult();
+        var secondRunResult = VerifyHelpers.GetGeneratorDriver<DragonFruit2Generator>(clonedCompilation).GetRunResult();
+
+        VerifyHelpers.AssertRunResultsEqual(firstRunResult, secondRunResult, _expectedDragonFruit2TrackingNames);
+
+    }
+
+
+
 }

@@ -29,9 +29,9 @@ internal partial class MyArgs
     {
         public override void RegisterCustomizations()
         {
-            //Age.Default(16);
-            //Age.ValidateGreaterThan(0);
-            //Age.RegisterAsRequired();
+            Age.Default(16);
+            Age.ValidateGreaterThan(0);
+            Age.RegisterAsRequired();
         }
     }
 }

@@ -5,7 +5,8 @@ namespace SampleConsoleApp;
 /// <summary>
 /// This is a test command
 /// </summary>
-public partial class MyOtherArgs : ArgsRootBase<MyOtherArgs>
+[CommandClass]
+public partial class MyOtherArgs 
 {
     /// <summary>
     /// "Your name"

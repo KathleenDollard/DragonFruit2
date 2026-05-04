@@ -1,10 +1,12 @@
 ﻿using DragonFruit2.Validators;
+using DragonFruit2;
 
 namespace SampleConsoleApp;
 
 /// <summary>
 /// This is a test command
 /// </summary>
+[CommandClass]
 public partial class SubCommandArgs
 {
     /// <summary>

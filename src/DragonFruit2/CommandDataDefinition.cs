@@ -54,7 +54,6 @@ public abstract class CommandDataDefinition : DataDefinition
 }
 
 public abstract class CommandDataDefinition<TRootArgs> : CommandDataDefinition
-    where TRootArgs : ArgsRootBase<TRootArgs>
 {
     public CommandDataDefinition(CommandDataDefinition? parentDataDefinition,
                                  CommandDataDefinition? rootDataDefinition)

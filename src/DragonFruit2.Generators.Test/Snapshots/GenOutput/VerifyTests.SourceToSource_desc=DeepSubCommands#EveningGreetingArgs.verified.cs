@@ -37,12 +37,12 @@ namespace MyNamespace
             }
         }
 
-        static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
+        static partial void RegisterCustomDefaults(Builder<MyNamespace.MyArgs> builder, DefaultDataProvider<MyNamespace.MyArgs> defaultDataProvider);
 
         /// <summary>
         ///  The data definition is available to data providers and are used for initialization.
         /// </summary>
-        public partial class EveningGreetingArgsDataDefinition : CommandDataDefinition<MyArgs>
+        public partial class EveningGreetingArgsDataDefinition : CommandDataDefinition<MyNamespace.MyArgs>
         {
 
             public EveningGreetingArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
@@ -80,7 +80,7 @@ namespace MyNamespace
 
         }
 
-        public class EveningGreetingArgsDataValues : DataValues<MyArgs>
+        public class EveningGreetingArgsDataValues : DataValues<MyNamespace.MyArgs>
         {
 
             public EveningGreetingArgsDataValues(EveningGreetingArgsDataDefinition commandDefinition)
@@ -90,7 +90,7 @@ namespace MyNamespace
                 Add(Age);
             }
 
-             public override bool Operate<TReturn>(IOperateOnDataValue<MyArgs, TReturn> operationContainer)
+             public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyArgs, TReturn> operationContainer)
             {
                 try
                 {

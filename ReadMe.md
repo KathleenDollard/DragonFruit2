@@ -1,6 +1,15 @@
 
 ## NEWSFLASH!!!!
 
+### Generation redesign
+
+The long delay between PRs here is partially because of "life" and also because this is a major redesign that aligns with my "Staying sane with Roslyn source generators" talk that I will be giving at Techorama in May. Watch for future documentation in this repo on a th arc of the generation process.
+
+The impact on the design is that `CommandClass` types must have a `CommandClass` attribute. This improves generation performance, and indicates that they are special DTO classes with extra behavior, and in non-trivial cases, should probably be isolated to the CLI layer. It is also a breaking change in the prototype.
+
+
+### .NET Rocks
+
 Kathleen was interviewed about CLIs and DragonFruit2 on [.NET Rocks show #1992](https://open.spotify.com/episode/7uio0R72UtP1bEh8YKJfqn?si=25c3d592aba8444b ), scheduled for release March 5, 2026. If you are visiting based on that show - Welcome!!! 
 
 Kathleen will be speaking at [Techorama](https://www.techorama.be/) May 11-13. One of her talks will be _Staying sane when writing Roslyn source generators_, which will feature the techniques in the DragonFruit2 source generators.
@@ -33,11 +42,17 @@ DragonFruit2 is intended as the next generation of the DragonFruit portion of Sy
 
 ## Notes on docs
 
-Unfortunately, is evolving relatively rapidly and up to date docs are challenging. [The Design Overview](docs/Design/DesignOverview.md) explains how the application runs. The documents in the Design folder are at least OK, and those in its subfolders will not be helpful.
+This project evolving relatively rapidly and up to date docs are challenging. [The Design Overview](docs/Design/DesignOverview.md) explains how the application runs. The documents in the Design folder are at least OK, and those in its subfolders will not be helpful.
 
-This `ReadMe.md` file is also being kept up to date.
+This `ReadMe.md` file is being kept up to date.
 
-Issues and PRs are welcome to keep these docs current, and all other docs can be considered suspect. As other documents are updated, they will be included here.
+Issues and PRs are welcome to keep docs current, and all other docs can be considered suspect. As other documents are updated, they will be included here.
+
+## Non-negotiables
+
+- Simple, simple, simple for simple CLIs with linear scaling when using more complex features.
+- .NETStandard support. Also, CLIs using code written in C# 7.3 must work.
+- Let System.CommandLine do what it does really well - parsing and strong typing results. Wrap it to allow evolving behavior.
 
 ## Scenarios
 
@@ -67,23 +82,24 @@ else
 }
 ```
 
-_Currently, `TryParse` is not yet implemented, so you will need to use `ParseArgs`._
+`TryParse` and `TryExecute` are planned.
 
 You may use any name in place of `Args` as the type parameter to `TryParse`. It will be squiggled at this point in your process.
 
 Positioning your cursor on the `Args` type parameter, hold Ctl and hit the period. You should get a menu that includes "Generate type `Args`", and "Generate a class in a new file".
 
-Hit F12 to navigate to this new class and add `partial` to the class declaration:
+Hit F12 to navigate to this new class and add `partial` and the `CommandClass` attribute to the class declaration:
 
 ```csharp
+[CommandClass]
 public partial class Args
 ```
 
-The partial designator indicates that the DragonFruit2 generator will generate the code for the System.CommandLine interface and other DragonFruit2 features. 
+The `CommandClass` attribute indicates that the DragonFruit2 generator will generate the code for the System.CommandLine interface and other DragonFruit2 features. The `partial` keyword indicates that the DragonFruit2 generator will add code to the class.
 
-_The hope is that we will eventually have a fixer that appears for the DragonFruit2 entry points and offers to create the `Args` class with the appropriate name and `partial`.
+_Eventually, there should be a fixer that appears for the DragonFruit2 entry points and offers to create the `Args` class with the appropriate name and `partial`._
 
-Add properties to the `Args` class. By default properties are created as options. Use Pascal case for property names (the normal C# standard). DragonFruit2 will convert these to appropriate names for your CLI based on the Posix standard. If you would like a property to appear as an argument, use the `Argument` attribute and specify the position in which the argument will appear. Argument positions should be unique. Here is an example:
+Add properties to the `Args` class. By default properties are created as options. Use Pascal case for property names (the normal C# standard). DragonFruit2 will convert these to appropriate names for your CLI based on the POSIX standard. If you would like a property to appear as an argument, use the `Argument` attribute and specify the position in which the argument will appear. Argument positions should be unique. Here is an example:
 
 _We should create an analyzer that checks for unique positions._
 
@@ -113,7 +129,9 @@ You would call this in the terminal as:
 
 ### SubCommands
 
-Subcommands are handled via derived classes. While this may be surprising, it allows a very natural handling of things like how the returned result specifies what command was selected. A simple example is:
+Many CLIs consist of a single level. Some CLIs, such as the .NET CLI have subcommands, such as `dotnet add package DragonFruit2`. Whether or not there are subcommands, the initial entry point (`dotnet` in this case) is called the root command.
+
+Subcommands in DragonFruit2are handled via derived classes. While this may be surprising, it allows a very natural handling of things like common options and how the returned result specifies which command was selected. A simple example is:
 
 ```csharp
 public partial class SubCommandArgs
@@ -132,6 +150,19 @@ public partial class EveningArgs : SubCommandArgs
 }
 ```
 
+#### SubCommand notes
+
+The decision to use derived class for subcommands is largely pragmatic, but it may also make it more natural
+to create nicely shaped CLIs. For example, considering `dotnet package add` to be an `add` specialization of 
+the `package` command group, which is itself a specialization of the `dotnet` command group.
+
+The pragmatic considerations for using derived classes for subcommandsare: 
+
+- It reduces the number of attributes or special knowledge needed to build a CLI
+- Only leaf nodes are ever invoked/created as a parse result and making non-invokable classes abstract is natural
+- Any options or arguments that apply to parent commands apply to the leaf and this makes their values naturally available
+- `recursive`, which has sometimes challenged folks, is strictly an aspect of System.CommandLine and based on an attribute. It's unrelated to the Args data.
+- When working with a result it can be typed to the parent and a `switch` used to determine which subcommand was executed.
 
 ### Validation
 
@@ -171,7 +202,7 @@ internal partial class MyArgs : ArgsRootBase<MyArgs>
 }
 ```
 
-Registration requires a partial class, which you might be unfamiliar with. Trust me it works!
+Registration requires a nested partial class, which you might be unfamiliar with. Trust me it works!
 
 ### Default values
 
@@ -211,60 +242,7 @@ internal partial class MyArgs : ArgsRootBase<MyArgs>
 }
 ```
 
-### Execution
-
-A `TryExecute` method that runs an `Execute` method on the `Args` class is planned.
-
-## Overall design
-
-Commands are defined via a class or struct (which can be a record) that is passed as the generic argument to
-the `ParseArgs` or `Invoke` method.
-
-Options and arguments are defined via properties on the command declaring class.
-
-```c#
-namespace SampleConsoleApp;
-
-public partial class MyArgs
-{
-    /// <summary>
-    /// "Your name"
-    /// </summary>
-    public required string Name { get; set; }
-
-    /// <summary>
-    /// "Your age"
-    /// </summary>
-    public int Age { get; set; } = 0;
-
-    /// <summary>
-    /// "Greeting message"
-    /// </summary>
-    public string Greeting { get; set; } = string.Empty;
-}
-```
- 
-## Naming
-
-_ It is generally suggested that your arg class use normal naming without suffixes. However,
-sufixes are also supported
-- The name of the class is the name of the command
-  - If it is the root command, the name is not used
-  - If the name ends in `Command` or `Args` it is removed unless the `UseExactName` _(not yet implemented)_ attribute is used
-- The name of the property is the name of the option or argument
-  - By default, properties are options, because arguments need position information
-  - Arguments use the `Argument` attribute, which must include `Position`
-  - It is an error not to supply unique positions
-  - The position of the property within the class is never used, because C# almost never has meaning to order and refactoring order is common 
-
-## Required options and arguments
-
-- Arguments and options are _not_ required unless:
-  - The corresponding property is marked with the `required` keyword
-  - The corresponding property is marked with the `Required` attribute (generally for downlevel usage) (_not yet implemented_)
-  - It is a non-nullable reference type, unless it contains the `NotRequired` attribute _(not yet implemented)_, which is supplied for downlevel support
-
-## Default values
+#### Default value notes
 
 - Default values for non-required arguments and options can be explicit or implicit
   - If is an auto-property which supplies an initialization value, it must be a constant and is used
@@ -273,25 +251,47 @@ sufixes are also supported
   - _Future: Dependent defaults, such as a date that appears as an offset from another date. A scenario to track: Two dates and an integer. Each date is the other date with the days specified by the integer added or subtracted from the other date._
   - _Future: As much as possible, specific definitions will be used to support intelligent help, but in the end we will need a "whatever you need" ("get out of jail free") approach. This might be a custom type based on an interface to really encourage the author to supply help information._
 
-## Subcommands
+## Required options and arguments
 
-To create a subcommand, create a class that is derived from the `Args` class specified in the DragonFruit2 entry point (`TryParse`, `ParseArgs` or `TryExecute`). This class must be marked as `partial` and in the same project. It can be nested or in another namespace if desired. (_currently needs to be in the same namespace_)
+There are several ways to indicate that an option or argument is required. 
 
-The decision to use derived class for subcommands is largely pragmatic, but it may also make it more natural
-to create nicely shaped CLIs. For example, considering `dotnet package add` to be an `add` specialization of 
-the `package` command group, which is itself a specialization of the `dotnet` command group.
+- Arguments and options are _not_ required unless:
+  - The corresponding property is marked with the `required` keyword
+  - The corresponding property is marked with the `Required` attribute (generally for downlevel usage) (_not yet implemented_)
+  - It is a non-nullable reference type, unless it contains the `NotRequired` attribute _(not yet implemented)_, which is supplied for downlevel support
+ 
+ More guidelines may be needed to determine when a value is required. 
 
-The pragmatic considerations are: 
+ Required values should not have default values. _A future analyzer will give a warning or error if a required value has a default value._
 
-- It reduces the number of attributes or special knowledge needed to build a CLI
-- Only leaf nodes are ever invoked/created as a parse result and making non-invokable classes abstract is natural
-- Any options or arguments that apply to parent commands apply to the leaf and this makes their values naturally available
-- `recursive`, which has sometimes challenged folks, is strictly an aspect of System.CommandLine and based on an attribute. It's unrelated to the Args data.
-- When working with a result it can be typed to the parent and a `switch` used to determine which subcommand was executed.
+### Execution
 
-## Non-negotiables
+A `TryExecute` method that runs an `Execute` method on the `Args` class is planned.
+ 
+## Naming
 
-- Simple, simple, simple for simple CLIs with linear scaling on complicating features. If cliffs exist, they are for very complex scenarios that do not follow the System.CommandLine interpretation of Posix
-- .NETStandard support. Also, using code written in C# 7.3 must work.
-- Focus on System.CommandLine doing what it does really well - parsing and strong typing results.
+It is generally suggested that your arg class use normal naming without suffixes. However, sufixes are also supported
+
+- The name of the class is the name of the command
+  - If it is the root command, the name is not used
+  - If the name ends in `Command` or `Args` it is removed unless the `UseExactName` _(not yet implemented)_ attribute is used
+- The name of the property is the name of the option or argument
+  - By default, properties are options, because arguments need position information
+  - Arguments use the `Argument` attribute, which must include `Position`
+  - It is an error not to supply unique positions for arguments
+  - If an option ends in `Option` or an argument ends in `Argument`, the suffix is removed unless the `UseExactName` _(not yet implemented)_ attribute is used
+  - The position of the property within the class is never used, because C# almost never has meaning to order and refactoring order is common 
+
+
+
+
+
+
+
+
+
+
+
+
+
 

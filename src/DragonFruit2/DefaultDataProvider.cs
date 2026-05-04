@@ -3,7 +3,6 @@
 namespace DragonFruit2;
 
 public class DefaultDataProvider<TRootArgs> : DataProvider<TRootArgs>
-     where TRootArgs : ArgsRootBase<TRootArgs>
 {
     //// TODO: This a temporary hack to get the default system working
     //private static readonly DefaultDataProvider<TRootArgs> _instance = new(null);

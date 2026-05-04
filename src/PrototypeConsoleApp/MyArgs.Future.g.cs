@@ -14,7 +14,7 @@ namespace SampleConsoleApp;
 /// <summary>
 /// 
 /// </summary>
-partial class MyArgs : ArgsRootBase<MyArgs>
+partial class MyArgs 
 {
     // Only generate the following constructor if there are no other constructors defined (possibly via partial constructor)
     public MyArgs()

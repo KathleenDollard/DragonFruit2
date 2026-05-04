@@ -6,7 +6,8 @@ namespace SampleConsoleApp;
 /// <summary>
 /// This is a test command
 /// </summary>
-internal partial class MyArgs : ArgsRootBase<MyArgs>
+[CommandClass]
+internal partial class MyArgs
 {
     /// <summary>
     /// "Your name"
@@ -28,9 +29,9 @@ internal partial class MyArgs : ArgsRootBase<MyArgs>
     {
         public override void RegisterCustomizations()
         {
-            //Age.Default(16);
-            //Age.ValidateGreaterThan(0);
-            //Age.RegisterAsRequired();
+            Age.Default(16);
+            Age.ValidateGreaterThan(0);
+            Age.RegisterAsRequired();
         }
     }
 }

@@ -1,3 +1,4 @@
+using DragonFruit2.Generators.Metadata;
 using Microsoft.CodeAnalysis;
 
 namespace DragonFruit2.Generators;
@@ -9,37 +10,46 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var rootCommandInfos = context.SyntaxProvider
+        // Lambda's are used to allow IEnumerable parameters for testing. If this is identified 
+        // as a perf issue, an extra call can be made, or tests can create ImmutableArrays.
+        // (If the signature matched exactly, method groups can be used instead of lambdas)
+
+        var cliInfos = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: static (node, _) => builder.InitialFilter(node),
-                transform: static (ctx, _) => builder.Transform(ctx))
+                predicate: DragonFruit2Builder.InitialEntryPointFilter,
+                transform: DragonFruit2Builder.TransformEntryPoint)
             .WithTrackingName("ParseArgsInvocations")
             .Where(static s => s is not null)
             .Select(static (s, _) => s!) // Quiet nullability warning
+            .WithTrackingName(TrackingNames.ExtractEntryPoint);
+
+        var cliInfosByNamespace = cliInfos
             .Collect()
-            .WithTrackingName(TrackingNames.Extract);
+            .Select((infos, ctx) => CommandBuilder.GetCliInfoGroups(infos, ctx))
+            .SelectMany((x, ctx) => x)
+            .WithTrackingName(TrackingNames.BuildCliInfoGroups);
 
-        var boundRootCommandInfos = rootCommandInfos
-            .Select((infos, ctx) => builder.BindParentsAndRemoveDuplicates(infos))
-            .WithTrackingName(TrackingNames.BindParentsAndRemoveDuplicates);
+        context.RegisterSourceOutput(cliInfosByNamespace,
+                                     DragonFruit2Builder.OutputCliSource);
 
-        var allCommandInfos = boundRootCommandInfos
-            .SelectMany(static (collected, _) => collected.SelectMany(commandInfo => builder.GetSelfAndDescendants(commandInfo)))
-            .WithTrackingName(TrackingNames.FlattenHierarchy);
+        var commandInfos = context.SyntaxProvider
+            .ForAttributeWithMetadataName(
+                fullyQualifiedMetadataName: "DragonFruit2.CommandClassAttribute",
+                predicate: DragonFruit2Builder.FilterForClassDeclarations,
+                transform: DragonFruit2Builder.TransformCommandClasses)
+            .WithTrackingName("ParseArgsInvocations")
+            .Where(static s => s is not null)
+            .Select(static (s, _) => s!) // Quiet nullability warning
+            .WithTrackingName(TrackingNames.ExtractCommandClasses);
 
-        var collectedAllCommandInfos = allCommandInfos.Collect();
+        var commandNodes = commandInfos
+            .Collect()
+            .Select((infos, ctx) => CommandBuilder.BuildCommandNodes(infos, ctx))
+            .SelectMany((x, ctx) => x)
+            .WithTrackingName(TrackingNames.BuildCommandNodes);
 
-        context.RegisterSourceOutput(collectedAllCommandInfos,
-                static (spc, cmdInfos) =>
-                {
-                    builder.OutputCliSource(spc, cmdInfos);
-                });
-
-        context.RegisterSourceOutput(allCommandInfos,
-            static (spc, collected) =>
-        {
-            builder.OutputSource(spc, collected);
-        });
+        context.RegisterSourceOutput(commandNodes,
+            DragonFruit2Builder.OutputCommandPartialSource);
     }
 
 }

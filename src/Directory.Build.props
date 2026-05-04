@@ -5,5 +5,8 @@
 		<UseArtifactPath>true</UseArtifactPath>
 		<ArtifactsPath>$(MSBuildThisFileDirectory)..\artifacts</ArtifactsPath>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+
+    <Version>0.1.0-beta-0013</Version>
+    
 	</PropertyGroup>
 </Project>

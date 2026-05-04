@@ -1,0 +1,53 @@
+﻿[
+  {
+    Name: MyNamespace.MyArgs,
+    ParentCommand: null,
+    RootCommand: MyNamespace.MyArgs,
+    SubCommands: [
+      {
+        Name: MyNamespace.MorningGreetingArgs,
+        ParentCommand: MyNamespace.MyArgs,
+        RootCommand: MyNamespace.MyArgs,
+        SubCommands: []
+      },
+      {
+        Name: MyNamespace.EveningGreetingArgs,
+        ParentCommand: MyNamespace.MyArgs,
+        RootCommand: MyNamespace.MyArgs,
+        SubCommands: [
+          {
+            Name: MyNamespace.Bar,
+            ParentCommand: MyNamespace.EveningGreetingArgs,
+            RootCommand: MyNamespace.MyArgs,
+            SubCommands: []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    Name: MyNamespace.MorningGreetingArgs,
+    ParentCommand: MyNamespace.MyArgs,
+    RootCommand: MyNamespace.MyArgs,
+    SubCommands: []
+  },
+  {
+    Name: MyNamespace.EveningGreetingArgs,
+    ParentCommand: MyNamespace.MyArgs,
+    RootCommand: MyNamespace.MyArgs,
+    SubCommands: [
+      {
+        Name: MyNamespace.Bar,
+        ParentCommand: MyNamespace.EveningGreetingArgs,
+        RootCommand: MyNamespace.MyArgs,
+        SubCommands: []
+      }
+    ]
+  },
+  {
+    Name: MyNamespace.Bar,
+    ParentCommand: MyNamespace.EveningGreetingArgs,
+    RootCommand: MyNamespace.MyArgs,
+    SubCommands: []
+  }
+]

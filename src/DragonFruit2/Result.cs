@@ -45,7 +45,6 @@ public abstract class Result
 }
 
 public class Result<TRootArgs> : Result
-    where TRootArgs : ArgsRootBase<TRootArgs>
 {
 
     public Result(string[] commandLineArguments) : base(commandLineArguments)

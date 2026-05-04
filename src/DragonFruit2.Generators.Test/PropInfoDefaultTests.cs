@@ -1,4 +1,5 @@
 ﻿using DragonFruit2.Defaults;
+using DragonFruit2.Generators.Metadata;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 

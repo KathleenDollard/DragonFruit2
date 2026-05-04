@@ -1,0 +1,68 @@
+﻿using DragonFruit2.Generators.Metadata;
+
+namespace DragonFruit2.Generators.Test;
+
+[Serializable]
+public class CliInfoTheoryData
+    : TheoryData<string, IEnumerable<string>>
+{
+    private void AddTheoryData(string name,  string[] sources)
+    {
+        Add(name, sources);
+    }
+
+    public CliInfoTheoryData()
+    {
+        AddTheoryData("MultipleNamespacesAndInvocationsSource",
+                sources:
+                   [ """
+                    using DragonFruit2;
+
+                    // global namespace
+
+                    var myArgsDataValues = Cli.ParseArgs<MyArgs>(args);
+                    var myArgsDataValues2 = Cli.ParseArgs<MyArgs2>(args);
+
+                    [CommandClass] class MyArgs{} 
+                    [CommandClass] class MyArgs2{}
+                    """,
+
+                    """
+                    using DragonFruit2;
+
+                    namespace MyArgsNamespace;
+
+                    [CommandClass] public class MyArgs3 
+                    {}
+                    """,
+
+                    """
+                    using DragonFruit2;
+
+                    namespace MyArgsNamespace2;
+
+                    [CommandClass] public class MyArgs4
+                    {}
+                    """,
+
+                    """
+                    using DragonFruit2;
+
+                    namespace MyNamespace;
+
+                    public class OtherEntryPoints
+                    {
+                       public void OtherCalls(string[] args)
+                       {
+                          var myArgsDataValues = Cli.ParseArgs<MyArgsNamespace.MyArgs3>(args);
+                          var myArgsDataValues = Cli.ParseArgs<MyArgsNamespace2.MyArgs4>(args);
+                       }
+                    }
+                    """,
+                    ]
+                );
+
+    }
+
+}
+

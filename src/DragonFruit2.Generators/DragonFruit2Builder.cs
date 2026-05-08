@@ -90,7 +90,7 @@ public class DragonFruit2Builder
     {
         try
         {
-            context.AddSource(commandNode.CommandInfo.Name, OutputPartialArgs.GetSourcePartialArgs(commandNode));
+            context.AddSource(commandNode.CommandInfo.Name, OutputPartialArgs.GetSourcePartialCommandClass(commandNode));
         }
         catch 
         {

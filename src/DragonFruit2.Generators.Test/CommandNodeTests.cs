@@ -8,7 +8,7 @@ namespace DragonFruit2.Generators.Test;
 //public class CommandNodeTests
 //{
 //    [Theory]
-//    [InlineData("[CommandClass] public class MyArgs { }", "MyArgs")]
+//    [InlineData("[CommandClass] public class MyCommand { }", "MyCommand")]
 //    [InlineData("[CommandClass] public abstract class BaseArgs { }", "BaseArgs")]
 //    [InlineData("[CommandClass] internal class InternalArgs { }", "InternalArgs")]
 //    [InlineData("[CommandClass] protected class ProtectedArgs { }", "ProtectedArgs")]
@@ -48,7 +48,7 @@ namespace DragonFruit2.Generators.Test;
 //    // TODO: This test does not do what it says it does
 //    public void CreateCommandInfo_WithNullCliNamespace_IsNull()
 //    {
-//        var source = "namespace TestNamespace; public class MyArgs { }";
+//        var source = "namespace TestNamespace; public class MyCommand { }";
 
 //        var result = TestHelpers.CommandInfoFromSource(source, "");
 
@@ -78,16 +78,16 @@ namespace DragonFruit2.Generators.Test;
 //public void SubCommandCanBeCreated()
 //{
 //    var sourceText = """
-//            public partial class MyArgs
+//            public partial class MyCommand
 //            {
 //                public required string Name { get; set; }
 //            }
 
-//            public partial class MorningGreetingArgs : MyArgs
+//            public partial class MorningGreetingArgs : MyCommand
 //            {
 //            }
 
-//            public partial class EveningGreetingArgs : MyArgs
+//            public partial class EveningGreetingArgs : MyCommand
 //            {
 //                public int Age { get; init; } = 1;
 //            }

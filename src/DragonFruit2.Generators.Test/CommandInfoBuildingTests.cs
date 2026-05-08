@@ -12,13 +12,13 @@ public class CommandInfoTests
             using DragonFruit2;
 
             [CommandClass] 
-            public partial class MyArgs
+            public partial class MyCommand
             { }
             """;
 
         var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
-        Assert.Equal("MyArgs", commandInfo?.Name);
+        Assert.Equal("MyCommand", commandInfo?.Name);
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public class CommandInfoTests
             namespace MyNamespace
             {
                 [CommandClass] 
-                public partial class MyArgs
+                public partial class MyCommand
                 { }
             }
             """;
@@ -49,7 +49,7 @@ public class CommandInfoTests
             
             namespace MyNamespace;
             [CommandClass] 
-            public partial class MyArgs
+            public partial class MyCommand
             { }
             """;
 
@@ -66,7 +66,7 @@ public class CommandInfoTests
             using DragonFruit2;
             
             [CommandClass] 
-            public partial class MyArgs
+            public partial class MyCommand
             { }
             """;
 
@@ -84,7 +84,7 @@ public class CommandInfoTests
             using DragonFruit2;
             
             [CommandClass] 
-            protected internal partial class MyArgs
+            protected internal partial class MyCommand
             { }
             """;
 
@@ -107,7 +107,7 @@ public class CommandInfoTests
             
             namespace TestNamespace; 
             [CommandClass] 
-            {{accessibility}} class MyArgs  
+            {{accessibility}} class MyCommand  
             { }
             """;
 
@@ -125,7 +125,7 @@ public class CommandInfoTests
             using DragonFruit2; 
 
             [CommandClass] 
-            public class MyArgs  
+            public class MyCommand  
             { }
             """;
 

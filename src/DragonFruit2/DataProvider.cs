@@ -4,18 +4,18 @@ public abstract class DataProvider
 {
 }
 
-public abstract class DataProvider<TRootArgs> : DataProvider
+public abstract class DataProvider<TRootCommand> : DataProvider
 {
-    protected DataProvider(Builder<TRootArgs> builder)
+    protected DataProvider(Builder<TRootCommand> builder)
     {
         Builder = builder;
     }
 
-    public Builder<TRootArgs> Builder { get; }
+    public Builder<TRootCommand> Builder { get; }
 
-    protected abstract bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition, Result<TRootArgs> result, out TValue Value);
+    protected abstract bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition, Result<TRootCommand> result, out TValue Value);
 
-    public bool TrySetDataValue<TValue>(DataValue<TValue> dataValue, Result<TRootArgs> result)
+    public bool TrySetDataValue<TValue>(DataValue<TValue> dataValue, Result<TRootCommand> result)
     {
         if (dataValue.IsSet)
         {
@@ -29,7 +29,7 @@ public abstract class DataProvider<TRootArgs> : DataProvider
         return false;
     }
 
-    public virtual void Initialize(Builder<TRootArgs> builder, CommandDataDefinition<TRootArgs> commandDefinition, Result<TRootArgs> result)
+    public virtual void Initialize(Builder<TRootCommand> builder, CommandDataDefinition<TRootCommand> commandDefinition, Result<TRootCommand> result)
     {
         // no op
     }

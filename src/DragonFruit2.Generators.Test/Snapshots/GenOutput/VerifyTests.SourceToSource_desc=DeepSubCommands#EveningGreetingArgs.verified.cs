@@ -12,7 +12,7 @@ namespace MyNamespace
     /// <summary>
     /// Auto-generated partial class for building CLI commands for <see cref="EveningGreetingArgs"/>" and creating a new EveningGreetingArgs instance from a <see cref="System.CommandLine.ParseResult" />.
     /// </summary>
-    partial class EveningGreetingArgs : MyArgs
+    partial class EveningGreetingArgs : MyCommand
     {
 
         public EveningGreetingArgs()
@@ -37,12 +37,12 @@ namespace MyNamespace
             }
         }
 
-        static partial void RegisterCustomDefaults(Builder<MyNamespace.MyArgs> builder, DefaultDataProvider<MyNamespace.MyArgs> defaultDataProvider);
+        static partial void RegisterCustomDefaults(Builder<MyNamespace.MyCommand> builder, DefaultDataProvider<MyNamespace.MyCommand> defaultDataProvider);
 
         /// <summary>
         ///  The data definition is available to data providers and are used for initialization.
         /// </summary>
-        public partial class EveningGreetingArgsDataDefinition : CommandDataDefinition<MyNamespace.MyArgs>
+        public partial class EveningGreetingArgsDataDefinition : CommandDataDefinition<MyNamespace.MyCommand>
         {
 
             public EveningGreetingArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
@@ -80,7 +80,7 @@ namespace MyNamespace
 
         }
 
-        public class EveningGreetingArgsDataValues : DataValues<MyNamespace.MyArgs>
+        public class EveningGreetingArgsDataValues : DataValues<MyNamespace.MyCommand>
         {
 
             public EveningGreetingArgsDataValues(EveningGreetingArgsDataDefinition commandDefinition)
@@ -90,7 +90,7 @@ namespace MyNamespace
                 Add(Age);
             }
 
-             public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyArgs, TReturn> operationContainer)
+             public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyCommand, TReturn> operationContainer)
             {
                 try
                 {

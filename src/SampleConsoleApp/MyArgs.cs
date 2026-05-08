@@ -7,7 +7,7 @@ namespace SampleConsoleApp;
 /// This is a test command
 /// </summary>
 [CommandClass]
-internal partial class MyArgs
+internal partial class MyCommand
 {
     /// <summary>
     /// "Your name"
@@ -25,7 +25,7 @@ internal partial class MyArgs
     /// </summary>
     public string Greeting { get; set; } = string.Empty;
 
-    partial class MyArgsDataDefinition
+    partial class MyCommandDataDefinition
     {
         public override void RegisterCustomizations()
         {

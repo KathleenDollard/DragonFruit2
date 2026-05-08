@@ -19,18 +19,18 @@ public class CommandInfoTheoryData : TheoryData<string, string, string>
                     namespace MyNamespace
                     {
                         [CommandClass]
-                        public partial class MyArgs 
+                        public partial class MyCommand 
                         {
                             public required string Name { get; set; }
                         }
 
                         [CommandClass]
-                        public partial class MorningGreetingArgs : MyArgs
+                        public partial class MorningGreetingArgs : MyCommand
                         {
                         }
 
                         [CommandClass]
-                        public partial class EveningGreetingArgs : MyArgs
+                        public partial class EveningGreetingArgs : MyCommand
                         {
                             public int Age { get; init; } = 1;
                         }

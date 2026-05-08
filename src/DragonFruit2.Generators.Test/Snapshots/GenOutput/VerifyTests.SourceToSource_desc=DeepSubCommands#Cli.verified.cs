@@ -23,14 +23,14 @@ public class Cli
     /// <remarks>
     /// It is not currently clear how builders and configuration are the same and different and thus expected changes in this space. Accessing it is currently difficult to avoid confusion.
     /// </remarks>
-    /// <typeparam name="TRootArgs">The type containing the CLI definition, the root command if there are subcommands.</typeparam>
+    /// <typeparam name="TRootCommand">The type containing the CLI definition, the root command if there are subcommands.</typeparam>
 
-    public static Builder<TRootArgs>? CreateBuilder<TRootArgs>()
+    public static Builder<TRootCommand>? CreateBuilder<TRootCommand>()
     {
-        if (typeof(TRootArgs) == typeof(MyArgs))
+        if (typeof(TRootCommand) == typeof(MyCommand))
         {
-            var builder = new Builder<MyArgs>(new MyArgs.MyArgsDataDefinition(null, null));
-            return builder is Builder<TRootArgs> typedBuilder
+            var builder = new Builder<MyCommand>(new MyCommand.MyCommandDataDefinition(null, null));
+            return builder is Builder<TRootCommand> typedBuilder
                   ? typedBuilder
                   : throw new InvalidOperationException("Type mismatch creating builder.");
         }
@@ -43,15 +43,15 @@ public class Cli
     /// <remarks>
     /// The args class specified as the type argument must be public.
     /// </remarks>
-    /// <typeparam name="TRootArgs">The type containing the CLI definition.</typeparam>
+    /// <typeparam name="TRootCommand">The type containing the CLI definition.</typeparam>
     /// <param name="args">Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.</param>
 
-    public static Result<TRootArgs> ParseArgs<TRootArgs>(string[]? args = null)
+    public static Result<TRootCommand> ParseArgs<TRootCommand>(string[]? args = null)
     {
-        var builder = CreateBuilder<TRootArgs>();
+        var builder = CreateBuilder<TRootCommand>();
         if (builder is null)
         {
-            var result = new Result<TRootArgs>(Builder<TRootArgs>.GetArgsFromEnvironment());
+            var result = new Result<TRootCommand>(Builder<TRootCommand>.GetArgsFromEnvironment());
             result.AddDiagnostic(new Diagnostic(DiagnosticId.CouldNotFindBuilder.ToValidationIdString(), DiagnosticSeverity.Error));
             return result;
         }
@@ -64,14 +64,14 @@ public class Cli
     /// <remarks>
     /// The args class specified as the type argument must be public.
     /// </remarks>
-    /// <typeparam name="TRootArgs">The type containing the CLI definition.</typeparam>
+    /// <typeparam name="TRootCommand">The type containing the CLI definition.</typeparam>
     /// <param name="result">An out parameter that contains an instance of the requested class and supporting data, such as diagnostics, a suggested CLI return value, etc.</param>
     /// <param name="args">Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.</param>
     /// <exception cref="InvalidOperationException">To be implemented soon.</param>
 
-    public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)
+    public static bool TryParseArgs<TRootCommand>(out Result<TRootCommand> result, string[]? args = null)
     {
-        result = ParseArgs<TRootArgs>(args);
+        result = ParseArgs<TRootCommand>(args);
         return result.IsValid;
     }
 }

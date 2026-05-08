@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace DragonFruit2;
 
 /// <summary>
-/// Represents the definition of a data member corresponding to a property in an ArgsClass.
+/// Represents the definition of a data member corresponding to a property in an CommandClass.
 /// </summary>
 /// <remarks>
 /// This class may be frequently used by data providers that have no interest in the CLI shape.

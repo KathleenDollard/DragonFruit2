@@ -5,7 +5,7 @@ Console.WriteLine("Welcome to the SubCommand sample app");
 
 if (subcommandArgsDataValues.IsValid)
 {
-    return subcommandArgsDataValues.Args switch
+    return subcommandArgsDataValues.Command switch
     {
         MorningArgs morningArgs => MorningGreeting(morningArgs),
 

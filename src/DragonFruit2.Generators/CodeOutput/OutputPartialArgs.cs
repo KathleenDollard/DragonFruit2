@@ -4,7 +4,7 @@ namespace DragonFruit2.Generators.CodeOutput;
 
 internal class OutputPartialArgs
 {
-    internal static string GetSourcePartialArgs(CommandNode commandNode)
+    internal static string GetSourcePartialCommandClass(CommandNode commandNode)
     {
         var commandInfo = commandNode.CommandInfo;
         var sb = new StringBuilderWrapper();
@@ -152,11 +152,4 @@ internal class OutputPartialArgs
         sb.Append($"static partial void RegisterCustomDefaults(Builder<{commandNode.RootCommandNode?.FullName}> builder, DefaultDataProvider<{commandNode.RootCommandNode?.FullName}> defaultDataProvider);");
         sb.AppendLine();
     }
-
-    //internal static void GetArgsBuilder(StringBuilderWrapper sb, CommandNode commandNode)
-    //{
-    //    sb.OpenMethod($"public static ArgsBuilder<{commandNode.RootCommandName}> GetArgsBuilder(Builder<{commandNode.RootCommandName}> builder, CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)");
-    //    sb.AppendLine($"return new {commandNode.RootCommandName}.{commandNode.RootCommandName}ArgsBuilder(parentDataDefinition, rootDataDefinition);");
-    //    sb.CloseMethod();
-    //}
 }

@@ -1,24 +1,24 @@
 ﻿[
   {
-    Name: MyNamespace.MyArgs,
+    Name: MyNamespace.MyCommand,
     ParentCommand: null,
-    RootCommand: MyNamespace.MyArgs,
+    RootCommand: MyNamespace.MyCommand,
     SubCommands: [
       {
         Name: MyNamespace.MorningGreetingArgs,
-        ParentCommand: MyNamespace.MyArgs,
-        RootCommand: MyNamespace.MyArgs,
+        ParentCommand: MyNamespace.MyCommand,
+        RootCommand: MyNamespace.MyCommand,
         SubCommands: []
       },
       {
         Name: MyNamespace.EveningGreetingArgs,
-        ParentCommand: MyNamespace.MyArgs,
-        RootCommand: MyNamespace.MyArgs,
+        ParentCommand: MyNamespace.MyCommand,
+        RootCommand: MyNamespace.MyCommand,
         SubCommands: [
           {
             Name: MyNamespace.Bar,
             ParentCommand: MyNamespace.EveningGreetingArgs,
-            RootCommand: MyNamespace.MyArgs,
+            RootCommand: MyNamespace.MyCommand,
             SubCommands: []
           }
         ]
@@ -27,19 +27,19 @@
   },
   {
     Name: MyNamespace.MorningGreetingArgs,
-    ParentCommand: MyNamespace.MyArgs,
-    RootCommand: MyNamespace.MyArgs,
+    ParentCommand: MyNamespace.MyCommand,
+    RootCommand: MyNamespace.MyCommand,
     SubCommands: []
   },
   {
     Name: MyNamespace.EveningGreetingArgs,
-    ParentCommand: MyNamespace.MyArgs,
-    RootCommand: MyNamespace.MyArgs,
+    ParentCommand: MyNamespace.MyCommand,
+    RootCommand: MyNamespace.MyCommand,
     SubCommands: [
       {
         Name: MyNamespace.Bar,
         ParentCommand: MyNamespace.EveningGreetingArgs,
-        RootCommand: MyNamespace.MyArgs,
+        RootCommand: MyNamespace.MyCommand,
         SubCommands: []
       }
     ]
@@ -47,7 +47,7 @@
   {
     Name: MyNamespace.Bar,
     ParentCommand: MyNamespace.EveningGreetingArgs,
-    RootCommand: MyNamespace.MyArgs,
+    RootCommand: MyNamespace.MyCommand,
     SubCommands: []
   }
 ]

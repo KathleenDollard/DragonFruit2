@@ -4,29 +4,29 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace DragonFruit2;
 
-public class Builder<TRootArgs>
+public class Builder<TRootCommand>
 {
 
-    public Builder(CommandDataDefinition<TRootArgs> rootCommandDefinition, DragonFruit2Configuration? configuration = null)
+    public Builder(CommandDataDefinition<TRootCommand> rootCommandDefinition, DragonFruit2Configuration? configuration = null)
     {
-        AddDataProvider(new CliDataProvider<TRootArgs>(this));
-        AddDataProvider(new DefaultDataProvider<TRootArgs>(this));
+        AddDataProvider(new CliDataProvider<TRootCommand>(this));
+        AddDataProvider(new DefaultDataProvider<TRootCommand>(this));
         Configuration = configuration;
         RootCommandDefinition = rootCommandDefinition;
     }
 
-    public CommandDataDefinition<TRootArgs> RootCommandDefinition { get; }
+    public CommandDataDefinition<TRootCommand> RootCommandDefinition { get; }
 
     public string[]? CommandLineArguments { get; protected set; }
 
-    public List<DataProvider<TRootArgs>> DataProviders { get; } = [];
+    public List<DataProvider<TRootCommand>> DataProviders { get; } = [];
     public DragonFruit2Configuration? Configuration { get; }
 
     public TDataProvider GetDataProvider<TDataProvider>()
-            where TDataProvider : DataProvider<TRootArgs>
+            where TDataProvider : DataProvider<TRootCommand>
         => DataProviders.OfType<TDataProvider>().FirstOrDefault();
 
-    public void AddDataProvider(DataProvider<TRootArgs> provider, int position = int.MaxValue)
+    public void AddDataProvider(DataProvider<TRootCommand> provider, int position = int.MaxValue)
     {
         // TODO: Should we protect against multiple entries of the same provider? The same provider type? (might be scenarios for that) Have an "allow multiples" trait on the provider? (How would we do that in Framework?) Have each provider build a key that could differentiate?
         if (position < int.MaxValue)
@@ -39,10 +39,10 @@ public class Builder<TRootArgs>
         }
     }
 
-    public Result<TRootArgs> ParseArgs(string[]? commandLineArguments)
+    public Result<TRootCommand> ParseArgs(string[]? commandLineArguments)
     {
         commandLineArguments ??= GetArgsFromEnvironment();
-        var result = new Result<TRootArgs>(commandLineArguments);
+        var result = new Result<TRootCommand>(commandLineArguments);
         try
         {
             CommandLineArguments = commandLineArguments;
@@ -64,7 +64,7 @@ public class Builder<TRootArgs>
             if (Validate(result))
             {
                 var instance = result.DataValues.CreateInstance();
-                result.Args = instance;
+                result.Command = instance;
             }
 
             return result;
@@ -85,13 +85,13 @@ public class Builder<TRootArgs>
         return [.. Environment.GetCommandLineArgs().Skip(1)];
     }
 
-    private bool TryGetActiveCommandDefinition(Result<TRootArgs> result,
-                                               [NotNullWhen(true)] out CommandDataDefinition<TRootArgs> activeCommandDefinition,
-                                               [NotNullWhen(true)] out DataProvider<TRootArgs> activeDataProvider)
+    private bool TryGetActiveCommandDefinition(Result<TRootCommand> result,
+                                               [NotNullWhen(true)] out CommandDataDefinition<TRootCommand> activeCommandDefinition,
+                                               [NotNullWhen(true)] out DataProvider<TRootCommand> activeDataProvider)
     {
-        foreach (var dataProvider in DataProviders.OfType<IActiveArgsProvider<TRootArgs>>())
+        foreach (var dataProvider in DataProviders.OfType<IActiveCommandProvider<TRootCommand>>())
         {
-            if (dataProvider.TryGetActiveArgsDefinition(result, out activeCommandDefinition, out activeDataProvider))
+            if (dataProvider.TryGetActiveCommandDefinition(result, out activeCommandDefinition, out activeDataProvider))
             {
                 return true;
             }
@@ -101,26 +101,26 @@ public class Builder<TRootArgs>
         return false;
     }
 
-    private void GatherActiveDataValues(Result<TRootArgs> result)
+    private void GatherActiveDataValues(Result<TRootCommand> result)
     {
 
         result.DataValues?.Operate(new SetActiveDataValueOperation(result, result.ActiveDataProvider));
     }
 
-    internal struct SetActiveDataValueOperation : IOperateOnDataValue<TRootArgs, Void>
+    internal struct SetActiveDataValueOperation : IOperateOnDataValue<TRootCommand, Void>
     {
-        private readonly DataProvider<TRootArgs> _dataProvider;
-        public SetActiveDataValueOperation(Result<TRootArgs> result, DataProvider<TRootArgs> dataProvider)
+        private readonly DataProvider<TRootCommand> _dataProvider;
+        public SetActiveDataValueOperation(Result<TRootCommand> result, DataProvider<TRootCommand> dataProvider)
         {
             Result = result;
             _dataProvider = dataProvider;
         }
 
-        public Result<TRootArgs> Result { get; init; }
+        public Result<TRootCommand> Result { get; init; }
         public string OperationName => nameof(SetActiveDataValueOperation);
 
         public bool TryOperate<TValue>(DataValue<TValue> dataValue,
-                                       IOperateOnDataValue<TRootArgs, Void> operation,
+                                       IOperateOnDataValue<TRootCommand, Void> operation,
                                        out Void _)
         {
             _ = default;
@@ -133,28 +133,28 @@ public class Builder<TRootArgs>
         }
     }
 
-    private void GatherFromOtherDataProviders(Result<TRootArgs> result)
+    private void GatherFromOtherDataProviders(Result<TRootCommand> result)
     {
         result.DataValues?.Operate(new GatherFromOterDataProvidersOperation(result, result.ActiveDataProvider, DataProviders));
     }
 
-    internal struct GatherFromOterDataProvidersOperation : IOperateOnDataValue<TRootArgs, Void>
+    internal struct GatherFromOterDataProvidersOperation : IOperateOnDataValue<TRootCommand, Void>
     {
-        private readonly IEnumerable<DataProvider<TRootArgs>> _dataProviders;
-        private readonly DataProvider<TRootArgs> _activeDataProvider;
+        private readonly IEnumerable<DataProvider<TRootCommand>> _dataProviders;
+        private readonly DataProvider<TRootCommand> _activeDataProvider;
 
-        public GatherFromOterDataProvidersOperation(Result<TRootArgs> result, DataProvider<TRootArgs> activeDataProvider, IEnumerable<DataProvider<TRootArgs>> dataProviders)
+        public GatherFromOterDataProvidersOperation(Result<TRootCommand> result, DataProvider<TRootCommand> activeDataProvider, IEnumerable<DataProvider<TRootCommand>> dataProviders)
         {
             Result = result;
             _dataProviders = dataProviders;
             _activeDataProvider = activeDataProvider;
         }
 
-        public Result<TRootArgs> Result { get; init; }
+        public Result<TRootCommand> Result { get; init; }
         public readonly string OperationName => nameof(SetActiveDataValueOperation);
 
         public bool TryOperate<TValue>(DataValue<TValue> dataValue,
-                                       IOperateOnDataValue<TRootArgs, Void> operation,
+                                       IOperateOnDataValue<TRootCommand, Void> operation,
                                        out Void _)
         {
             _ = default;
@@ -177,7 +177,7 @@ public class Builder<TRootArgs>
 
 
 
-    //private bool CheckRequired(Result<TRootArgs> result)
+    //private bool CheckRequired(Result<TRootCommand> result)
     //{
     //    if (result.ActiveCommandDefinition is null) throw new ArgumentNullException(nameof(result.ActiveCommandDefinition));
     //    if (result.DataValues is null) throw new ArgumentNullException(nameof(result.DataValues));
@@ -196,7 +196,7 @@ public class Builder<TRootArgs>
     //    return true;
     //}
 
-    private bool Validate(Result<TRootArgs> result)
+    private bool Validate(Result<TRootCommand> result)
     {
         if (result.ActiveCommandDefinition is null) throw new ArgumentNullException(nameof(result.ActiveCommandDefinition));
         if (result.DataValues is null) throw new ArgumentNullException(nameof(result.DataValues));
@@ -210,7 +210,7 @@ public class Builder<TRootArgs>
         return isValid;
     }
 
-    private void InitializeDataProviders(Result<TRootArgs> result)
+    private void InitializeDataProviders(Result<TRootCommand> result)
     {
         foreach (var dataProvider in DataProviders)
         {

@@ -41,15 +41,15 @@ public abstract class DataValues : IEnumerable<DataValue>
     }
 }
 
-public abstract class DataValues<TRootArgs> : DataValues
+public abstract class DataValues<TRootCommand> : DataValues
 {
     protected DataValues(CommandDataDefinition commandDefinition)
         : base(commandDefinition)
     { }
 
-    public abstract bool Operate<TReturn>(IOperateOnDataValue<TRootArgs, TReturn> operationContainer);
+    public abstract bool Operate<TReturn>(IOperateOnDataValue<TRootCommand, TReturn> operationContainer);
 
-    protected internal abstract TRootArgs CreateInstance();
+    protected internal abstract TRootCommand CreateInstance();
 
 
 }

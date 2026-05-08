@@ -5,10 +5,10 @@ public interface IOperationOnMemberDefinition<TReturn>
     TReturn Operate<TValue>(MemberDataDefinition<TValue> memberDefinition);
 }
 
-public interface IOperateOnDataValue<TRootArgs, TReturn>
+public interface IOperateOnDataValue<TRootCommand, TReturn>
 {
-    bool TryOperate<TValue>(DataValue<TValue> dataValue,IOperateOnDataValue<TRootArgs, TReturn> operation, out TReturn returnValue);
-    Result<TRootArgs> Result { get; }
+    bool TryOperate<TValue>(DataValue<TValue> dataValue,IOperateOnDataValue<TRootCommand, TReturn> operation, out TReturn returnValue);
+    Result<TRootCommand> Result { get; }
     string OperationName { get; }
 }
 

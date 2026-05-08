@@ -1,6 +1,6 @@
 ﻿[
   {
-    Name: MyArgs,
+    Name: MyCommand,
     NamespaceName: MyNamespace,
     Accessibility: public,
     BaseTypeName: Object,
@@ -13,7 +13,7 @@
         Name: Name,
         CliName: --name,
         TypeName: string,
-        ContainingTypeName: MyArgs,
+        ContainingTypeName: MyCommand,
         IsValueType: false,
         HasRequiredModifier: true,
         HasArgumentAttribute: false,
@@ -29,9 +29,9 @@
     Name: MorningGreetingArgs,
     NamespaceName: MyNamespace,
     Accessibility: public,
-    BaseTypeName: MyArgs,
+    BaseTypeName: MyCommand,
     BaseTypeNamespace: MyNamespace,
-    BaseTypeFullName: MyNamespace.MyArgs,
+    BaseTypeFullName: MyNamespace.MyCommand,
     SimpleName: morning-greeting,
     Arguments: [],
     Options: []
@@ -40,9 +40,9 @@
     Name: EveningGreetingArgs,
     NamespaceName: MyNamespace,
     Accessibility: public,
-    BaseTypeName: MyArgs,
+    BaseTypeName: MyCommand,
     BaseTypeNamespace: MyNamespace,
-    BaseTypeFullName: MyNamespace.MyArgs,
+    BaseTypeFullName: MyNamespace.MyCommand,
     SimpleName: evening-greeting,
     Arguments: [],
     Options: [

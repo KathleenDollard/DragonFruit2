@@ -13,7 +13,7 @@ public class PropInfoValidatorTests
             namespace TestNamespace;
             using DragonFruit2.Validators;
             
-            public class MyArgs
+            public class MyCommand
             {
                 [GreaterThan(0)]
                 public int Age { get; set; }
@@ -21,7 +21,7 @@ public class PropInfoValidatorTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
         Assert.NotNull(propSymbol);
@@ -39,7 +39,7 @@ public class PropInfoValidatorTests
             namespace TestNamespace;
             using DragonFruit2.Validators;
             
-            public class MyArgs
+            public class MyCommand
             {
                 [GreaterThan(0)]
                 public int Age { get; set; }
@@ -47,7 +47,7 @@ public class PropInfoValidatorTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
         Assert.NotNull(propSymbol);
@@ -66,7 +66,7 @@ public class PropInfoValidatorTests
             namespace TestNamespace;
             using DragonFruit2.Validators;
             
-            public class MyArgs
+            public class MyCommand
             {
                 [GreaterThan(0)]
                 public int Age { get; set; }
@@ -74,7 +74,7 @@ public class PropInfoValidatorTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
         Assert.NotNull(propSymbol);
@@ -94,7 +94,7 @@ public class PropInfoValidatorTests
             namespace TestNamespace;
             using DragonFruit2.Validators;
             
-            public class MyArgs
+            public class MyCommand
             {
                 [GreaterThan(0)]
                 [LessThan(150)]
@@ -103,7 +103,7 @@ public class PropInfoValidatorTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
         Assert.NotNull(propSymbol);
@@ -123,7 +123,7 @@ public class PropInfoValidatorTests
             namespace TestNamespace;
             using DragonFruit2.Validators;
             
-            public class MyArgs
+            public class MyCommand
             {
                 [MinLength("5")]
                 public string Name { get; set; }
@@ -131,7 +131,7 @@ public class PropInfoValidatorTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
@@ -147,14 +147,14 @@ public class PropInfoValidatorTests
     {
         var source = """
             namespace TestNamespace;
-            public class MyArgs
+            public class MyCommand
             {
                 public string Name { get; set; }
             }
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
@@ -171,7 +171,7 @@ public class PropInfoValidatorTests
             namespace TestNamespace;
             using DragonFruit2.Validators;
             
-            public class MyArgs
+            public class MyCommand
             {
                 [ConstantValidator(true)]
                 public string Name { get; set; }
@@ -179,7 +179,7 @@ public class PropInfoValidatorTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
@@ -197,7 +197,7 @@ public class PropInfoValidatorTests
             namespace TestNamespace;
             using DragonFruit2.Validators;
             
-            public class MyArgs
+            public class MyCommand
             {
                 [ConstantValidator(false)]
                 public string Name { get; set; }
@@ -205,7 +205,7 @@ public class PropInfoValidatorTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
@@ -223,7 +223,7 @@ public class PropInfoValidatorTests
             namespace TestNamespace;
             using DragonFruit2.Validators;
             
-            public class MyArgs
+            public class MyCommand
             {
                 [ConstantValidator(null)]
                 public int Age { get; set; }
@@ -231,7 +231,7 @@ public class PropInfoValidatorTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
         Assert.NotNull(propSymbol);

@@ -14,7 +14,7 @@ public class PropInfoDefaultTests
             namespace TestNamespace;
             using DragonFruit2.Defaults;
             
-            public class MyArgs
+            public class MyCommand
             {
                 [DefaultConstant(13)]
                 public int Age { get; set; }
@@ -22,7 +22,7 @@ public class PropInfoDefaultTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
         Assert.NotNull(propSymbol);
@@ -41,7 +41,7 @@ public class PropInfoDefaultTests
             namespace TestNamespace;
             using DragonFruit2.Defaults;
             
-            public class MyArgs
+            public class MyCommand
             {
                 [DefaultConstant(13)]
                 public int Age { get; set; }
@@ -49,7 +49,7 @@ public class PropInfoDefaultTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
         Assert.NotNull(propSymbol);
@@ -68,7 +68,7 @@ public class PropInfoDefaultTests
             namespace TestNamespace;
             using DragonFruit2.Defaults;
             
-            public class MyArgs
+            public class MyCommand
             {
                 [DefaultConstant(13)]
                 public int Age { get; set; }
@@ -76,7 +76,7 @@ public class PropInfoDefaultTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
         Assert.NotNull(propSymbol);
@@ -96,7 +96,7 @@ public class PropInfoDefaultTests
             namespace TestNamespace;
             using DragonFruit2.Defaults;
 
-            public class MyArgs
+            public class MyCommand
             {
                 [DefaultConstant("Other")]
                 [DefaultConstant(15)]
@@ -108,7 +108,7 @@ public class PropInfoDefaultTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
         Assert.NotNull(propSymbol);
@@ -128,7 +128,7 @@ public class PropInfoDefaultTests
             namespace TestNamespace;
             using DragonFruit2.Defaults;
 
-            public class MyArgs
+            public class MyCommand
             {
                 [DefaultConstant("Hello")]
                 public string Name { get; set; }
@@ -136,7 +136,7 @@ public class PropInfoDefaultTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
@@ -152,14 +152,14 @@ public class PropInfoDefaultTests
     {
         var source = """
             namespace TestNamespace;
-            public class MyArgs
+            public class MyCommand
             {
                 public string Name { get; set; }
             }
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
@@ -177,7 +177,7 @@ public class PropInfoDefaultTests
             namespace TestNamespace;
             using DragonFruit2.Defaults;
 
-            public class MyArgs
+            public class MyCommand
             {
                 [DefaultConstant(true)]
                 public string Name { get; set; }
@@ -185,7 +185,7 @@ public class PropInfoDefaultTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
@@ -203,7 +203,7 @@ public class PropInfoDefaultTests
             namespace TestNamespace;
             using DragonFruit2.Defaults;
 
-            public class MyArgs
+            public class MyCommand
             {
                 [DefaultConstant(false)]
                 public string Name { get; set; }
@@ -211,7 +211,7 @@ public class PropInfoDefaultTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
@@ -229,7 +229,7 @@ public class PropInfoDefaultTests
             namespace TestNamespace;
             using DragonFruit2.Defaults;
 
-            public class MyArgs
+            public class MyCommand
             {
                 [DefaultConstant(null)]
                 public int Age { get; set; }
@@ -237,7 +237,7 @@ public class PropInfoDefaultTests
             """;
         var argsTree = CSharpSyntaxTree.ParseText(source);
         var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
         Assert.NotNull(propSymbol);

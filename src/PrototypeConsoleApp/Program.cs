@@ -1,12 +1,12 @@
 ﻿using SampleConsoleApp;
 using DragonFruit2;
 
-var myArgsDataValues = Cli.ParseArgs<MyArgs>(args);
+var myArgsDataValues = Cli.ParseArgs<MyCommand>(args);
 Console.WriteLine("Welcome to the Sample Console App!") ;
 
 if (myArgsDataValues.IsValid)
 {
-    var myArgs = myArgsDataValues.Args!; // Safe to use '!' because IsValid is true
+    var myArgs = myArgsDataValues.Command!; // Safe to use '!' because IsValid is true
     var drink = $", so would you like some wine?.";
     var noDrink = ".";
     Console.WriteLine($"{myArgs.Greeting} {myArgs.Name}, you're {myArgs.Age}{(myArgs.Age >= 18 ? drink : noDrink)}");

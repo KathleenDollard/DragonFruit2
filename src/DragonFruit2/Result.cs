@@ -44,17 +44,17 @@ public abstract class Result
 
 }
 
-public class Result<TRootArgs> : Result
+public class Result<TRootCommand> : Result
 {
 
     public Result(string[] commandLineArguments) : base(commandLineArguments)
     {
     }
 
-    public TRootArgs? Args { get; internal set; }
-    public DataValues<TRootArgs>? DataValues { get; internal set; }
+    public TRootCommand? Command { get; internal set; }
+    public DataValues<TRootCommand>? DataValues { get; internal set; }
 
-    public CommandDataDefinition<TRootArgs>? ActiveCommandDefinition
+    public CommandDataDefinition<TRootCommand>? ActiveCommandDefinition
     {
         get;
         internal set
@@ -66,10 +66,10 @@ public class Result<TRootArgs> : Result
         }
     }
 
-    public DataProvider<TRootArgs> ActiveDataProvider { get; internal set; }
+    public DataProvider<TRootCommand> ActiveDataProvider { get; internal set; }
 
     public override IEnumerable<Diagnostic> Diagnostics
-    // This is in the TRootArgs specific version because it accesses DataValues
+    // This is in the TRootCommand specific version because it accesses DataValues
     {
         get
         {

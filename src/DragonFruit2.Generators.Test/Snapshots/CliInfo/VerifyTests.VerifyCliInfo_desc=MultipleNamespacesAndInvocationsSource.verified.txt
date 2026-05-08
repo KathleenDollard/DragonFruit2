@@ -1,20 +1,20 @@
 ﻿[
   {
     RootTypeNamespace: ,
-    RootCommandName: MyArgs
+    RootCommandName: MyCommand
   },
   {
     RootTypeNamespace: ,
-    RootCommandName: MyArgs2
+    RootCommandName: MyCommand2
   },
   {
-    RootTypeNamespace: MyArgsNamespace,
-    RootCommandName: MyArgs3,
+    RootTypeNamespace: MyCommandNamespace,
+    RootCommandName: MyCommand3,
     EntryPointNamespace: MyNamespace
   },
   {
-    RootTypeNamespace: MyArgsNamespace2,
-    RootCommandName: MyArgs4,
+    RootTypeNamespace: MyCommandNamespace2,
+    RootCommandName: MyCommand4,
     EntryPointNamespace: MyNamespace
   }
 ]

@@ -12,7 +12,7 @@ namespace MyNamespace
     /// <summary>
     /// Auto-generated partial class for building CLI commands for <see cref="MorningGreetingArgs"/>" and creating a new MorningGreetingArgs instance from a <see cref="System.CommandLine.ParseResult" />.
     /// </summary>
-    partial class MorningGreetingArgs : MyArgs
+    partial class MorningGreetingArgs : MyCommand
     {
 
         [SetsRequiredMembers()]
@@ -21,12 +21,12 @@ namespace MyNamespace
         {
         }
 
-        static partial void RegisterCustomDefaults(Builder<MyNamespace.MyArgs> builder, DefaultDataProvider<MyNamespace.MyArgs> defaultDataProvider);
+        static partial void RegisterCustomDefaults(Builder<MyNamespace.MyCommand> builder, DefaultDataProvider<MyNamespace.MyCommand> defaultDataProvider);
 
         /// <summary>
         ///  The data definition is available to data providers and are used for initialization.
         /// </summary>
-        public partial class MorningGreetingArgsDataDefinition : CommandDataDefinition<MyNamespace.MyArgs>
+        public partial class MorningGreetingArgsDataDefinition : CommandDataDefinition<MyNamespace.MyCommand>
         {
 
             public MorningGreetingArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
@@ -51,7 +51,7 @@ namespace MyNamespace
 
         }
 
-        public class MorningGreetingArgsDataValues : DataValues<MyNamespace.MyArgs>
+        public class MorningGreetingArgsDataValues : DataValues<MyNamespace.MyCommand>
         {
 
             public MorningGreetingArgsDataValues(MorningGreetingArgsDataDefinition commandDefinition)
@@ -59,7 +59,7 @@ namespace MyNamespace
             {
             }
 
-             public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyArgs, TReturn> operationContainer)
+             public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyCommand, TReturn> operationContainer)
             {
                 try
                 {

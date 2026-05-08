@@ -13,18 +13,18 @@ public abstract class CommandDataDefinition : DataDefinition
     private readonly List< DefaultDefinition> _defaultDefinitions = [];
     private readonly Dictionary<string, Validator> _validators = [];
 
-    public CommandDataDefinition(Type rootArgs,
+    public CommandDataDefinition(Type rootCommand,
                                  CommandDataDefinition? parentDataDefinition,
                                  CommandDataDefinition? rootDataDefinition)
-        : base(rootArgs.Name)
+        : base(rootCommand.Name)
     {
         ParentDataDefinition = parentDataDefinition;
         RootDataDefinition = rootDataDefinition ?? this;
-        ArgsType = rootArgs;
+        CommandType = rootCommand;
     }
 
 
-    public Type ArgsType { get; }
+    public Type CommandType { get; }
     public CommandDataDefinition? ParentDataDefinition { get; }
     public CommandDataDefinition RootDataDefinition { get; }
 
@@ -53,16 +53,16 @@ public abstract class CommandDataDefinition : DataDefinition
 
 }
 
-public abstract class CommandDataDefinition<TRootArgs> : CommandDataDefinition
+public abstract class CommandDataDefinition<TRootCommand> : CommandDataDefinition
 {
     public CommandDataDefinition(CommandDataDefinition? parentDataDefinition,
                                  CommandDataDefinition? rootDataDefinition)
-        : base(typeof(TRootArgs), parentDataDefinition, rootDataDefinition)
+        : base(typeof(TRootCommand), parentDataDefinition, rootDataDefinition)
     {    }
 
-    public Func<DataValues<TRootArgs>>? GetDataValues { get; protected set; }
+    public Func<DataValues<TRootCommand>>? GetDataValues { get; protected set; }
 
-    internal DataValues<TRootArgs> CreateDataValues()
+    internal DataValues<TRootCommand> CreateDataValues()
     {
         if (GetDataValues is null)
         {

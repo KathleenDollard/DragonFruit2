@@ -69,7 +69,8 @@ public class Cli
     /// <param name="args">Optionaly pass the commandline args</param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)
+    public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result,
+                                               string[]? args = null)
     {
         result = ParseArgs<TRootArgs>(args);
         return result.IsValid;

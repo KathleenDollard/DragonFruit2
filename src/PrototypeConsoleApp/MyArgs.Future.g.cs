@@ -77,7 +77,6 @@ partial class MyArgs
             RegisterCustomizations();
         }
 
-
         public OptionDataDefinition<string> Name { get; }
         public OptionDataDefinition<int> Age { get; }
         public OptionDataDefinition<string> Greeting { get; }

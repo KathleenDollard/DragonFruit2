@@ -16,7 +16,6 @@ public class CommandInfoTheoryData : TheoryData<string, string, string>
                     """
                     using DragonFruit2;
 
-
                     namespace MyNamespace
                     {
                         [CommandClass]

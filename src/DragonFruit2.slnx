@@ -1,23 +1,10 @@
 <Solution>
-  <Folder Name="/docs/">
-    <File Path="../docs/Design/DataValues.md" />
-    <File Path="../docs/Design/DesignOverview.md" />
-    <File Path="../docs/Design/GenerationDesign.md" />
-    <File Path="../docs/Design/GoalsAndAudience.md" />
-    <File Path="../docs/Design/Questions and Answers.md" />
-    <File Path="../docs/Design/RequiredValues.md" />
-    <File Path="../docs/Design/StartupProblem.md" />
-    <File Path="../docs/Design/Transforms.md" />
-    <File Path="../docs/_Overview.md" />
-    <File Path="TestingStrategy.md" />
-  </Folder>
   <Folder Name="/Solution Items/">
     <File Path="../.gitattributes" />
     <File Path="../.gitignore" />
     <File Path="../ReadMe.md" />
     <File Path=".editorconfig" />
     <File Path="Directory.Build.props" />
-    <File Path="DragonFruit2.Generators/CommandInfo.cs" />
   </Folder>
   <Project Path="DragonFruit2.Common.Test/DragonFruit2.Common.Test.csproj" />
   <Project Path="DragonFruit2.Common/DragonFruit2.Common.csproj" Id="4ee6eacd-d3b4-4213-8e16-d9f7eaec2c38" />
@@ -31,6 +18,7 @@
     <Build Solution="Debug|*" Project="false" />
   </Project>
   <Project Path="DragonFruit2/DragonFruit2.csproj" />
+  <Project Path="Playspace/Playspace.csproj" Id="e24bfe51-71ae-4255-a07f-c7f0b741ad8a" />
   <Project Path="PrototypeConsoleApp/PrototypeConsoleApp.csproj" />
   <Project Path="SampleConsoleApp/SampleConsoleApp.csproj" />
   <Project Path="SubCommandSampleApp/SubCommandSampleApp.csproj" Id="824e9dcd-a0f0-4178-83b9-6db05ccad94d" />

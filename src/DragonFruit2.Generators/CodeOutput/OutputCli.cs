@@ -79,8 +79,6 @@ public class OutputCli
             sb.CloseIf();
         }
 
-        // TODO: Switch to a compilation generator and add all root args here.
-
         sb.Return("null");
         sb.CloseMethod();
         sb.AppendLine();

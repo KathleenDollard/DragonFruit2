@@ -10,10 +10,7 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // Lambda's are used to allow IEnumerable parameters for testing. If this is identified 
-        // as a perf issue, an extra call can be made, or tests can create ImmutableArrays.
-        // (If the signature matched exactly, method groups can be used instead of lambdas)
-
+        // Filter the ParseArgs invocation syntax and transorm to CliInfo
         var cliInfos = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: DragonFruit2Builder.InitialEntryPointFilter,
@@ -23,6 +20,8 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
             .Select(static (s, _) => s!) // Quiet nullability warning
             .WithTrackingName(TrackingNames.ExtractEntryPoint);
 
+        // Create CliInfoGroup for each namespace
+        // This allows one file to be generated for each namespace
         var cliInfosByNamespace = cliInfos
             .Collect()
             .Select((infos, ctx) => CommandBuilder.GetCliInfoGroups(infos, ctx))
@@ -32,16 +31,19 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
         context.RegisterSourceOutput(cliInfosByNamespace,
                                      DragonFruit2Builder.OutputCliSource);
 
+        // Find all CommandClasses and transform to CommandInfo instances
         var commandInfos = context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 fullyQualifiedMetadataName: "DragonFruit2.CommandClassAttribute",
                 predicate: DragonFruit2Builder.FilterForClassDeclarations,
                 transform: DragonFruit2Builder.TransformCommandClasses)
-            .WithTrackingName("ParseArgsInvocations")
             .Where(static s => s is not null)
             .Select(static (s, _) => s!) // Quiet nullability warning
             .WithTrackingName(TrackingNames.ExtractCommandClasses);
 
+        // Create a tree of nodes; each node includes its CommandInfo 
+        // and nodes for its subcommands; allowing one file
+        // per CommandInfo/CommandInfo
         var commandNodes = commandInfos
             .Collect()
             .Select((infos, ctx) => CommandBuilder.BuildCommandNodes(infos, ctx))

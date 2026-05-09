@@ -35,7 +35,7 @@ public class CommandInfoTests
             }
             """;
 
-        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCodeWithArgsMyNamespace);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCodeWithMyNamespace);
 
         Assert.NotNull(commandInfo);
         Assert.Equal("MyNamespace", commandInfo?.NamespaceName);
@@ -53,14 +53,14 @@ public class CommandInfoTests
             { }
             """;
 
-        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCodeWithArgsMyNamespace);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCodeWithMyNamespace);
 
         Assert.NotNull(commandInfo);
         Assert.Equal("MyNamespace", commandInfo?.NamespaceName);
     }
 
     [Fact]
-    public async Task CommandInfoIncludesArgsClassAccessibility()
+    public async Task CommandInfoIncludesCommandClassAccessibility()
     {
         var sourceText = """
             using DragonFruit2;
@@ -78,7 +78,7 @@ public class CommandInfoTests
 
 
     [Fact]
-    public async Task CommandInfoIncludesArgsClassTwoWordAccessibility()
+    public async Task CommandInfoIncludesCommandClassTwoWordAccessibility()
     {
         var sourceText = """
             using DragonFruit2;

@@ -35,13 +35,13 @@ public class CommandInfoTheoryData : TheoryData<string, string, string>
                             public int Age { get; init; } = 1;
                         }
                         [CommandClass]
-                        public partial class Bar : EveningGreetingArgs
+                        public partial class Bar : EveningGreetingCommand
                         {
                         }
                     }
 
                     """,
-                consoleSource: TestHelpers.EmptyConsoleAppCodeWithArgsMyNamespace);
+                consoleSource: TestHelpers.EmptyConsoleAppCodeWithMyNamespace);
 
     }
 

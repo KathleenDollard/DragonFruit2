@@ -26,7 +26,7 @@
     ]
   },
   {
-    Name: MorningGreetingArgs,
+    Name: MorningGreetingCommand,
     NamespaceName: MyNamespace,
     Accessibility: public,
     BaseTypeName: MyCommand,
@@ -37,7 +37,7 @@
     Options: []
   },
   {
-    Name: EveningGreetingArgs,
+    Name: EveningGreetingCommand,
     NamespaceName: MyNamespace,
     Accessibility: public,
     BaseTypeName: MyCommand,
@@ -50,7 +50,7 @@
         Name: Age,
         CliName: --age,
         TypeName: int,
-        ContainingTypeName: EveningGreetingArgs,
+        ContainingTypeName: EveningGreetingCommand,
         IsValueType: true,
         NullableAnnotation: NotAnnotated,
         HasRequiredModifier: false,
@@ -68,9 +68,9 @@
     Name: Bar,
     NamespaceName: MyNamespace,
     Accessibility: public,
-    BaseTypeName: EveningGreetingArgs,
+    BaseTypeName: EveningGreetingCommand,
     BaseTypeNamespace: MyNamespace,
-    BaseTypeFullName: MyNamespace.EveningGreetingArgs,
+    BaseTypeFullName: MyNamespace.EveningGreetingCommand,
     SimpleName: bar,
     Arguments: [],
     Options: []

@@ -16,11 +16,11 @@ public partial class SubCommandArgs
     public string Greeting { get; set; } = "Hello";
 }
 
-public partial class MorningArgs : SubCommandArgs
+public partial class MorningCommand : SubCommandArgs
 {
 }
 
-public partial class EveningArgs : SubCommandArgs
+public partial class EveningCommand : SubCommandArgs
 {
 
     /// <summary>
@@ -30,4 +30,4 @@ public partial class EveningArgs : SubCommandArgs
     public int Age { get; init; } = 1;
 }
 
-public partial class Bar : EveningArgs { }
+public partial class Bar : EveningCommand { }

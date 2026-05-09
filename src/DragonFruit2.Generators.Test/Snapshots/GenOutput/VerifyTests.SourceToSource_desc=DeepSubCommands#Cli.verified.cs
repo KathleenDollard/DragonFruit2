@@ -46,7 +46,7 @@ public class Cli
     /// <typeparam name="TRootCommand">The type containing the CLI definition.</typeparam>
     /// <param name="args">Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.</param>
 
-    public static Result<TRootCommand> ParseArgs<TRootCommand>(string[]? args = null)
+    public static Result<TRootCommand> ParseAxgs<TRootCommand>(string[]? args = null)
     {
         var builder = CreateBuilder<TRootCommand>();
         if (builder is null)
@@ -55,7 +55,7 @@ public class Cli
             result.AddDiagnostic(new Diagnostic(DiagnosticId.CouldNotFindBuilder.ToValidationIdString(), DiagnosticSeverity.Error));
             return result;
         }
-        return builder.ParseArgs(args);
+        return builder.ParseAxgs(args);
     }
 
     /// <summary>
@@ -69,9 +69,9 @@ public class Cli
     /// <param name="args">Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.</param>
     /// <exception cref="InvalidOperationException">To be implemented soon.</param>
 
-    public static bool TryParseArgs<TRootCommand>(out Result<TRootCommand> result, string[]? args = null)
+    public static bool TryParseAxgs<TRootCommand>(out Result<TRootCommand> result, string[]? args = null)
     {
-        result = ParseArgs<TRootCommand>(args);
+        result = ParseAxgs<TRootCommand>(args);
         return result.IsValid;
     }
 }

@@ -44,10 +44,10 @@ partial class MyCommand
 
     static partial void RegisterCustomDefaults(Builder<MyCommand> builder, DefaultDataProvider<MyCommand> defaultDataProvider);
 
-    // Generation Note: MyCommand in the class declaration is TArgs.
+    // Generation Note: MyCommand in the class declaration is TCommand.
     public partial class MyCommandDataDefinition : CommandDataDefinition<MyCommand>
     {
-        // Generation Note: MyCommand in the following constructor is TArgs.
+        // Generation Note: MyCommand in the following constructor is TCommand.
         public MyCommandDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
             : base(parentDataDefinition, rootDataDefinition)
         {

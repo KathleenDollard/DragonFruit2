@@ -9,34 +9,34 @@ public static class TestHelpers
     public const string EmptyConsoleAppCode = """
         using DragonFruit2;
         
-        var myArgs = Cli.ParseArgs<MyCommand>(args);
+        var myArgs = Cli.ParseAxgs<MyCommand>(args);
         """;
 
     public const string EmptyConsoleAppCodeWithArgsMyNamespace = """
         using DragonFruit2;
         using MyNamespace;
         
-        var myArgs = Cli.ParseArgs<MyCommand>(args);
+        var myArgs = Cli.ParseAxgs<MyCommand>(args);
         """;
 
     public const string ConsoleAppWithDuplicateCall = """
         using DragonFruit2;
         
-        var myArgs = Cli.ParseArgs<MyCommand>(args);
-        var myArgs2 = Cli.ParseArgs<MyCommand>(args);
+        var myArgs = Cli.ParseAxgs<MyCommand>(args);
+        var myArgs2 = Cli.ParseAxgs<MyCommand>(args);
         """;
 
     public const string ConsoleAppWithTwoDifferentCalls = """
         using DragonFruit2;
         
-        var myArgs = Cli.ParseArgs<MyCommand>(args);
-        var myArgs2 = Cli.ParseArgs<MyOtherArgs>(args);
+        var myArgs = Cli.ParseAxgs<MyCommand>(args);
+        var myArgs2 = Cli.ParseAxgs<MyOtherArgs>(args);
         """;
 
     public const string ConsoleAppWithTryParseCall = """
         using DragonFruit2;
         
-        var success = Cli.TryParseArgs<MyCommand>(args, out var result);
+        var success = Cli.TryParseAxgs<MyCommand>(args, out var result);
         if (success)
         {
             // do something

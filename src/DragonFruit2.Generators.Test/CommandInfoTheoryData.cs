@@ -25,12 +25,12 @@ public class CommandInfoTheoryData : TheoryData<string, string, string>
                         }
 
                         [CommandClass]
-                        public partial class MorningGreetingArgs : MyCommand
+                        public partial class MorningGreetingCommand : MyCommand
                         {
                         }
 
                         [CommandClass]
-                        public partial class EveningGreetingArgs : MyCommand
+                        public partial class EveningGreetingCommand : MyCommand
                         {
                             public int Age { get; init; } = 1;
                         }

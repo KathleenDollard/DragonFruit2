@@ -39,7 +39,7 @@ public class Builder<TRootCommand>
         }
     }
 
-    public Result<TRootCommand> ParseArgs(string[]? commandLineArguments)
+    public Result<TRootCommand> ParseAxgs(string[]? commandLineArguments)
     {
         commandLineArguments ??= GetArgsFromEnvironment();
         var result = new Result<TRootCommand>(commandLineArguments);

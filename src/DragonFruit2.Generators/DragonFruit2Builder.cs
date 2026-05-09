@@ -15,11 +15,11 @@ public class DragonFruit2Builder
     }
 
     /// <summary>
-    /// Determines whether the specified syntax node represents an invocation of the generic method 'ParseArgs' with
+    /// Determines whether the specified syntax node represents an invocation of the generic method 'ParseAxgs' with
     /// exactly one type argument.
     /// </summary>
     /// <param name="node">The syntax node to evaluate.</param>
-    /// <returns>true if the node is an invocation of 'ParseArgs' with a single type argument; otherwise, false.</returns>
+    /// <returns>true if the node is an invocation of 'ParseAxgs' with a single type argument; otherwise, false.</returns>
     public static bool InitialEntryPointFilter(SyntaxNode node, CancellationToken _)
     {
         if (node is null) return false;
@@ -43,7 +43,7 @@ public class DragonFruit2Builder
 
         static bool IsMethodNameOfInterest(string valueText)
         {
-            return valueText == "ParseArgs" || valueText == "TryParseArgs" || valueText == "TryExecute";
+            return valueText == "ParseAxgs" || valueText == "TryParseAxgs" || valueText == "TryExecute";
         }
     }
 
@@ -90,7 +90,7 @@ public class DragonFruit2Builder
     {
         try
         {
-            context.AddSource(commandNode.CommandInfo.Name, OutputPartialArgs.GetSourcePartialCommandClass(commandNode));
+            context.AddSource(commandNode.CommandInfo.Name, OutputPartialCommand.GetSourcePartialCommandClass(commandNode));
         }
         catch 
         {

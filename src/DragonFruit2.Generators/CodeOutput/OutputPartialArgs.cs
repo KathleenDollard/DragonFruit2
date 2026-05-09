@@ -2,7 +2,7 @@
 
 namespace DragonFruit2.Generators.CodeOutput;
 
-internal class OutputPartialArgs
+internal class OutputPartialCommand
 {
     internal static string GetSourcePartialCommandClass(CommandNode commandNode)
     {

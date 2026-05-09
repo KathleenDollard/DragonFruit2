@@ -20,8 +20,8 @@ public class CliInfoTheoryData
 
                     // global namespace
 
-                    var myArgsDataValues = Cli.ParseArgs<MyCommand>(args);
-                    var myArgsDataValues2 = Cli.ParseArgs<MyCommand2>(args);
+                    var myArgsDataValues = Cli.ParseAxgs<MyCommand>(args);
+                    var myArgsDataValues2 = Cli.ParseAxgs<MyCommand2>(args);
 
                     [CommandClass] class MyCommand{} 
                     [CommandClass] class MyCommand2{}
@@ -54,8 +54,8 @@ public class CliInfoTheoryData
                     {
                        public void OtherCalls(string[] args)
                        {
-                          var myArgsDataValues = Cli.ParseArgs<MyCommandNamespace.MyCommand3>(args);
-                          var myArgsDataValues = Cli.ParseArgs<MyCommandNamespace2.MyCommand4>(args);
+                          var myArgsDataValues = Cli.ParseAxgs<MyCommandNamespace.MyCommand3>(args);
+                          var myArgsDataValues = Cli.ParseAxgs<MyCommandNamespace2.MyCommand4>(args);
                        }
                     }
                     """,

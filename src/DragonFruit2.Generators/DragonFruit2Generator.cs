@@ -10,7 +10,7 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // Filter the ParseArgs invocation syntax and transorm to CliInfo
+        // Filter the ParseAxgs invocation syntax and transorm to CliInfo
         var cliInfos = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: DragonFruit2Builder.InitialEntryPointFilter,

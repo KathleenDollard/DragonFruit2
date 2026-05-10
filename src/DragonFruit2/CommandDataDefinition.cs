@@ -16,7 +16,7 @@ public abstract class CommandDataDefinition : DataDefinition
     public CommandDataDefinition(Type command,
                                  CommandDataDefinition? parentDataDefinition,
                                  CommandDataDefinition? rootDataDefinition)
-        : base(command.Name)
+        : base(command.Name.EndsWith("Command") ? command.Name.Substring(0, command.Name.Length - 7) : command.Name)
     {
         ParentDataDefinition = parentDataDefinition;
         RootDataDefinition = rootDataDefinition ?? this;

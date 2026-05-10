@@ -135,15 +135,15 @@ public class Builder<TRootCommand>
 
     private void GatherFromOtherDataProviders(Result<TRootCommand> result)
     {
-        result.DataValues?.Operate(new GatherFromOterDataProvidersOperation(result, result.ActiveDataProvider, DataProviders));
+        result.DataValues?.Operate(new GatherFromOtherDataProvidersOperation(result, result.ActiveDataProvider, DataProviders));
     }
 
-    internal struct GatherFromOterDataProvidersOperation : IOperateOnDataValue<TRootCommand, Void>
+    internal struct GatherFromOtherDataProvidersOperation : IOperateOnDataValue<TRootCommand, Void>
     {
         private readonly IEnumerable<DataProvider<TRootCommand>> _dataProviders;
         private readonly DataProvider<TRootCommand> _activeDataProvider;
 
-        public GatherFromOterDataProvidersOperation(Result<TRootCommand> result, DataProvider<TRootCommand> activeDataProvider, IEnumerable<DataProvider<TRootCommand>> dataProviders)
+        public GatherFromOtherDataProvidersOperation(Result<TRootCommand> result, DataProvider<TRootCommand> activeDataProvider, IEnumerable<DataProvider<TRootCommand>> dataProviders)
         {
             Result = result;
             _dataProviders = dataProviders;

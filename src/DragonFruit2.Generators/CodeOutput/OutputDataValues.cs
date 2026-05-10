@@ -38,7 +38,7 @@ internal class OutputDataValues
 
     private static void Operate(StringBuilderWrapper sb,  CommandNode  commandNode)
     {
-        sb.OpenMethod($" public override bool Operate<TReturn>(IOperateOnDataValue<{ commandNode.RootCommandNode?.FullName}, TReturn> operationContainer)");
+        sb.OpenMethod($"public override bool Operate<TReturn>(IOperateOnDataValue<{ commandNode.RootCommandNode?.FullName}, TReturn> operationContainer)");
         sb.OpenTry();
         foreach (var propInfo in  commandNode.GetSelfAndAncestorPropInfos())
         {

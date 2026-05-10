@@ -5,7 +5,7 @@ public abstract class Result
     public abstract IEnumerable<Diagnostic> Diagnostics { get; }
     private readonly List<Diagnostic> diagnostics = [];
     // For .NET Framework runtimes, it is important not to recreate the Random instance as the seed can be repeated in a loop, such as when we support scripts
-    private static Random random = new();
+    private static readonly Random random = new();
 
     public Result(string[] commandLineArguments)
     {
@@ -97,43 +97,5 @@ public class Result<TCommand, TRootCommand> : Result<TRootCommand>
 
     public Result(string[] commandLineArguments) : base(commandLineArguments)
     {
-    }
-
-    public TRootCommand? Command { get; internal set; }
-    public DataValues<TRootCommand>? DataValues { get; internal set; }
-
-    public CommandDataDefinition<TRootCommand>? ActiveCommandDefinition
-    {
-        get;
-        internal set
-        {
-            if (value is null)
-            { throw new ArgumentNullException(nameof(value)); }
-            field = value;
-            DataValues = field.CreateDataValues();
-        }
-    }
-
-    public DataProvider<TRootCommand> ActiveDataProvider { get; internal set; }
-
-    public override IEnumerable<Diagnostic> Diagnostics
-        => DataValues switch
-        {
-            null => CommandDiagnostics,
-            _ => CommandDiagnostics
-                    .Concat(DataValues
-                        .Where(d => d.Diagnostics is not null && d.Diagnostics.Any())
-                        .SelectMany(d => d.Diagnostics))
-        };
-
-
-    public void Cleanup()
-    {
-
-        if (!Configuration.ResultDebuggingLevel.HasFlag(ResultDebuggingLevel.DataValues))
-        {
-            DataValues = null;
-        }
-
     }
 }

@@ -2,7 +2,7 @@
 
 public class DataDefinition
 {
-    public IEnumerable<string> ReusableDefinitionsUsed = new List<string>();
+    public IEnumerable<string> ReusableDefinitionsUsed = [];
 
     public DataDefinition(string name)
     {

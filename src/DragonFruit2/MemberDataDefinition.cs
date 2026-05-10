@@ -41,7 +41,7 @@ public abstract class MemberDataDefinition<TValue> : MemberDataDefinition
 
     public override IEnumerable<Diagnostic>? Validate(DataValue dataValue)
     {
-        if (!(dataValue is DataValue<TValue> typedDataValue))
+        if (dataValue is not DataValue<TValue> typedDataValue)
         {
             throw new InvalidOperationException($"Data values is of an unexpected type. The expect type is {typeof(TValue)}, but the passed type is {dataValue.GetType().GenericTypeArguments.First()}");
         }
@@ -52,7 +52,7 @@ public abstract class MemberDataDefinition<TValue> : MemberDataDefinition
             var newDiagnostics = validator.Validate(typedDataValue);
             if (newDiagnostics is not null && newDiagnostics.Any())
             {
-                diagnostics ??= new List<Diagnostic>();
+                diagnostics ??= [];
                 diagnostics.AddRange(newDiagnostics);
             }
         }

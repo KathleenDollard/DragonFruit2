@@ -53,9 +53,7 @@ public class Builder<TRootCommand>
                 return result;
             }
             result.ActiveCommandDefinition = activeCommandDefinition;
-            if (result.ActiveDataProvider is null)
-
-                result.ActiveDataProvider = activeDataProvider;
+            result.ActiveDataProvider ??= activeDataProvider;
             if (result.DataValues is null) throw new InvalidOperationException("DataValues should not be null after ActiveCommandDefinition is set");
 
             GatherActiveDataValues(result);
@@ -107,7 +105,7 @@ public class Builder<TRootCommand>
         result.DataValues?.Operate(new SetActiveDataValueOperation(result, result.ActiveDataProvider));
     }
 
-    internal struct SetActiveDataValueOperation : IOperateOnDataValue<TRootCommand, Void>
+    internal readonly struct SetActiveDataValueOperation : IOperateOnDataValue<TRootCommand, Void>
     {
         private readonly DataProvider<TRootCommand> _dataProvider;
         public SetActiveDataValueOperation(Result<TRootCommand> result, DataProvider<TRootCommand> dataProvider)
@@ -138,7 +136,7 @@ public class Builder<TRootCommand>
         result.DataValues?.Operate(new GatherFromOtherDataProvidersOperation(result, result.ActiveDataProvider, DataProviders));
     }
 
-    internal struct GatherFromOtherDataProvidersOperation : IOperateOnDataValue<TRootCommand, Void>
+    internal readonly struct GatherFromOtherDataProvidersOperation : IOperateOnDataValue<TRootCommand, Void>
     {
         private readonly IEnumerable<DataProvider<TRootCommand>> _dataProviders;
         private readonly DataProvider<TRootCommand> _activeDataProvider;

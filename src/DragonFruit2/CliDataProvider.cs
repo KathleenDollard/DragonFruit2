@@ -66,9 +66,9 @@ public class CliDataProvider<TRootCommand>
         command.SetAction(p => ParseResult = p);
     }
 
-    internal struct CreateFromMembersOperation : IOperationOnMemberDefinition<Symbol>
+    internal readonly struct CreateFromMembersOperation : IOperationOnMemberDefinition<Symbol>
     {
-        private CliDataProvider<TRootCommand> _dataProvider;
+        private readonly CliDataProvider<TRootCommand> _dataProvider;
         public CreateFromMembersOperation(CliDataProvider<TRootCommand> dataProvider)
         {
             _dataProvider = dataProvider;
@@ -188,11 +188,11 @@ public class CliDataProvider<TRootCommand>
         var command = commandResult.Command;
         switch (command)
         {
-            case SclWrappers.Command sclCommand and IHasDataDefinition { DataDefinition: CommandDataDefinition<TRootCommand> dataDefinition }:
+            case SclWrappers.Command and IHasDataDefinition { DataDefinition: CommandDataDefinition<TRootCommand> dataDefinition }:
                 activeDataProvider = this;
                 activeCommandDefinition = dataDefinition;
                 return true;
-            case SclWrappers.RootCommand sclRootCommand and IHasDataDefinition { DataDefinition: CommandDataDefinition<TRootCommand> dataDefinition }:
+            case SclWrappers.RootCommand and IHasDataDefinition { DataDefinition: CommandDataDefinition<TRootCommand> dataDefinition }:
                 activeDataProvider = this;
                 activeCommandDefinition = dataDefinition;
                 return true;

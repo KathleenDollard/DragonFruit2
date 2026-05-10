@@ -1,19 +1,18 @@
 ﻿[
   {
-    Name: MyArgs,
+    Name: MyCommand,
     NamespaceName: MyNamespace,
     Accessibility: public,
-    BaseTypeName: Object,
-    BaseTypeNamespace: System,
-    BaseTypeFullName: System.Object,
-    SimpleName: my,
+    BaseTypeName: CommandClass,
+    BaseTypeNamespace: DragonFruit2,
+    BaseTypeFullName: DragonFruit2.CommandClass,
     Arguments: [],
     Options: [
       {
         Name: Name,
         CliName: --name,
         TypeName: string,
-        ContainingTypeName: MyArgs,
+        ContainingTypeName: MyCommand,
         IsValueType: false,
         HasRequiredModifier: true,
         HasArgumentAttribute: false,
@@ -26,31 +25,29 @@
     ]
   },
   {
-    Name: MorningGreetingArgs,
+    Name: MorningGreetingCommand,
     NamespaceName: MyNamespace,
     Accessibility: public,
-    BaseTypeName: MyArgs,
+    BaseTypeName: MyCommand,
     BaseTypeNamespace: MyNamespace,
-    BaseTypeFullName: MyNamespace.MyArgs,
-    SimpleName: morning-greeting,
+    BaseTypeFullName: MyNamespace.MyCommand,
     Arguments: [],
     Options: []
   },
   {
-    Name: EveningGreetingArgs,
+    Name: EveningGreetingCommand,
     NamespaceName: MyNamespace,
     Accessibility: public,
-    BaseTypeName: MyArgs,
+    BaseTypeName: MyCommand,
     BaseTypeNamespace: MyNamespace,
-    BaseTypeFullName: MyNamespace.MyArgs,
-    SimpleName: evening-greeting,
+    BaseTypeFullName: MyNamespace.MyCommand,
     Arguments: [],
     Options: [
       {
         Name: Age,
         CliName: --age,
         TypeName: int,
-        ContainingTypeName: EveningGreetingArgs,
+        ContainingTypeName: EveningGreetingCommand,
         IsValueType: true,
         NullableAnnotation: NotAnnotated,
         HasRequiredModifier: false,
@@ -68,10 +65,9 @@
     Name: Bar,
     NamespaceName: MyNamespace,
     Accessibility: public,
-    BaseTypeName: EveningGreetingArgs,
+    BaseTypeName: EveningGreetingCommand,
     BaseTypeNamespace: MyNamespace,
-    BaseTypeFullName: MyNamespace.EveningGreetingArgs,
-    SimpleName: bar,
+    BaseTypeFullName: MyNamespace.EveningGreetingCommand,
     Arguments: [],
     Options: []
   }

@@ -13,18 +13,23 @@ public abstract class CommandDataDefinition : DataDefinition
     private readonly List< DefaultDefinition> _defaultDefinitions = [];
     private readonly Dictionary<string, Validator> _validators = [];
 
-    public CommandDataDefinition(Type rootArgs,
+    public CommandDataDefinition(Type command,
                                  CommandDataDefinition? parentDataDefinition,
                                  CommandDataDefinition? rootDataDefinition)
-        : base(rootArgs.Name)
+        : base(SimpleName(command.Name))
     {
         ParentDataDefinition = parentDataDefinition;
         RootDataDefinition = rootDataDefinition ?? this;
-        ArgsType = rootArgs;
+        CommandType = command;
     }
+    public static string SimpleName(string name)
+    => name switch
+    {
+        _ when name.EndsWith("Command") => $"{name.Substring(0, name.Length - 7)}",
+        _ => name
+    };
 
-
-    public Type ArgsType { get; }
+    public Type CommandType { get; }
     public CommandDataDefinition? ParentDataDefinition { get; }
     public CommandDataDefinition RootDataDefinition { get; }
 
@@ -53,16 +58,17 @@ public abstract class CommandDataDefinition : DataDefinition
 
 }
 
-public abstract class CommandDataDefinition<TRootArgs> : CommandDataDefinition
+public abstract class CommandDataDefinition<TRootCommand> : CommandDataDefinition
 {
-    public CommandDataDefinition(CommandDataDefinition? parentDataDefinition,
-                                 CommandDataDefinition? rootDataDefinition)
-        : base(typeof(TRootArgs), parentDataDefinition, rootDataDefinition)
+    protected CommandDataDefinition(Type commandType,
+                                    CommandDataDefinition? parentDataDefinition,
+                                    CommandDataDefinition? rootDataDefinition)
+        : base(commandType, parentDataDefinition, rootDataDefinition)
     {    }
 
-    public Func<DataValues<TRootArgs>>? GetDataValues { get; protected set; }
+    public Func<DataValues<TRootCommand>>? GetDataValues { get; protected set; }
 
-    internal DataValues<TRootArgs> CreateDataValues()
+    internal DataValues<TRootCommand> CreateDataValues()
     {
         if (GetDataValues is null)
         {
@@ -70,5 +76,15 @@ public abstract class CommandDataDefinition<TRootArgs> : CommandDataDefinition
         }
         return GetDataValues();
     }
+
+}
+
+public abstract class CommandDataDefinition<TCommand, TRootCommand> : CommandDataDefinition<TRootCommand>
+    where TCommand : TRootCommand
+{
+    public CommandDataDefinition(CommandDataDefinition? parentDataDefinition,
+                                 CommandDataDefinition? rootDataDefinition)
+        : base(typeof(TCommand), parentDataDefinition, rootDataDefinition)
+    { }
 
 }

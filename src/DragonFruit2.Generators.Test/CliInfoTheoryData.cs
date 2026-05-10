@@ -20,28 +20,28 @@ public class CliInfoTheoryData
 
                     // global namespace
 
-                    var myArgsDataValues = Cli.ParseArgs<MyArgs>(args);
-                    var myArgsDataValues2 = Cli.ParseArgs<MyArgs2>(args);
+                    var myCommandDataValues = Cli.ParseArgs<MyCommand>(args);
+                    var myCommandDataValues2 = Cli.ParseArgs<MyCommand2>(args);
 
-                    [CommandClass] class MyArgs{} 
-                    [CommandClass] class MyArgs2{}
+                    [CommandClass] class MyCommand{} : CommandClass
+                    [CommandClass] class MyCommand2{} : CommandClass
                     """,
 
                     """
                     using DragonFruit2;
 
-                    namespace MyArgsNamespace;
+                    namespace MyCommandNamespace;
 
-                    [CommandClass] public class MyArgs3 
+                    [CommandClass] public class MyCommand3 : CommandClass
                     {}
                     """,
 
                     """
                     using DragonFruit2;
 
-                    namespace MyArgsNamespace2;
+                    namespace MyCommandNamespace2;
 
-                    [CommandClass] public class MyArgs4
+                    [CommandClass] public class MyCommand4 : CommandClass
                     {}
                     """,
 
@@ -54,8 +54,8 @@ public class CliInfoTheoryData
                     {
                        public void OtherCalls(string[] args)
                        {
-                          var myArgsDataValues = Cli.ParseArgs<MyArgsNamespace.MyArgs3>(args);
-                          var myArgsDataValues = Cli.ParseArgs<MyArgsNamespace2.MyArgs4>(args);
+                          var myCommandDataValues = Cli.ParseArgs<MyCommandNamespace.MyCommand3>(args);
+                          var myCommandDataValues = Cli.ParseArgs<MyCommandNamespace2.MyCommand4>(args);
                        }
                     }
                     """,

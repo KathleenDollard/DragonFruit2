@@ -2,19 +2,19 @@
 
 namespace DragonFruit2;
 
-public class DefaultDataProvider<TRootArgs> : DataProvider<TRootArgs>
+public class DefaultDataProvider<TRootCommand> : DataProvider<TRootCommand>
 {
     //// TODO: This a temporary hack to get the default system working
-    //private static readonly DefaultDataProvider<TRootArgs> _instance = new(null);
-    //public static DefaultDataProvider<TRootArgs> Instance() => _instance;
-    public DefaultDataProvider(Builder<TRootArgs> builder)
+    //private static readonly DefaultDataProvider<TRootCommand> _instance = new(null);
+    //public static DefaultDataProvider<TRootCommand> Instance() => _instance;
+    public DefaultDataProvider(Builder<TRootCommand> builder)
         : base(builder)
     {
     }
 
 
     protected override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition,
-                                             Result<TRootArgs> result,
+                                             Result<TRootCommand> result,
                                              [NotNullWhen(true)] out TValue value)
     {
         if (result.DataValues is null)

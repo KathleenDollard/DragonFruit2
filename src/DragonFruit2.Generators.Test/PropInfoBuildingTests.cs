@@ -14,7 +14,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
         
         [CommandClass] 
-        public partial class MyArgs 
+        public partial class MyCommand 
         { 
             public required string Name { get; set; }
         }
@@ -35,7 +35,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass] 
-        public partial class MyArgs
+        public partial class MyCommand
         { 
             [DragonFruit2.Argument(1)]
             public required string Name { get; set; }
@@ -58,7 +58,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass] 
-        public partial class MyArgs
+        public partial class MyCommand
         { 
             public int Name { get; set; }
         }
@@ -79,7 +79,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass] 
-        public partial class MyArgs
+        public partial class MyCommand
         { 
             public int GivenName { get; set; }
         }
@@ -100,7 +100,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass] 
-        public partial class MyArgs
+        public partial class MyCommand
         { 
             public int Name { get; set; }
         }
@@ -121,7 +121,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass] 
-        public partial class MyArgs
+        public partial class MyCommand
         { 
             public required string Name { get; set; }
         }
@@ -143,7 +143,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass] 
-        public partial class MyArgs
+        public partial class MyCommand
         { 
             public string Name { get; set; }
         }
@@ -165,7 +165,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass] 
-        public partial class MyArgs
+        public partial class MyCommand
         { 
             public int Name { get; set; } = 42
         }
@@ -186,7 +186,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass] 
-        public partial class MyArgs
+        public partial class MyCommand
         { 
             public int Name { get; set; } = 42
         }
@@ -207,7 +207,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass] 
-        public partial class MyArgs
+        public partial class MyCommand
         { 
             public int Name { get; set; } = 42
         }
@@ -228,7 +228,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass] 
-        public partial class MyArgs
+        public partial class MyCommand
         { 
             public string Name { get; set; } = 42
         }
@@ -249,7 +249,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass] 
-        public partial class MyArgs
+        public partial class MyCommand
         { 
             public string? Name { get; set; } = 42
         }
@@ -270,7 +270,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass]  
-        public partial class MyArgs
+        public partial class MyCommand : CommandClass
         { 
             public string Name { get; set; } = 42
         }
@@ -291,7 +291,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass] 
-        public partial class MyArgs
+        public partial class MyCommand : CommandClass
         { 
             [DragonFruit2.Description("R2D2")]
             public string Name { get; set; } = 42
@@ -314,20 +314,20 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public string Name { get; set; }
                 public int Age { get; set; }
                 public string Email { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbols = typeSymbol.GetMembers().OfType<IPropertySymbol>().ToList();
 
-        var results = propSymbols.Select(x => PropInfoHelpers.CreatePropInfo(x, compilation.GetSemanticModel(argsTree))).ToList();
+        var results = propSymbols.Select(x => PropInfoHelpers.CreatePropInfo(x, compilation.GetSemanticModel(commandSyntaxTree))).ToList();
 
         Assert.Equal(3, results.Count);
         Assert.Equal("Name", results[0].Name);
@@ -344,23 +344,23 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.Equal("Name", result.Name);
         Assert.Equal("string", result.TypeName);
-        Assert.Equal("MyArgs", result.ContainingTypeName);
+        Assert.Equal("MyCommand", result.ContainingTypeName);
         Assert.False(result.IsValueType);
         Assert.False(result.HasInitializer);
     }
@@ -373,19 +373,19 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public int Age { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.IsValueType);
     }
@@ -398,19 +398,19 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public string Greeting { get; set; } = "Hello";
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Greeting");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.HasInitializer);
         Assert.NotNull(result.InitializerText);
@@ -425,19 +425,19 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public required string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.HasRequiredModifier);
     }
@@ -452,20 +452,20 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 [Argument(Position = 0)]
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.HasArgumentAttribute);
         Assert.True(result.IsArgument);
@@ -481,20 +481,20 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 [Argument(5)]
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.Equal(5, result.Position);
     }
@@ -509,20 +509,20 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 [Description("User's full name")]
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.Equal("User's full name", result.Description);
     }
@@ -537,19 +537,19 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public string? Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.Equal(NullableAnnotation.Annotated, result.NullableAnnotation);
     }
@@ -562,19 +562,19 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.False(result.HasInitializer);
         Assert.Null(result.InitializerText);
@@ -588,19 +588,19 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.False(result.HasArgumentAttribute);
         Assert.False(result.IsArgument);
@@ -614,19 +614,19 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.Null(result.Description);
     }
@@ -639,19 +639,19 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public int Count { get; set; } = 42;
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Count");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.HasInitializer);
         Assert.NotNull(result.InitializerText);
@@ -668,19 +668,19 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.Equal(NullableAnnotation.NotAnnotated, result.NullableAnnotation);
     }
@@ -694,19 +694,19 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public string Path { get; set; } = "C:\\Users\\Test";
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Path");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.HasInitializer);
         Assert.NotNull(result.InitializerText);
@@ -720,19 +720,19 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public object Data { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Data");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.False(result.IsValueType);
     }
@@ -747,19 +747,19 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyArgs
+            public class MyCommand : CommandClass
             {
                 public int? OptionalAge { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
-        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyArgs");
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "OptionalAge");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.IsValueType);
         Assert.Equal(NullableAnnotation.Annotated, result.NullableAnnotation);

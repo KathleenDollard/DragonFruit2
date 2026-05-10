@@ -16,6 +16,9 @@ public static class DragonFruitExtensions
         [NotNullIfNotNull("Name")]
         public string? FullName
             => commandNode.CommandInfo.FullName;
+
+        public string? NestedName([NotNullIfNotNull(nameof(partialName))] string partialName)
+            => $"{commandNode.CommandInfo.FullName}.{commandNode.Name}{partialName}";
     }
 
     extension((string? NamespaceName, string? Name) tuple)

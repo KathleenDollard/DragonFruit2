@@ -4,6 +4,7 @@
 using DragonFruit2;
 using DragonFruit2.Validators;
 using System.CommandLine;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Cache;
 using System.Net.Http.Headers;
@@ -14,15 +15,15 @@ namespace SampleConsoleApp;
 /// <summary>
 /// 
 /// </summary>
-partial class MyArgs 
+partial class MyCommand 
 {
     // Only generate the following constructor if there are no other constructors defined (possibly via partial constructor)
-    public MyArgs()
+    public MyCommand()
     {
     }
 
     [SetsRequiredMembers()]
-    private MyArgs(DataValue<string> nameDataValue, DataValue<Int32> ageDataValue, DataValue<string> greetingDataValue)
+    private MyCommand(DataValue<string> nameDataValue, DataValue<Int32> ageDataValue, DataValue<string> greetingDataValue)
         : this()
     {
         // TODO: Resolve nullable warning. This appears in generated code and needs to be resolved.(Issue: #48)
@@ -42,16 +43,18 @@ partial class MyArgs
         }
     }
 
-    static partial void RegisterCustomDefaults(Builder<MyArgs> builder, DefaultDataProvider<MyArgs> defaultDataProvider);
+    static partial void RegisterCustomDefaults(Builder<MyCommand> builder, DefaultDataProvider<MyCommand> defaultDataProvider);
 
-    // Generation Note: MyArgs in the class declaration is TArgs.
-    public partial class MyArgsDataDefinition : CommandDataDefinition<MyArgs>
+    // Generation Note: MyCommand in the class declaration is TCommand.
+    public partial class MyCommandDataDefinition : CommandDataDefinition<MyCommand, MyCommand>
     {
-        // Generation Note: MyArgs in the following constructor is TArgs.
-        public MyArgsDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
+        public static MyCommandDataDefinition Instance = new(null, null);
+
+        // Generation Note: MyCommand in the following constructor is TCommand.
+        public MyCommandDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
             : base(parentDataDefinition, rootDataDefinition)
         {
-            GetDataValues = () => new MyArgsDataValues(this);
+            GetDataValues = () => new MyCommandDataValues();
 
             Name = new OptionDataDefinition<string>(this, nameof(Name))
             {
@@ -76,7 +79,6 @@ partial class MyArgs
 
             RegisterCustomizations();
         }
-
 
         public OptionDataDefinition<string> Name { get; }
         public OptionDataDefinition<int> Age { get; }
@@ -103,21 +105,24 @@ partial class MyArgs
         }
     }
 
-    // Generation Note: MyArgs in the following class is TRootArgs, except for the private srgsType.
-    public class MyArgsDataValues : DataValues<MyArgs>
+    // Generation Note: MyCommand in the following class is TRootCommand, except for the private srgsType.
+    public class MyCommandDataValues : DataValues<MyCommand>
     {
-        public MyArgsDataValues(MyArgsDataDefinition commandDefinition)
-            : base(commandDefinition)
+        public static MyCommandDataDefinition CommandDataDefinition = MyCommandDataDefinition.Instance;
+        private Type commandClassType = typeof(MyCommand);
+
+        public MyCommandDataValues()
+            : base()
         {
-            Name = DataValue<string>.Create(nameof(Name), argsType, this, commandDefinition.Name);
+            Name = DataValue<string>.Create(nameof(Name), commandType, this, CommandDataDefinition.Name);
             Add(Name);
-            Age = DataValue<int>.Create(nameof(Age), argsType, this, commandDefinition.Age);
+            Age = DataValue<int>.Create(nameof(Age), commandType, this, CommandDataDefinition.Age);
             Add(Age);
-            Greeting = DataValue<string>.Create(nameof(Greeting), argsType, this, commandDefinition.Greeting);
+            Greeting = DataValue<string>.Create(nameof(Greeting), commandType, this, CommandDataDefinition.Greeting);
             Add(Greeting);
         }
 
-        public override bool Operate<TReturn>(IOperateOnDataValue<MyArgs, TReturn> operationContainer)
+        public override bool Operate<TReturn>(IOperateOnDataValue<MyCommand, TReturn> operationContainer)
         {
             try
             {
@@ -134,15 +139,15 @@ partial class MyArgs
             }
         }
 
-        private Type argsType = typeof(MyArgs);
+        private Type commandType = typeof(MyCommand);
 
         public DataValue<string> Name { get; }
         public DataValue<int> Age { get; }
         public DataValue<string> Greeting { get; }
 
-        protected override MyArgs CreateInstance()
+        protected override MyCommand CreateInstance()
         {
-            return new MyArgs(Name, Age, Greeting);
+            return new MyCommand(Name, Age, Greeting);
         }
 
     }

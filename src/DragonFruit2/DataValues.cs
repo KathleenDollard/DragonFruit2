@@ -7,12 +7,12 @@ public abstract class DataValues : IEnumerable<DataValue>
 {
     readonly Dictionary<MemberDataDefinition, DataValue> _values = [];
 
-    protected DataValues(CommandDataDefinition commandDefinition)
+    protected DataValues()
     {
-        CommandDefinition = commandDefinition;
+        //CommandDefinition = commandDefinition;
     }
 
-    public CommandDataDefinition CommandDefinition { get; }
+    //public CommandDataDefinition CommandDefinition { get; }
 
     protected void Add<TValue>(DataValue<TValue> value)
     {
@@ -41,15 +41,14 @@ public abstract class DataValues : IEnumerable<DataValue>
     }
 }
 
-public abstract class DataValues<TRootArgs> : DataValues
+public abstract class DataValues<TRootCommand> : DataValues
 {
-    protected DataValues(CommandDataDefinition commandDefinition)
-        : base(commandDefinition)
+    protected DataValues()
+        : base()
     { }
 
-    public abstract bool Operate<TReturn>(IOperateOnDataValue<TRootArgs, TReturn> operationContainer);
+    public abstract bool Operate<TReturn>(IOperateOnDataValue<TRootCommand, TReturn> operationContainer);
 
-    protected internal abstract TRootArgs CreateInstance();
-
-
+    protected internal abstract TRootCommand CreateInstance();
+    
 }

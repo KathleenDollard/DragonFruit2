@@ -8,6 +8,7 @@ public class OutputDataDefinition
     {
         OpenClass(sb, commandNode);
 
+        Fields(sb, commandNode);
         Constructor(sb, commandNode);
         Properties(sb, commandNode);
         GetMemberDefinition(sb, commandNode);
@@ -17,11 +18,16 @@ public class OutputDataDefinition
         sb.CloseClass();
     }
 
+    private static void Fields(StringBuilderWrapper sb, CommandNode commandNode)
+    {
+        sb.AppendLine($"public static {commandNode.NestedName("DataDefinition")} Instance = new({sb.NullStringIfNull(commandNode.ParentCommandNode?.NestedName("DataDefinition.Instance"))}, {sb.NullStringIfNull(commandNode.RootCommandNode?.NestedName("DataDefinition.Instance"))});");
+    }   
+
     internal static void OpenClass(StringBuilderWrapper sb, CommandNode commandNode)
     {
         sb.AppendLine();
         sb.XmlSummary(" The data definition is available to data providers and are used for initialization.");
-        sb.OpenClass($"public partial class {commandNode .CommandInfo.Name}DataDefinition : CommandDataDefinition<{commandNode.RootCommandNode?.FullName}>");
+        sb.OpenClass($"public partial class {commandNode.CommandInfo.Name}DataDefinition : CommandDataDefinition<{commandNode.FullName}, {commandNode.RootCommandNode?.FullName}>");
     }
 
     private static void Constructor(StringBuilderWrapper sb, CommandNode commandNode)
@@ -29,7 +35,7 @@ public class OutputDataDefinition
         sb.OpenConstructor($"public {commandNode.CommandInfo.Name}DataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)",
               $"base(parentDataDefinition, rootDataDefinition)");
 
-        sb.AppendLine($"GetDataValues = () => new {commandNode.CommandInfo.Name}DataValues(this);");
+        sb.AppendLine($"GetDataValues = () => new {commandNode.CommandInfo.Name}DataValues();");
 
         foreach (var optionInfo in commandNode.CommandInfo.Options)
         {
@@ -79,7 +85,7 @@ public class OutputDataDefinition
             sb.CloseCurly(closeParens: true, endStatement: true);
 
         }
-   
+
         static void AddValidation(StringBuilderWrapper sb, PropInfo propInfo)
         {
             foreach (var validatorInfo in propInfo.Validators)
@@ -87,7 +93,7 @@ public class OutputDataDefinition
                 sb.AppendLine($"{propInfo.Name}.RegisterValidator(new {validatorInfo.ValidatorTypeName}<{propInfo.TypeName}>({propInfo.Name}.DefinitionName, 0));");
             }
         }
-        
+
         static void AddDefaults(StringBuilderWrapper sb, PropInfo propInfo)
         {
             // not yet implemented

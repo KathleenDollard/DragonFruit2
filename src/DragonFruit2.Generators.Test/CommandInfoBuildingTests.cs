@@ -12,13 +12,13 @@ public class CommandInfoTests
             using DragonFruit2;
 
             [CommandClass] 
-            public partial class MyArgs
+            public partial class MyCommand : CommandClass
             { }
             """;
 
         var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCode);
 
-        Assert.Equal("MyArgs", commandInfo?.Name);
+        Assert.Equal("MyCommand", commandInfo?.Name);
     }
 
     [Fact]
@@ -30,12 +30,12 @@ public class CommandInfoTests
             namespace MyNamespace
             {
                 [CommandClass] 
-                public partial class MyArgs
+                public partial class MyCommand : CommandClass
                 { }
             }
             """;
 
-        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCodeWithArgsMyNamespace);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCodeWithMyNamespace);
 
         Assert.NotNull(commandInfo);
         Assert.Equal("MyNamespace", commandInfo?.NamespaceName);
@@ -49,24 +49,24 @@ public class CommandInfoTests
             
             namespace MyNamespace;
             [CommandClass] 
-            public partial class MyArgs
+            public partial class MyCommand : CommandClass
             { }
             """;
 
-        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCodeWithArgsMyNamespace);
+        var commandInfo = TestHelpers.GetCommandInfo(sourceText, TestHelpers.EmptyConsoleAppCodeWithMyNamespace);
 
         Assert.NotNull(commandInfo);
         Assert.Equal("MyNamespace", commandInfo?.NamespaceName);
     }
 
     [Fact]
-    public async Task CommandInfoIncludesArgsClassAccessibility()
+    public async Task CommandInfoIncludesCommandClassAccessibility()
     {
         var sourceText = """
             using DragonFruit2;
             
             [CommandClass] 
-            public partial class MyArgs
+            public partial class MyCommand : CommandClass
             { }
             """;
 
@@ -78,13 +78,13 @@ public class CommandInfoTests
 
 
     [Fact]
-    public async Task CommandInfoIncludesArgsClassTwoWordAccessibility()
+    public async Task CommandInfoIncludesCommandClassTwoWordAccessibility()
     {
         var sourceText = """
             using DragonFruit2;
             
             [CommandClass] 
-            protected internal partial class MyArgs
+            protected internal partial class MyCommand : CommandClass
             { }
             """;
 
@@ -107,7 +107,7 @@ public class CommandInfoTests
             
             namespace TestNamespace; 
             [CommandClass] 
-            {{accessibility}} class MyArgs  
+            {{accessibility}} class MyCommand : CommandClass
             { }
             """;
 
@@ -125,7 +125,7 @@ public class CommandInfoTests
             using DragonFruit2; 
 
             [CommandClass] 
-            public class MyArgs  
+            public class MyCommand : CommandClass
             { }
             """;
 

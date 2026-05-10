@@ -5,22 +5,22 @@ namespace DragonFruit2;
 public abstract record class DataValue
 {
     public abstract bool Validate();
-    //protected internal abstract bool TrySetDefaultValue<TRootArgs>(DefaultDefinition defaultDefinition)
-    //    where TRootArgs ;
+    //protected internal abstract bool TrySetDefaultValue<TRootCommand>(DefaultDefinition defaultDefinition)
+    //    where TRootCommand ;
     private protected abstract IEnumerable<Diagnostic>? UntypedDiagnostics { get; }
     public IEnumerable<Diagnostic>? Diagnostics => UntypedDiagnostics;
 
-    public DataValue(string name, Type argsType, DataValues dataValues, MemberDataDefinition memberDefinition)
+    public DataValue(string name, Type argType, DataValues dataValues, MemberDataDefinition memberDefinition)
     {
         MemberDefinition = memberDefinition;
         Name = name;
         DataValues = dataValues;
-        ArgsType = argsType;
+        ArgType = argType;
     }
 
     public string Name { get; }
     public DataValues DataValues { get; }
-    public Type ArgsType { get; }
+    public Type ArgType { get; }
     public DataProvider? SetBy { get; protected set; }
     public bool IsSet => SetBy is not null; public MemberDataDefinition MemberDefinition { get; }
 
@@ -28,11 +28,11 @@ public abstract record class DataValue
 
 public record class DataValue<TValue> : DataValue
 {
-    public static DataValue<TValue> Create(string name, Type argsType, DataValues dataValues, MemberDataDefinition<TValue> memberDefinition)
-        => new(name, argsType, dataValues, memberDefinition);
+    public static DataValue<TValue> Create(string name, Type argType, DataValues dataValues, MemberDataDefinition<TValue> memberDefinition)
+        => new(name, argType, dataValues, memberDefinition);
 
-    private DataValue(string name, Type argsType, DataValues dataValues, MemberDataDefinition<TValue> memberDefinition)
-        : base(name, argsType, dataValues, memberDefinition)
+    private DataValue(string name, Type argType, DataValues dataValues, MemberDataDefinition<TValue> memberDefinition)
+        : base(name, argType, dataValues, memberDefinition)
     {
         MemberDefinition = memberDefinition;
     }
@@ -81,7 +81,7 @@ public record class DataValue<TValue> : DataValue
     }
 
 
-    //protected internal override bool TrySetDefaultValue<TRootArgs>(DefaultDefinition defaultDefinition)
+    //protected internal override bool TrySetDefaultValue<TRootCommand>(DefaultDefinition defaultDefinition)
     //{
     //    if (defaultDefinition is not DefaultDefinition<TValue> typedDefaultDefinition)
     //    {
@@ -91,7 +91,7 @@ public record class DataValue<TValue> : DataValue
     //    if (typedDefaultDefinition.TryGetDefaultValue(DataValues, MemberDefinition, out var defaultValue))
     //    { 
     //        // TODO: Determine how to describe provenance
-    //        SetValue(defaultValue, DefaultDataProvider<TRootArgs>.Instance());
+    //        SetValue(defaultValue, DefaultDataProvider<TRootCommand>.Instance());
     //        return true;
     //    }
     //    return false;

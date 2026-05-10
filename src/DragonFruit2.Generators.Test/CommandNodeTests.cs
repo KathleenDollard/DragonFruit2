@@ -8,10 +8,10 @@ namespace DragonFruit2.Generators.Test;
 //public class CommandNodeTests
 //{
 //    [Theory]
-//    [InlineData("[CommandClass] public class MyArgs { }", "MyArgs")]
-//    [InlineData("[CommandClass] public abstract class BaseArgs { }", "BaseArgs")]
-//    [InlineData("[CommandClass] internal class InternalArgs { }", "InternalArgs")]
-//    [InlineData("[CommandClass] protected class ProtectedArgs { }", "ProtectedArgs")]
+//    [InlineData("[CommandClass] public class MyCommand { }", "MyCommand")]
+//    [InlineData("[CommandClass] public abstract class BaseCommand { }", "BaseCommand")]
+//    [InlineData("[CommandClass] internal class InternalCommand { }", "InternalCommand")]
+//    [InlineData("[CommandClass] protected class ProtectedCommand { }", "ProtectedCommand")]
 //    public void CreateCommandInfo_RootType_HasNullBaseName(string typeDeclaration, string typeName)
 //    {
 //        var source = $"namespace TestNamespace; {typeDeclaration}";
@@ -30,25 +30,25 @@ namespace DragonFruit2.Generators.Test;
 //    {
 //        var source = """
 //            namespace TestNamespace;
-//            public class BaseArgs { }
-//            public class DerivedArgs : BaseArgs { }
+//            public class BaseCommand { }
+//            public class DerivedCommand : BaseCommand { }
 //            """;
 //        var compilation = TestHelpers.GetCompilation(source, "");
-//        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.DerivedArgs");
+//        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.DerivedCommand");
 //        Assert.NotNull(typeSymbol);
 
-//        var result = CommandInfoHelpers.CreateCommandInfo(typeSymbol, "BaseArgs", "TestCli");
+//        var result = CommandInfoHelpers.CreateCommandInfo(typeSymbol, "BaseCommand", "TestCli");
 
-//        Assert.Equal("DerivedArgs", result.Name);
-//        Assert.Equal("BaseArgs", result.BaseName);
-//        Assert.Equal("BaseArgs", result.RootName);
+//        Assert.Equal("DerivedCommand", result.Name);
+//        Assert.Equal("BaseCommand", result.BaseName);
+//        Assert.Equal("BaseCommand", result.RootName);
 //    }
 
 //    [Fact]
 //    // TODO: This test does not do what it says it does
 //    public void CreateCommandInfo_WithNullCliNamespace_IsNull()
 //    {
-//        var source = "namespace TestNamespace; public class MyArgs { }";
+//        var source = "namespace TestNamespace; public class MyCommand { }";
 
 //        var result = TestHelpers.CommandInfoFromSource(source, "");
 
@@ -60,34 +60,34 @@ namespace DragonFruit2.Generators.Test;
 //    {
 //        var source = """
 //            namespace TestNamespace;
-//            public abstract class BaseArgs<T> { }
-//            public class DerivedArgs : BaseArgs<int> { }
+//            public abstract class BaseCommand<T> { }
+//            public class DerivedCommand : BaseCommand<int> { }
 //            """;
-//        var argsTree = CSharpSyntaxTree.ParseText(source);
-//        var compilation = TestHelpers.GetCompilation(argsTree);
-//        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.DerivedArgs");
+//        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+//        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
+//        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.DerivedCommand");
 //        Assert.NotNull(typeSymbol);
 
-//        var result = CommandInfoHelpers.CreateCommandInfo(typeSymbol, "BaseArgs", "TestCli");
+//        var result = CommandInfoHelpers.CreateCommandInfo(typeSymbol, "BaseCommand", "TestCli");
 
 //        Assert.NotNull(result.BaseName);
-//        Assert.Equal("BaseArgs", result.BaseName);
+//        Assert.Equal("BaseCommand", result.BaseName);
 //    }
 
 //[Fact]
 //public void SubCommandCanBeCreated()
 //{
 //    var sourceText = """
-//            public partial class MyArgs
+//            public partial class MyCommand
 //            {
 //                public required string Name { get; set; }
 //            }
 
-//            public partial class MorningGreetingArgs : MyArgs
+//            public partial class MorningGreetingCommand : MyCommand
 //            {
 //            }
 
-//            public partial class EveningGreetingArgs : MyArgs
+//            public partial class EveningGreetingCommand : MyCommand
 //            {
 //                public int Age { get; init; } = 1;
 //            }

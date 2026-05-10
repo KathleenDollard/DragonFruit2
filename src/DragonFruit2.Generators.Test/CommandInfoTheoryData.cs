@@ -4,45 +4,44 @@ namespace DragonFruit2.Generators.Test;
 
 public class CommandInfoTheoryData : TheoryData<string, string, string>
 {
-    private void AddTheoryData(string name, string argsSource, string consoleSource)
+    private void AddTheoryData(string name, string commandSource, string consoleSource)
     {
-        Add(name, argsSource, consoleSource);
+        Add(name, commandSource, consoleSource);
     }
 
     public CommandInfoTheoryData()
     {
         AddTheoryData("DeepSubCommands",
-                argsSource:
+                commandSource:
                     """
                     using DragonFruit2;
-
 
                     namespace MyNamespace
                     {
                         [CommandClass]
-                        public partial class MyArgs 
+                        public partial class MyCommand : CommandClass
                         {
                             public required string Name { get; set; }
                         }
 
                         [CommandClass]
-                        public partial class MorningGreetingArgs : MyArgs
+                        public partial class MorningGreetingCommand : MyCommand
                         {
                         }
 
                         [CommandClass]
-                        public partial class EveningGreetingArgs : MyArgs
+                        public partial class EveningGreetingCommand : MyCommand
                         {
                             public int Age { get; init; } = 1;
                         }
                         [CommandClass]
-                        public partial class Bar : EveningGreetingArgs
+                        public partial class Bar : EveningGreetingCommand
                         {
                         }
                     }
 
                     """,
-                consoleSource: TestHelpers.EmptyConsoleAppCodeWithArgsMyNamespace);
+                consoleSource: TestHelpers.EmptyConsoleAppCodeWithMyNamespace);
 
     }
 

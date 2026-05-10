@@ -4,7 +4,7 @@ namespace DragonFruit2.Generators.CodeOutput;
 
 // The Cli uses a trick base on C# overload resolution behavior. Items in the current namespace have precedence over those in imported namespaces.
 // When the user initially creates the app, importing DragonFruit2 supplies a CLI class for IntelliSense. When generation occurs, this call
-// is replaced with the generated CLI. This design allows access to the RootArgsBuilder without complicating user code. In modern .NET, this 
+// is replaced with the generated CLI. This design allows access to the RootCommandBuilder without complicating user code. In modern .NET, this 
 // could also be done with a static interface method. However, old .NET Framework...
 public class OutputCli
 {
@@ -38,11 +38,11 @@ public class OutputCli
         // This adds the command namespaces when they are not in the same namespace as the call to
         // `Cli.TryParse`, including top-level statements. This avoids having to qualify sub and parent
         // calls.
-        foreach (var argsNamespace in commandNamespaces)
+        foreach (var commandNamespace in commandNamespaces)
         {
-            if (!string.IsNullOrEmpty(argsNamespace) && entryPointNamespace != argsNamespace)
+            if (!string.IsNullOrEmpty(commandNamespace) && entryPointNamespace != commandNamespace)
             {
-                sb.AppendLine($"using {argsNamespace};");
+                sb.AppendLine($"using {commandNamespace};");
             }
         }
     }
@@ -51,7 +51,7 @@ public class OutputCli
     {
         sb.AppendLines([
                 "/// <summary>",
-                $"""/// Auto-generated partial class that supplies the root ArgsBuilder type.""",
+                $"""/// Auto-generated partial class that supplies the root CommandBuilder type.""",
                 "/// </summary>",
                 $"public class Cli"]);
         sb.OpenCurly();
@@ -61,25 +61,23 @@ public class OutputCli
     {
 
         sb.XmlSummary("Creates a Builder, which can be configured, the System.CommandLine API can be accessed, and which can be reused (especially helpful in testing). ");
-        sb.XmlRemarks("The args class specified as the type argument must be public.");
+        sb.XmlRemarks("The CommandClass specified as the type argument must be public.");
         sb.XmlRemarks("You may need to build after editing this line.");
         sb.XmlRemarks("It is not currently clear how builders and configuration are the same and different and thus expected changes in this space. Accessing it is currently difficult to avoid confusion.");
-        sb.XmlTypeParam("TRootArgs", "The type containing the CLI definition, the root command if there are subcommands.");
+        sb.XmlTypeParam("TRootCommand", "The type containing the CLI definition, the root command if there are subcommands.");
 
-        sb.OpenMethod($"public static Builder<TRootArgs>? CreateBuilder<TRootArgs>()");
+        sb.OpenMethod($"public static Builder<TRootCommand>? CreateBuilder<TRootCommand>()");
 
         foreach (var cliInfo in cliInfos)
         {
             var rootName = cliInfo.RootCommandName;
-            sb.OpenIf($"typeof(TRootArgs) == typeof({rootName})");
+            sb.OpenIf($"typeof(TRootCommand) == typeof({rootName})");
             sb.AppendLine($"var builder = new Builder<{rootName}>(new {rootName}.{rootName}DataDefinition(null, null));");
-            sb.AppendLines([$"return builder is Builder<TRootArgs> typedBuilder",
+            sb.AppendLines([$"return builder is Builder<TRootCommand> typedBuilder",
             "      ? typedBuilder",
             "      : throw new InvalidOperationException(\"Type mismatch creating builder.\");"]);
             sb.CloseIf();
         }
-
-        // TODO: Switch to a compilation generator and add all root args here.
 
         sb.Return("null");
         sb.CloseMethod();
@@ -87,16 +85,16 @@ public class OutputCli
     }
     private static void ParseArgsMethod(StringBuilderWrapper sb)
     {
-        sb.XmlSummary("Parses CLI arguments to fill the specified args type.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.");
-        sb.XmlRemarks("The args class specified as the type argument must be public.");
-        sb.XmlTypeParam("TRootArgs", "The type containing the CLI definition.");
+        sb.XmlSummary("Parses CLI arguments to fill the specified CommandClass.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.");
+        sb.XmlRemarks("The CommandClass specified as the type argument must be public.");
+        sb.XmlTypeParam("TRootCommand", "The type containing the CLI definition.");
         sb.XmlParam("args", "Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.");
 
-        sb.OpenMethod($"public static Result<TRootArgs> ParseArgs<TRootArgs>(string[]? args = null)");
+        sb.OpenMethod($"public static Result<TRootCommand> ParseArgs<TRootCommand>(string[]? args = null)");
 
-        sb.AppendLine("var builder = CreateBuilder<TRootArgs>();");
+        sb.AppendLine("var builder = CreateBuilder<TRootCommand>();");
         sb.OpenIf("builder is null");
-        sb.AppendLine($"var result = new Result<TRootArgs>(Builder<TRootArgs>.GetArgsFromEnvironment());");
+        sb.AppendLine($"var result = new Result<TRootCommand>(Builder<TRootCommand>.GetArgsFromEnvironment());");
         sb.AppendLine("result.AddDiagnostic(new Diagnostic(DiagnosticId.CouldNotFindBuilder.ToValidationIdString(), DiagnosticSeverity.Error));");
         sb.Return("result");
         sb.CloseIf();
@@ -109,25 +107,25 @@ public class OutputCli
 
     private static void TryParseArgsMethod(StringBuilderWrapper sb)
     {
-        sb.XmlSummary("Attempts to parses CLI arguments and fill the specified args type.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.");
-        sb.XmlRemarks("The args class specified as the type argument must be public.");
-        sb.XmlTypeParam("TRootArgs", "The type containing the CLI definition.");
+        sb.XmlSummary("Attempts to parses CLI arguments and fill the specified CommandClass.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.");
+        sb.XmlRemarks("The CommandClass specified as the type argument must be public.");
+        sb.XmlTypeParam("TRootCommand", "The type containing the CLI definition.");
         sb.XmlParam("result", "An out parameter that contains an instance of the requested class and supporting data, such as diagnostics, a suggested CLI return value, etc.");
         sb.XmlParam("args", "Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.");
         sb.XmlException("InvalidOperationException", "To be implemented soon.");
 
-        sb.OpenMethod($"public static bool TryParseArgs<TRootArgs>(out Result<TRootArgs> result, string[]? args = null)");
+        sb.OpenMethod($"public static bool TryParseArgs<TRootCommand>(out Result<TRootCommand> result, string[]? args = null)");
 
-        sb.AppendLine($"result = ParseArgs<TRootArgs>(args);");
+        sb.AppendLine($"result = ParseArgs<TRootCommand>(args);");
         sb.Return("result.IsValid");
         sb.CloseMethod();
     }
 
     private static void BuilderFinderFragment(StringBuilderWrapper sb)
         {
-        sb.AppendLine("var builder = CreateBuilder<TRootArgs>();");
+        sb.AppendLine("var builder = CreateBuilder<TRootCommand>();");
         sb.OpenIf("builder is null");
-        sb.AppendLine($"var result = new Result<TRootArgs>(Builder<TRootArgs>.GetArgsFromEnvironment());");
+        sb.AppendLine($"var result = new Result<TRootCommand>(Builder<TRootCommand>.GetArgsFromEnvironment());");
         sb.AppendLine("result.AddDiagnostic(new Diagnostic(DiagnosticId.CouldNotFindBuilder.ToValidationIdString(), DiagnosticSeverity.Error));");
         sb.Return("result");
         sb.CloseIf();

@@ -6,10 +6,10 @@ using System.Xml.Linq;
 
 namespace DragonFruit2;
 
-public class CliDataProvider<TRootArgs> 
-    : DataProvider<TRootArgs>, IActiveArgsProvider<TRootArgs>
+public class CliDataProvider<TRootCommand> 
+    : DataProvider<TRootCommand>, IActiveCommandProvider<TRootCommand>
 {
-    public CliDataProvider(Builder<TRootArgs> builder)
+    public CliDataProvider(Builder<TRootCommand> builder)
         : base(builder)
     { }
 
@@ -32,27 +32,27 @@ public class CliDataProvider<TRootArgs>
     /// A single value is cached, which is used during a single run and if there is some reason another
     /// call is made with the same command line args, sucn as would happen if we support scripts
     /// <br/>
-    /// Note that this cache is via this class, which is hte TRootArgs generic, if there are multiple root args, 
+    /// Note that this cache is via this class, which is hte TRootCommand generic, if there are multiple root CommandClasses, 
     /// such as might happen in an interactive or scripting scenario, they will be separately cached.
     /// </remarks>
     public ParseResult? ParseResult { get; private set; }
 
-    private void InitializeRun(Result<TRootArgs> result)
+    private void InitializeRun(Result<TRootCommand> result)
     {
         if (RootCommand is null) throw new InvalidOperationException("RootCommand cannot be null");
         ParseResult = RootCommand.Parse(result.CommandLineArguments);
         cachedRunId = result.RunId;
     }
 
-    public Dictionary<(Type argsType, string propertyName), Symbol> LookupSymbol { get; set; } = [];
+    public Dictionary<(Type commandClassType, string propertyName), Symbol> LookupSymbol { get; set; } = [];
 
-    public override void Initialize(Builder<TRootArgs> builder, CommandDataDefinition<TRootArgs> commandDefinition, Result<TRootArgs> result)
+    public override void Initialize(Builder<TRootCommand> builder, CommandDataDefinition<TRootCommand> commandDefinition, Result<TRootCommand> result)
     {
         RootCommand = new SclWrappers.RootCommand(commandDefinition);
         InitializeCommand(RootCommand, builder, commandDefinition, result);
     }
 
-    private void InitializeCommand(System.CommandLine.Command command, Builder<TRootArgs> builder, CommandDataDefinition commandDefinition, Result<TRootArgs> result)
+    private void InitializeCommand(System.CommandLine.Command command, Builder<TRootCommand> builder, CommandDataDefinition commandDefinition, Result<TRootCommand> result)
     {
         var memberSymbols = commandDefinition.Operate(new CreateFromMembersOperation(this));
         command.AddRange(memberSymbols);
@@ -66,10 +66,10 @@ public class CliDataProvider<TRootArgs>
         command.SetAction(p => ParseResult = p);
     }
 
-    internal struct CreateFromMembersOperation : IOperationOnMemberDefinition<Symbol>
+    internal readonly struct CreateFromMembersOperation : IOperationOnMemberDefinition<Symbol>
     {
-        private CliDataProvider<TRootArgs> _dataProvider;
-        public CreateFromMembersOperation(CliDataProvider<TRootArgs> dataProvider)
+        private readonly CliDataProvider<TRootCommand> _dataProvider;
+        public CreateFromMembersOperation(CliDataProvider<TRootCommand> dataProvider)
         {
             _dataProvider = dataProvider;
         }
@@ -81,12 +81,12 @@ public class CliDataProvider<TRootArgs>
                 ArgumentDataDefinition<TValue> argumentDefinition => new SclWrappers.Argument<TValue>(argumentDefinition),
                 _ => throw new InvalidOperationException("Unsupported member definition type")
             };
-            _dataProvider.AddNameLookup((memberDefinition.CommandDefinition.ArgsType, memberDefinition.DefinitionName), newMember);
+            _dataProvider.AddNameLookup((memberDefinition.CommandDefinition.CommandType, memberDefinition.DefinitionName), newMember);
             return newMember;
         }
     }
 
-    protected override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition, Result<TRootArgs> result, out TValue value)
+    protected override bool TryGetValue<TValue>(MemberDataDefinition<TValue> memberDefinition, Result<TRootCommand> result, out TValue value)
     {
         if (ParseResult is null || cachedRunId != result.RunId)
         {
@@ -97,7 +97,7 @@ public class CliDataProvider<TRootArgs>
             value = default!;
             return false;
         }
-        var key = (memberDefinition.CommandDefinition.ArgsType, memberDefinition.DefinitionName);
+        var key = (memberDefinition.CommandDefinition.CommandType, memberDefinition.DefinitionName);
         var symbol = LookupSymbol[key];
         if (symbol is not null)
         {
@@ -164,14 +164,14 @@ public class CliDataProvider<TRootArgs>
         }
     }
 
-    private void AddNameLookup((Type argsType, string propertyName) key, Symbol symbol)
+    private void AddNameLookup((Type commandClassType, string propertyName) key, Symbol symbol)
     {
         LookupSymbol[key] = symbol;
     }
 
-    public bool TryGetActiveArgsDefinition(Result<TRootArgs> result,
-                                           [NotNullWhen(true)] out CommandDataDefinition<TRootArgs> activeCommandDefinition,
-                                           [NotNullWhen(true)] out DataProvider<TRootArgs> activeDataProvider)
+    public bool TryGetActiveCommandDefinition(Result<TRootCommand> result,
+                                           [NotNullWhen(true)] out CommandDataDefinition<TRootCommand> activeCommandDefinition,
+                                           [NotNullWhen(true)] out DataProvider<TRootCommand> activeDataProvider)
     {
 
         if (ParseResult is null || cachedRunId != result.RunId)
@@ -188,11 +188,11 @@ public class CliDataProvider<TRootArgs>
         var command = commandResult.Command;
         switch (command)
         {
-            case SclWrappers.Command sclCommand and IHasDataDefinition { DataDefinition: CommandDataDefinition<TRootArgs> dataDefinition }:
+            case SclWrappers.Command and IHasDataDefinition { DataDefinition: CommandDataDefinition<TRootCommand> dataDefinition }:
                 activeDataProvider = this;
                 activeCommandDefinition = dataDefinition;
                 return true;
-            case SclWrappers.RootCommand sclRootCommand and IHasDataDefinition { DataDefinition: CommandDataDefinition<TRootArgs> dataDefinition }:
+            case SclWrappers.RootCommand and IHasDataDefinition { DataDefinition: CommandDataDefinition<TRootCommand> dataDefinition }:
                 activeDataProvider = this;
                 activeCommandDefinition = dataDefinition;
                 return true;
@@ -212,40 +212,5 @@ public class CliDataProvider<TRootArgs>
         {
             ParseResult = parseResult;
         }
-
-
-        //private ParseResult? _parseResult = null;
-
-        //public string[]? InputArgs => Builder.CommandLineArguments;
-
-        ///// <summary>
-        ///// This is the System.CommandLine.ParseResult that is used internally.
-        ///// </summary>
-        ///// <remarks>
-        ///// A single value is cached, which is used during a single run and if there is some reason another
-        ///// call is made with the same command line args.
-        ///// <br/>
-        ///// Note that this cache is via the generic, if there are multiple root args, such as in an 
-        ///// interactive or scripting scenario, they will be separately cached.
-        ///// </remarks>
-        //public ParseResult? ParseResult
-        //{
-        //    get
-        //    {
-        //        if (RootCommand is null) throw new InvalidOperationException("RootCommand cannot be null");
-        //        if (InputArgs is null) throw new InvalidOperationException("InputArgs cannot be null");
-        //        if (field is null || _parseResultArgs != InputArgs)
-        //        {
-        //            field = RootCommand?.Parse(InputArgs);
-        //            _parseResultArgs = InputArgs ?? [];
-        //        }
-        //        return field;
-        //    }
-
-        //    private set;
-        //}
-
-
-
     }
 }

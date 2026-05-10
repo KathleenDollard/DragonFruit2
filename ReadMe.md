@@ -173,7 +173,7 @@ Declaring a property as `required` results in `Required` validation.
 Defining validation via an attribute:
 
 ```csharp
-internal partial class MyArgs : ArgsRootBase<MyArgs>
+internal partial class MyCommand : ArgsRootBase<MyCommand>
 {
     public required string Name { get; init; }
     [GreaterThan(0)]
@@ -185,14 +185,14 @@ internal partial class MyArgs : ArgsRootBase<MyArgs>
 Defining validation via registration:
 
 ```csharp
-internal partial class MyArgs : ArgsRootBase<MyArgs>
+internal partial class MyCommand : ArgsRootBase<MyCommand>
 {
     public required string Name { get; init; }
     [GreaterThan(0)]
     public int Age { get; init; } = 1;
     public required string Greeting { get; init; } = "Howdy";
 
-    partial class MyArgsDataDefinition
+    partial class MyCommandDataDefinition
     {
         public override void RegisterCustomizations()
         {
@@ -211,7 +211,7 @@ Default values work almost like validation, in that both attribute and registrat
 Adding a default value to the previous example via an attribute:
 
 ```csharp
-internal partial class MyArgs : ArgsRootBase<MyArgs>
+internal partial class MyCommand : ArgsRootBase<MyCommand>
 {
     public required string Name { get; init; }
     [GreaterThan(0)]
@@ -224,14 +224,14 @@ internal partial class MyArgs : ArgsRootBase<MyArgs>
 Adding a default value to the previous example via registration:
 
 ```csharp
-internal partial class MyArgs : ArgsRootBase<MyArgs>
+internal partial class MyCommand : ArgsRootBase<MyCommand>
 {
     public required string Name { get; init; }
     [GreaterThan(0)]
     public int Age { get; init; }
     public required string Greeting { get; init; }
 
-    partial class MyArgsDataDefinition
+    partial class MyCommandDataDefinition
     {
         public override void RegisterCustomizations()
         {

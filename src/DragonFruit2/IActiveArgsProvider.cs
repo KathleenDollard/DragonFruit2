@@ -2,9 +2,9 @@
 
 namespace DragonFruit2;
 
-internal interface IActiveArgsProvider<TRootArgs> 
+internal interface IActiveCommandProvider<TRootCommand> 
 {
-    bool TryGetActiveArgsDefinition(Result<TRootArgs> result,
-                                    [NotNullWhen(true)] out CommandDataDefinition<TRootArgs> activeCommandDefition,
-                                    [NotNullWhen(true)] out DataProvider<TRootArgs> activeDataProvider);
+    bool TryGetActiveCommandDefinition(Result<TRootCommand> result,
+                                    [NotNullWhen(true)] out CommandDataDefinition<TRootCommand> activeCommandDefition,
+                                    [NotNullWhen(true)] out DataProvider<TRootCommand> activeDataProvider);
 }

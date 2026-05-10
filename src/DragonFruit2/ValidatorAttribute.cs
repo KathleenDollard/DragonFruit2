@@ -24,7 +24,7 @@
 /// Thus, we absolutely need analzyers for validator attributes. Hopefully we can make them not too
 /// painful to write. XUnit can be our pattern here. The analyzer for the attribute usage needs to check:
 /// <br/>
-/// - The class using the attribute is an Args class
+/// - The class using the attribute is a class
 /// - The names of any dependent properties are in the current class
 /// - The actual type (such as IComparable&lt;TValue>) of any values are correct
 /// <br/>

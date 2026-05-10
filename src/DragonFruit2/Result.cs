@@ -5,7 +5,7 @@ public abstract class Result
     public abstract IEnumerable<Diagnostic> Diagnostics { get; }
     private readonly List<Diagnostic> diagnostics = [];
     // For .NET Framework runtimes, it is important not to recreate the Random instance as the seed can be repeated in a loop, such as when we support scripts
-    private static Random random = new();
+    private static readonly Random random = new();
 
     public Result(string[] commandLineArguments)
     {
@@ -44,17 +44,18 @@ public abstract class Result
 
 }
 
-public class Result<TRootArgs> : Result
+public class Result<TRootCommand> : Result
 {
 
     public Result(string[] commandLineArguments) : base(commandLineArguments)
     {
     }
 
-    public TRootArgs? Args { get; internal set; }
-    public DataValues<TRootArgs>? DataValues { get; internal set; }
+    public TRootCommand? Command { get; internal set; }
+    public DataValues<TRootCommand>? DataValues { get; internal set; }
 
-    public CommandDataDefinition<TRootArgs>? ActiveCommandDefinition
+    public CommandDataDefinition<TRootCommand>? ActiveCommandDefinition
+
     {
         get;
         internal set
@@ -66,20 +67,18 @@ public class Result<TRootArgs> : Result
         }
     }
 
-    public DataProvider<TRootArgs> ActiveDataProvider { get; internal set; }
+    public DataProvider<TRootCommand> ActiveDataProvider { get; internal set; }
 
-    public override IEnumerable<Diagnostic> Diagnostics
-    // This is in the TRootArgs specific version because it accesses DataValues
-    {
-        get
+    public override IEnumerable<Diagnostic> Diagnostics 
+        => DataValues switch
         {
-            // TODO: Check if we need the null check in the following LINQ.
-            var memberDiagnostics = DataValues
-                                        .Where(d => d.Diagnostics is not null && d.Diagnostics.Any())
-                                        .SelectMany(d => d.Diagnostics);
-            return CommandDiagnostics.Concat(memberDiagnostics);
-        }
-    }
+            null => CommandDiagnostics,
+            _ when DataValues.All(d => d.Diagnostics is null || !d.Diagnostics.Any()) => CommandDiagnostics,
+            _ => CommandDiagnostics
+                    .Concat(DataValues
+                        .Where(d => d.Diagnostics is not null && d.Diagnostics.Any())
+                        .SelectMany(d => d.Diagnostics))
+        };
 
 
     public void Cleanup()
@@ -90,5 +89,13 @@ public class Result<TRootArgs> : Result
             DataValues = null;
         }
 
+    }
+}
+
+public class Result<TCommand, TRootCommand> : Result<TRootCommand>
+{
+
+    public Result(string[] commandLineArguments) : base(commandLineArguments)
+    {
     }
 }

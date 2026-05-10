@@ -6,29 +6,38 @@ internal class OutputDataValues
 {
     internal static void GetClass(StringBuilderWrapper sb, CommandNode commandNode)
     {
-        OpenClass( commandNode , sb);
+        OpenClass(commandNode, sb);
 
-        Constructor(sb,  commandNode );
-        Operate(sb,  commandNode );
+        Constructor(sb, commandNode);
+        Operate(sb, commandNode);
         sb.AppendLine();
-        Fields(sb,  commandNode );
-        Properties(sb,  commandNode );
-        CreateInstance(sb,  commandNode );
+        Fields(sb, commandNode);
+        Properties(sb, commandNode);
+        CreateInstance(sb, commandNode);
 
         sb.CloseClass();
     }
 
-    private static void OpenClass( CommandNode  commandNode, StringBuilderWrapper sb)
+    private static void OpenClass(CommandNode commandNode, StringBuilderWrapper sb)
     {
         sb.AppendLine();
-        sb.OpenClass($"public class { commandNode.CommandInfo.Name}DataValues : DataValues<{ commandNode.RootCommandNode?.FullName}>");
+        switch (commandNode.ParentCommandNode)
+        {
+            case null:
+                sb.OpenClass($"public class {commandNode.CommandInfo.Name}DataValues : DataValues<{commandNode.RootCommandNode?.FullName}>");
+                break;
+            case { } parentNode:
+                sb.OpenClass($"public class {commandNode.CommandInfo.Name}DataValues : {parentNode.FullName}.{parentNode.Name}DataValues");
+                break;
+        }
+        ;
     }
 
-    private static void Constructor(StringBuilderWrapper sb,  CommandNode  commandNode)
+    private static void Constructor(StringBuilderWrapper sb, CommandNode commandNode)
     {
-        sb.OpenConstructor($"public { commandNode.CommandInfo.Name}DataValues({ commandNode.CommandInfo.Name}DataDefinition commandDefinition)",
+        sb.OpenConstructor($"public {commandNode.CommandInfo.Name}DataValues({commandNode.CommandInfo.Name}DataDefinition commandDefinition)",
             "base(commandDefinition)");
-        foreach (var propInfo in  commandNode.CommandInfo.GetOptionsAndArguments())
+        foreach (var propInfo in commandNode.CommandInfo.GetOptionsAndArguments())
         {
             sb.AppendLine($"{propInfo.Name} = DataValue<{propInfo.TypeName}>.Create(nameof({propInfo.Name}), commandClassType, this, commandDefinition.{propInfo.Name});");
             sb.AppendLine($"Add({propInfo.Name});");
@@ -36,11 +45,11 @@ internal class OutputDataValues
         sb.CloseConstructor();
     }
 
-    private static void Operate(StringBuilderWrapper sb,  CommandNode  commandNode)
+    private static void Operate(StringBuilderWrapper sb, CommandNode commandNode)
     {
-        sb.OpenMethod($"public override bool Operate<TReturn>(IOperateOnDataValue<{ commandNode.RootCommandNode?.FullName}, TReturn> operationContainer)");
+        sb.OpenMethod($"public override bool Operate<TReturn>(IOperateOnDataValue<{commandNode.RootCommandNode?.FullName}, TReturn> operationContainer)");
         sb.OpenTry();
-        foreach (var propInfo in  commandNode.GetSelfAndAncestorPropInfos())
+        foreach (var propInfo in commandNode.GetSelfAndAncestorPropInfos())
         {
             sb.AppendLine($"operationContainer.TryOperate({propInfo.Name}, operationContainer, out var _);");
         }
@@ -53,24 +62,24 @@ internal class OutputDataValues
         sb.CloseMethod();
     }
 
-    private static void Fields(StringBuilderWrapper sb,  CommandNode  commandNode)
+    private static void Fields(StringBuilderWrapper sb, CommandNode commandNode)
     {
-        sb.AppendLine($"private Type commandClassType = typeof({ commandNode.CommandInfo.Name});");
+        sb.AppendLine($"private Type commandClassType = typeof({commandNode.CommandInfo.Name});");
     }
 
-    private static void Properties(StringBuilderWrapper sb,  CommandNode  commandNode)
+    private static void Properties(StringBuilderWrapper sb, CommandNode commandNode)
     {
-        foreach (var propInfo in  commandNode.GetSelfAndAncestorPropInfos())
+        foreach (var propInfo in commandNode.GetSelfAndAncestorPropInfos())
         {
             sb.AppendLine($"public DataValue<{propInfo.TypeName}> {propInfo.Name} {{ get; }}");
         }
     }
 
-    private static void CreateInstance(StringBuilderWrapper sb,  CommandNode  commandNode)
+    private static void CreateInstance(StringBuilderWrapper sb, CommandNode commandNode)
     {
-        sb.OpenMethod($"""protected override { commandNode.CommandInfo.Name} CreateInstance()""");
-        var ctorArguments =  commandNode.GetSelfAndAncestorPropInfos().Select(p => p.Name);
-        sb.Append($"return new { commandNode.CommandInfo.Name}({string.Join(", ", ctorArguments)});");
+        sb.OpenMethod($"""protected override {commandNode.CommandInfo.Name} CreateInstance()""");
+        var ctorArguments = commandNode.GetSelfAndAncestorPropInfos().Select(p => p.Name);
+        sb.Append($"return new {commandNode.CommandInfo.Name}({string.Join(", ", ctorArguments)});");
         sb.CloseMethod();
 
     }

@@ -55,6 +55,7 @@ public class Result<TRootCommand> : Result
     public DataValues<TRootCommand>? DataValues { get; internal set; }
 
     public CommandDataDefinition<TRootCommand>? ActiveCommandDefinition
+
     {
         get;
         internal set
@@ -69,6 +70,53 @@ public class Result<TRootCommand> : Result
     public DataProvider<TRootCommand> ActiveDataProvider { get; internal set; }
 
     public override IEnumerable<Diagnostic> Diagnostics 
+        => DataValues switch
+        {
+            null => CommandDiagnostics,
+            _ when DataValues.All(d => d.Diagnostics is null || !d.Diagnostics.Any()) => CommandDiagnostics,
+            _ => CommandDiagnostics
+                    .Concat(DataValues
+                        .Where(d => d.Diagnostics is not null && d.Diagnostics.Any())
+                        .SelectMany(d => d.Diagnostics))
+        };
+
+
+    public void Cleanup()
+    {
+
+        if (!Configuration.ResultDebuggingLevel.HasFlag(ResultDebuggingLevel.DataValues))
+        {
+            DataValues = null;
+        }
+
+    }
+}
+
+public class Result<TCommand, TRootCommand> : Result<TRootCommand>
+{
+
+    public Result(string[] commandLineArguments) : base(commandLineArguments)
+    {
+    }
+
+    public TRootCommand? Command { get; internal set; }
+    public DataValues<TRootCommand>? DataValues { get; internal set; }
+
+    public CommandDataDefinition<TRootCommand>? ActiveCommandDefinition
+    {
+        get;
+        internal set
+        {
+            if (value is null)
+            { throw new ArgumentNullException(nameof(value)); }
+            field = value;
+            DataValues = field.CreateDataValues();
+        }
+    }
+
+    public DataProvider<TRootCommand> ActiveDataProvider { get; internal set; }
+
+    public override IEnumerable<Diagnostic> Diagnostics
         => DataValues switch
         {
             null => CommandDiagnostics,

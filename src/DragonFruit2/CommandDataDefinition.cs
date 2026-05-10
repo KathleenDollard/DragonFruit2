@@ -13,14 +13,14 @@ public abstract class CommandDataDefinition : DataDefinition
     private readonly List< DefaultDefinition> _defaultDefinitions = [];
     private readonly Dictionary<string, Validator> _validators = [];
 
-    public CommandDataDefinition(Type rootCommand,
+    public CommandDataDefinition(Type command,
                                  CommandDataDefinition? parentDataDefinition,
                                  CommandDataDefinition? rootDataDefinition)
-        : base(rootCommand.Name)
+        : base(command.Name)
     {
         ParentDataDefinition = parentDataDefinition;
         RootDataDefinition = rootDataDefinition ?? this;
-        CommandType = rootCommand;
+        CommandType = command;
     }
 
 
@@ -55,9 +55,10 @@ public abstract class CommandDataDefinition : DataDefinition
 
 public abstract class CommandDataDefinition<TRootCommand> : CommandDataDefinition
 {
-    public CommandDataDefinition(CommandDataDefinition? parentDataDefinition,
-                                 CommandDataDefinition? rootDataDefinition)
-        : base(typeof(TRootCommand), parentDataDefinition, rootDataDefinition)
+    protected CommandDataDefinition(Type commandType,
+                                    CommandDataDefinition? parentDataDefinition,
+                                    CommandDataDefinition? rootDataDefinition)
+        : base(commandType, parentDataDefinition, rootDataDefinition)
     {    }
 
     public Func<DataValues<TRootCommand>>? GetDataValues { get; protected set; }
@@ -70,5 +71,15 @@ public abstract class CommandDataDefinition<TRootCommand> : CommandDataDefinitio
         }
         return GetDataValues();
     }
+
+}
+
+public abstract class CommandDataDefinition<TCommand, TRootCommand> : CommandDataDefinition<TRootCommand>
+    where TCommand : TRootCommand
+{
+    public CommandDataDefinition(CommandDataDefinition? parentDataDefinition,
+                                 CommandDataDefinition? rootDataDefinition)
+        : base(typeof(TCommand), parentDataDefinition, rootDataDefinition)
+    { }
 
 }

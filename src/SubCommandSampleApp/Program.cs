@@ -4,12 +4,12 @@ internal class Program
 {
     private static int Main(string[] args)
     {
-        var subcommandCommandDataValues = Cli.ParseArgs<SubCommandCommand>(args);
+        var result = Cli.ParseArgs<SubCommandCommand>(args);
         Console.WriteLine("Welcome to the SubCommand sample app");
 
-        if (subcommandCommandDataValues.IsValid)
+        if (result.IsValid)
         {
-            return subcommandCommandDataValues.Command switch
+            return result.Command switch
             {
                 MorningCommand morningCommand => MorningGreeting(morningCommand),
 
@@ -20,7 +20,7 @@ internal class Program
         }
         else
         {
-            subcommandCommandDataValues.ReportErrorsToConsole();
+            result.ReportErrorsToConsole();
             return 1;
         }
 

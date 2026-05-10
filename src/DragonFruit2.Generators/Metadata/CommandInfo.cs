@@ -8,30 +8,12 @@ public record class CommandInfo
 {
     public required string Name { get; init; }
     public string? NamespaceName { get; init; }
-    public required string Accessibility {  get; init; }
+    public required string Accessibility { get; init; }
 
     // The base info is used to create the CommandNode tree
     public required string? BaseTypeName { get; init; }
     public required string? BaseTypeNamespace { get; init; }
     public string? BaseTypeFullName => (BaseTypeNamespace, BaseTypeName).FullName;
-   
-    public string? SimpleName
-    {
-        get => field switch
-        {
-            null => $"{ToSimpleName(Name)}",
-            _ => field
-        };
-        init;
-    }
-
-    private string ToSimpleName(string name)
-    {
-        name = Name.EndsWith("Command")
-               ? Name.Substring(0, Name.Length - 7)
-               : Name;
-        return name.ToKebabCase();
-    }
 
     public List<PropInfo> Arguments => field ??= [];
 

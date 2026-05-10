@@ -16,13 +16,18 @@ public abstract class CommandDataDefinition : DataDefinition
     public CommandDataDefinition(Type command,
                                  CommandDataDefinition? parentDataDefinition,
                                  CommandDataDefinition? rootDataDefinition)
-        : base(command.Name.EndsWith("Command") ? command.Name.Substring(0, command.Name.Length - 7) : command.Name)
+        : base(SimpleName(command.Name))
     {
         ParentDataDefinition = parentDataDefinition;
         RootDataDefinition = rootDataDefinition ?? this;
         CommandType = command;
     }
-
+    public static string SimpleName(string name)
+    => name switch
+    {
+        _ when name.EndsWith("Command") => $"{name.Substring(0, name.Length - 7)}",
+        _ => name
+    };
 
     public Type CommandType { get; }
     public CommandDataDefinition? ParentDataDefinition { get; }

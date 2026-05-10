@@ -74,7 +74,7 @@ namespace MyNamespace
                 }
             }
 
-            private Type argsType = typeof(MorningGreetingCommand);
+            private Type commandClassType = typeof(MorningGreetingCommand);
             public DataValue<string> Name { get; }
 
             protected override MorningGreetingCommand CreateInstance()

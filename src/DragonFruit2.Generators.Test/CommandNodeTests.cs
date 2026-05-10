@@ -63,8 +63,8 @@ namespace DragonFruit2.Generators.Test;
 //            public abstract class BaseCommand<T> { }
 //            public class DerivedCommand : BaseCommand<int> { }
 //            """;
-//        var argsTree = CSharpSyntaxTree.ParseText(source);
-//        var compilation = TestHelpers.GetCompilation(argsTree);
+//        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+//        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
 //        var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.DerivedCommand");
 //        Assert.NotNull(typeSymbol);
 

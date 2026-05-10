@@ -84,7 +84,8 @@ public static class PropInfoHelpers
     /// Extract validator metadata from an AttributeData.
     /// This reads the attribute class, constructor arguments and named arguments.
     /// The returned ValidatorInfo is populated with the attribute name, full type name,
-    /// a list of constructor-argument string representations, and a dictionary of named args.
+    /// a list of constructor-argument string representations, and a dictionary of named 
+    /// attribute arguments.
     /// </summary>
     private static ValidatorInfo? GetValidatorInfo(AttributeData validationAttribute, AttributeData validationAttrAttr, SemanticModel semanticModel)
     {

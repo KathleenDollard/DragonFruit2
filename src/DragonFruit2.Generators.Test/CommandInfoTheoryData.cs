@@ -4,15 +4,15 @@ namespace DragonFruit2.Generators.Test;
 
 public class CommandInfoTheoryData : TheoryData<string, string, string>
 {
-    private void AddTheoryData(string name, string argsSource, string consoleSource)
+    private void AddTheoryData(string name, string commandSource, string consoleSource)
     {
-        Add(name, argsSource, consoleSource);
+        Add(name, commandSource, consoleSource);
     }
 
     public CommandInfoTheoryData()
     {
         AddTheoryData("DeepSubCommands",
-                argsSource:
+                commandSource:
                     """
                     using DragonFruit2;
 

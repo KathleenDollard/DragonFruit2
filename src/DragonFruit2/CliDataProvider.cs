@@ -32,7 +32,7 @@ public class CliDataProvider<TRootCommand>
     /// A single value is cached, which is used during a single run and if there is some reason another
     /// call is made with the same command line args, sucn as would happen if we support scripts
     /// <br/>
-    /// Note that this cache is via this class, which is hte TRootCommand generic, if there are multiple root args, 
+    /// Note that this cache is via this class, which is hte TRootCommand generic, if there are multiple root CommandClasses, 
     /// such as might happen in an interactive or scripting scenario, they will be separately cached.
     /// </remarks>
     public ParseResult? ParseResult { get; private set; }
@@ -44,7 +44,7 @@ public class CliDataProvider<TRootCommand>
         cachedRunId = result.RunId;
     }
 
-    public Dictionary<(Type argsType, string propertyName), Symbol> LookupSymbol { get; set; } = [];
+    public Dictionary<(Type commandClassType, string propertyName), Symbol> LookupSymbol { get; set; } = [];
 
     public override void Initialize(Builder<TRootCommand> builder, CommandDataDefinition<TRootCommand> commandDefinition, Result<TRootCommand> result)
     {
@@ -164,7 +164,7 @@ public class CliDataProvider<TRootCommand>
         }
     }
 
-    private void AddNameLookup((Type argsType, string propertyName) key, Symbol symbol)
+    private void AddNameLookup((Type commandClassType, string propertyName) key, Symbol symbol)
     {
         LookupSymbol[key] = symbol;
     }

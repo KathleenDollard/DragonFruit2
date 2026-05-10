@@ -38,11 +38,11 @@ public class OutputCli
         // This adds the command namespaces when they are not in the same namespace as the call to
         // `Cli.TryParse`, including top-level statements. This avoids having to qualify sub and parent
         // calls.
-        foreach (var argsNamespace in commandNamespaces)
+        foreach (var commandNamespace in commandNamespaces)
         {
-            if (!string.IsNullOrEmpty(argsNamespace) && entryPointNamespace != argsNamespace)
+            if (!string.IsNullOrEmpty(commandNamespace) && entryPointNamespace != commandNamespace)
             {
-                sb.AppendLine($"using {argsNamespace};");
+                sb.AppendLine($"using {commandNamespace};");
             }
         }
     }
@@ -61,7 +61,7 @@ public class OutputCli
     {
 
         sb.XmlSummary("Creates a Builder, which can be configured, the System.CommandLine API can be accessed, and which can be reused (especially helpful in testing). ");
-        sb.XmlRemarks("The args class specified as the type argument must be public.");
+        sb.XmlRemarks("The CommandClass specified as the type argument must be public.");
         sb.XmlRemarks("You may need to build after editing this line.");
         sb.XmlRemarks("It is not currently clear how builders and configuration are the same and different and thus expected changes in this space. Accessing it is currently difficult to avoid confusion.");
         sb.XmlTypeParam("TRootCommand", "The type containing the CLI definition, the root command if there are subcommands.");
@@ -85,8 +85,8 @@ public class OutputCli
     }
     private static void ParseArgsMethod(StringBuilderWrapper sb)
     {
-        sb.XmlSummary("Parses CLI arguments to fill the specified args type.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.");
-        sb.XmlRemarks("The args class specified as the type argument must be public.");
+        sb.XmlSummary("Parses CLI arguments to fill the specified CommandClass.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.");
+        sb.XmlRemarks("The CommandClass specified as the type argument must be public.");
         sb.XmlTypeParam("TRootCommand", "The type containing the CLI definition.");
         sb.XmlParam("args", "Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.");
 
@@ -107,8 +107,8 @@ public class OutputCli
 
     private static void TryParseArgsMethod(StringBuilderWrapper sb)
     {
-        sb.XmlSummary("Attempts to parses CLI arguments and fill the specified args type.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.");
-        sb.XmlRemarks("The args class specified as the type argument must be public.");
+        sb.XmlSummary("Attempts to parses CLI arguments and fill the specified CommandClass.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.");
+        sb.XmlRemarks("The CommandClass specified as the type argument must be public.");
         sb.XmlTypeParam("TRootCommand", "The type containing the CLI definition.");
         sb.XmlParam("result", "An out parameter that contains an instance of the requested class and supporting data, such as diagnostics, a suggested CLI return value, etc.");
         sb.XmlParam("args", "Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.");

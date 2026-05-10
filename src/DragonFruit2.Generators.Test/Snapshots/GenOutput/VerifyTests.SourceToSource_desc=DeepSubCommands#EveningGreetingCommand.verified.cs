@@ -86,7 +86,7 @@ namespace MyNamespace
             public EveningGreetingCommandDataValues(EveningGreetingCommandDataDefinition commandDefinition)
                 : base(commandDefinition)
             {
-                Age = DataValue<int>.Create(nameof(Age), argsType, this, commandDefinition.Age);
+                Age = DataValue<int>.Create(nameof(Age), commandClassType, this, commandDefinition.Age);
                 Add(Age);
             }
 
@@ -106,7 +106,7 @@ namespace MyNamespace
                 }
             }
 
-            private Type argsType = typeof(EveningGreetingCommand);
+            private Type commandClassType = typeof(EveningGreetingCommand);
             public DataValue<int> Age { get; }
             public DataValue<string> Name { get; }
 

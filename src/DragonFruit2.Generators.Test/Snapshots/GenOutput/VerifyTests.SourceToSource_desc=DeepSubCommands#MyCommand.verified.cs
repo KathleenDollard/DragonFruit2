@@ -90,7 +90,7 @@ namespace MyNamespace
             public MyCommandDataValues(MyCommandDataDefinition commandDefinition)
                 : base(commandDefinition)
             {
-                Name = DataValue<string>.Create(nameof(Name), argsType, this, commandDefinition.Name);
+                Name = DataValue<string>.Create(nameof(Name), commandClassType, this, commandDefinition.Name);
                 Add(Name);
             }
 
@@ -109,7 +109,7 @@ namespace MyNamespace
                 }
             }
 
-            private Type argsType = typeof(MyCommand);
+            private Type commandClassType = typeof(MyCommand);
             public DataValue<string> Name { get; }
 
             protected override MyCommand CreateInstance()

@@ -30,7 +30,7 @@ internal class OutputDataValues
             "base(commandDefinition)");
         foreach (var propInfo in  commandNode.CommandInfo.GetOptionsAndArguments())
         {
-            sb.AppendLine($"{propInfo.Name} = DataValue<{propInfo.TypeName}>.Create(nameof({propInfo.Name}), argsType, this, commandDefinition.{propInfo.Name});");
+            sb.AppendLine($"{propInfo.Name} = DataValue<{propInfo.TypeName}>.Create(nameof({propInfo.Name}), commandClassType, this, commandDefinition.{propInfo.Name});");
             sb.AppendLine($"Add({propInfo.Name});");
         }
         sb.CloseConstructor();
@@ -55,7 +55,7 @@ internal class OutputDataValues
 
     private static void Fields(StringBuilderWrapper sb,  CommandNode  commandNode)
     {
-        sb.AppendLine($"private Type argsType = typeof({ commandNode.CommandInfo.Name});");
+        sb.AppendLine($"private Type commandClassType = typeof({ commandNode.CommandInfo.Name});");
     }
 
     private static void Properties(StringBuilderWrapper sb,  CommandNode  commandNode)

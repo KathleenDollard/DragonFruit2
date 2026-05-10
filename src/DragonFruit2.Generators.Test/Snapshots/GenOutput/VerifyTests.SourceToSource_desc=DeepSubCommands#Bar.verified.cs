@@ -75,7 +75,7 @@ namespace MyNamespace
                 }
             }
 
-            private Type argsType = typeof(Bar);
+            private Type commandClassType = typeof(Bar);
             public DataValue<int> Age { get; }
             public DataValue<string> Name { get; }
 

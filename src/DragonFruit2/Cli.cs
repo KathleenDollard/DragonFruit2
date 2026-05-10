@@ -4,26 +4,26 @@ public static class Cli
 {
 
     /// <summary>
-    /// Parses CLI arguments to fill the specified args type. 
+    /// Parses CLI arguments to fill the specified CommandClass as part of a Resut object
     /// </summary>
     /// <remarks>
-    /// The args class specified as the type argument must be public.
+    /// The Command class specified as the type argument must be public.
     /// <br/>
     /// You may need to build after editing this line.
     /// </remarks>
     /// <typeparam name="TRootCommand">The type containing the CLI definition</typeparam>
     /// <param name="args">Optionaly pass the commandline args</param>
-    /// <returns>A Result instance containing the hydrated args or error messages.</returns>
+    /// <returns>A Result instance containing the hydrated CommandClass or error messages.</returns>
     public static Result<TRootCommand> ParseArgs<TRootCommand>(string[]? args = null)
     {
         throw new InvalidOperationException("This method is a stub for source generation. You either called `DragonFruit2.Cli.TryParse` instead of an import for DragonFruit2 and `Cli.TryParse' or there is a problem with source generation.");
     }
 
     /// <summary>
-    /// Attempts to parses CLI arguments and fill the specified args type.
+    /// Attempts to parse CLI arguments to fill the specified CommandClass as part of a Resut object
     /// </summary>
     /// <remarks>
-    /// The args class specified as the type argument must be public.
+    /// The Command class specified as the type argument must be public.
     /// <br/>
     /// You may need to build after editing this line.
     /// </remarks>

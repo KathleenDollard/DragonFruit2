@@ -15,7 +15,7 @@ public class Cli
     /// Creates a Builder, which can be configured, the System.CommandLine API can be accessed, and which can be reused (especially helpful in testing). 
     /// </summary>
     /// <remarks>
-    /// The args class specified as the type argument must be public.
+    /// The CommandClass specified as the type argument must be public.
     /// </remarks>
     /// <remarks>
     /// You may need to build after editing this line.
@@ -38,10 +38,10 @@ public class Cli
     }
 
     /// <summary>
-    /// Parses CLI arguments to fill the specified args type.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.
+    /// Parses CLI arguments to fill the specified CommandClass.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.
     /// </summary>
     /// <remarks>
-    /// The args class specified as the type argument must be public.
+    /// The CommandClass specified as the type argument must be public.
     /// </remarks>
     /// <typeparam name="TRootCommand">The type containing the CLI definition.</typeparam>
     /// <param name="args">Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.</param>
@@ -59,10 +59,10 @@ public class Cli
     }
 
     /// <summary>
-    /// Attempts to parses CLI arguments and fill the specified args type.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.
+    /// Attempts to parses CLI arguments and fill the specified CommandClass.<br/>This method is generated specific to the type argument.<br/>You may need to build after editing.
     /// </summary>
     /// <remarks>
-    /// The args class specified as the type argument must be public.
+    /// The CommandClass specified as the type argument must be public.
     /// </remarks>
     /// <typeparam name="TRootCommand">The type containing the CLI definition.</typeparam>
     /// <param name="result">An out parameter that contains an instance of the requested class and supporting data, such as diagnostics, a suggested CLI return value, etc.</param>

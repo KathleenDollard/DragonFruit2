@@ -321,13 +321,13 @@ public class PropInfoBuildingTests
                 public string Email { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbols = typeSymbol.GetMembers().OfType<IPropertySymbol>().ToList();
 
-        var results = propSymbols.Select(x => PropInfoHelpers.CreatePropInfo(x, compilation.GetSemanticModel(argsTree))).ToList();
+        var results = propSymbols.Select(x => PropInfoHelpers.CreatePropInfo(x, compilation.GetSemanticModel(commandSyntaxTree))).ToList();
 
         Assert.Equal(3, results.Count);
         Assert.Equal("Name", results[0].Name);
@@ -349,14 +349,14 @@ public class PropInfoBuildingTests
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.Equal("Name", result.Name);
         Assert.Equal("string", result.TypeName);
@@ -378,14 +378,14 @@ public class PropInfoBuildingTests
                 public int Age { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Age");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.IsValueType);
     }
@@ -403,14 +403,14 @@ public class PropInfoBuildingTests
                 public string Greeting { get; set; } = "Hello";
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Greeting");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.HasInitializer);
         Assert.NotNull(result.InitializerText);
@@ -430,14 +430,14 @@ public class PropInfoBuildingTests
                 public required string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.HasRequiredModifier);
     }
@@ -458,14 +458,14 @@ public class PropInfoBuildingTests
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.HasArgumentAttribute);
         Assert.True(result.IsArgument);
@@ -487,14 +487,14 @@ public class PropInfoBuildingTests
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.Equal(5, result.Position);
     }
@@ -515,14 +515,14 @@ public class PropInfoBuildingTests
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.Equal("User's full name", result.Description);
     }
@@ -542,14 +542,14 @@ public class PropInfoBuildingTests
                 public string? Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.Equal(NullableAnnotation.Annotated, result.NullableAnnotation);
     }
@@ -567,14 +567,14 @@ public class PropInfoBuildingTests
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.False(result.HasInitializer);
         Assert.Null(result.InitializerText);
@@ -593,14 +593,14 @@ public class PropInfoBuildingTests
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.False(result.HasArgumentAttribute);
         Assert.False(result.IsArgument);
@@ -619,14 +619,14 @@ public class PropInfoBuildingTests
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.Null(result.Description);
     }
@@ -644,14 +644,14 @@ public class PropInfoBuildingTests
                 public int Count { get; set; } = 42;
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Count");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.HasInitializer);
         Assert.NotNull(result.InitializerText);
@@ -673,14 +673,14 @@ public class PropInfoBuildingTests
                 public string Name { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Name");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.Equal(NullableAnnotation.NotAnnotated, result.NullableAnnotation);
     }
@@ -699,14 +699,14 @@ public class PropInfoBuildingTests
                 public string Path { get; set; } = "C:\\Users\\Test";
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Path");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.HasInitializer);
         Assert.NotNull(result.InitializerText);
@@ -725,14 +725,14 @@ public class PropInfoBuildingTests
                 public object Data { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "Data");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.False(result.IsValueType);
     }
@@ -752,14 +752,14 @@ public class PropInfoBuildingTests
                 public int? OptionalAge { get; set; }
             }
             """;
-        var argsTree = CSharpSyntaxTree.ParseText(source);
-        var compilation = TestHelpers.GetCompilation(argsTree);
+        var commandSyntaxTree = CSharpSyntaxTree.ParseText(source);
+        var compilation = TestHelpers.GetCompilation(commandSyntaxTree);
         var typeSymbol = compilation.GetTypeByMetadataName("TestNamespace.MyCommand");
         Assert.NotNull(typeSymbol);
         var propSymbol = typeSymbol.GetMembers().OfType<IPropertySymbol>().First(p => p.Name == "OptionalAge");
         Assert.NotNull(propSymbol);
 
-        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(argsTree));
+        var result = PropInfoHelpers.CreatePropInfo(propSymbol, compilation.GetSemanticModel(commandSyntaxTree));
 
         Assert.True(result.IsValueType);
         Assert.Equal(NullableAnnotation.Annotated, result.NullableAnnotation);

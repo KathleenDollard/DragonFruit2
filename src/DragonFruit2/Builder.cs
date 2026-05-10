@@ -1,5 +1,4 @@
 ﻿using DragonFruit2.Validators;
-using System.Data;
 using System.Diagnostics.CodeAnalysis;
 
 namespace DragonFruit2;
@@ -39,7 +38,7 @@ public class Builder<TRootCommand>
         }
     }
 
-    public Result<TRootCommand> ParseAxgs(string[]? commandLineArguments)
+    public Result<TRootCommand> ParseArgs(string[]? commandLineArguments)
     {
         commandLineArguments ??= GetArgsFromEnvironment();
         var result = new Result<TRootCommand>(commandLineArguments);

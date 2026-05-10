@@ -4,7 +4,7 @@ internal class Program
 {
     private static int Main(string[] args)
     {
-        var subcommandCommandDataValues = Cli.ParseAxgs<SubCommandArgs>(args);
+        var subcommandCommandDataValues = Cli.ParseArgs<SubCommandArgs>(args);
         Console.WriteLine("Welcome to the SubCommand sample app");
 
         if (subcommandCommandDataValues.IsValid)

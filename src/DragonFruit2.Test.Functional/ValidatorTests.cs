@@ -9,7 +9,7 @@ public class ValidatorTests
     {
         var commandLine = "--command -1";
 
-        var result = Cli.ParseAxgs<ValidatorTestsCommand>([commandLine]);
+        var result = Cli.ParseArgs<ValidatorTestsCommand>([commandLine]);
 
         Assert.Single(result.Diagnostics);
         Assert.Equal(DiagnosticId.GreaterThan.ToValidationIdString(), result.Diagnostics.First().Id);

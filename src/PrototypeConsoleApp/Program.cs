@@ -1,7 +1,7 @@
 ﻿using SampleConsoleApp;
 using DragonFruit2;
 
-var myCommandDataValues = Cli.ParseAxgs<MyCommand>(args);
+var myCommandDataValues = Cli.ParseArgs<MyCommand>(args);
 Console.WriteLine("Welcome to the Sample Console App!") ;
 
 if (myCommandDataValues.IsValid)

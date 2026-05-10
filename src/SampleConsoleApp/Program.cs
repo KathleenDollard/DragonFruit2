@@ -4,7 +4,7 @@ using SampleConsoleApp;
 Console.WriteLine("Welcome to the Sample Console App!");
 Console.WriteLine();
 
-if (Cli.TryParseAxgs<MyCommand>(out var result))
+if (Cli.TryParseArgs<MyCommand>(out var result))
 {
     var myCommand = result.Command!; // Safe to use '!' because IsValid is true
     var drink = "would you like some wine?.";
@@ -16,7 +16,7 @@ else
     result.ReportErrorsToConsole();
 }
 
-var otherCommandResult = Cli.ParseAxgs<MyOtherCommand>();
+var otherCommandResult = Cli.ParseArgs<MyOtherCommand>();
 
 Console.WriteLine();
 Console.WriteLine("Goodbye from the Sample Console App!");

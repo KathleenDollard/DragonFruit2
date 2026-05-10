@@ -14,7 +14,7 @@ public static class Cli
     /// <typeparam name="TRootCommand">The type containing the CLI definition</typeparam>
     /// <param name="args">Optionaly pass the commandline args</param>
     /// <returns>A Result instance containing the hydrated args or error messages.</returns>
-    public static Result<TRootCommand> ParseAxgs<TRootCommand>(string[]? args = null)
+    public static Result<TRootCommand> ParseArgs<TRootCommand>(string[]? args = null)
     {
         throw new InvalidOperationException("This method is a stub for source generation. You either called `DragonFruit2.Cli.TryParse` instead of an import for DragonFruit2 and `Cli.TryParse' or there is a problem with source generation.");
     }
@@ -32,7 +32,7 @@ public static class Cli
     /// <param name="args">Optionaly pass the commandline args</param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static bool TryParseAxgs<TRootCommand>(out Result<TRootCommand> result, string[]? args = null) 
+    public static bool TryParseArgs<TRootCommand>(out Result<TRootCommand> result, string[]? args = null) 
     {
         throw new InvalidOperationException("This method is a stub for source generation. You either called `DragonFruit2.Cli.TryParse` instead of an import for DragonFruit2 and `Cli.TryParse' or there is a problem with source generation.");
     }

@@ -90,7 +90,7 @@ public class OutputCli
         sb.XmlTypeParam("TRootCommand", "The type containing the CLI definition.");
         sb.XmlParam("args", "Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.");
 
-        sb.OpenMethod($"public static Result<TRootCommand> ParseAxgs<TRootCommand>(string[]? args = null)");
+        sb.OpenMethod($"public static Result<TRootCommand> ParseArgs<TRootCommand>(string[]? args = null)");
 
         sb.AppendLine("var builder = CreateBuilder<TRootCommand>();");
         sb.OpenIf("builder is null");
@@ -99,7 +99,7 @@ public class OutputCli
         sb.Return("result");
         sb.CloseIf();
 
-        sb.AppendLine($"return builder.ParseAxgs(args);");
+        sb.AppendLine($"return builder.ParseArgs(args);");
 
         sb.CloseMethod();
         sb.AppendLine();
@@ -114,9 +114,9 @@ public class OutputCli
         sb.XmlParam("args", "Optionaly pass the commandline args, using the keyword `args`. If not passed, they will be retrieved for you.");
         sb.XmlException("InvalidOperationException", "To be implemented soon.");
 
-        sb.OpenMethod($"public static bool TryParseAxgs<TRootCommand>(out Result<TRootCommand> result, string[]? args = null)");
+        sb.OpenMethod($"public static bool TryParseArgs<TRootCommand>(out Result<TRootCommand> result, string[]? args = null)");
 
-        sb.AppendLine($"result = ParseAxgs<TRootCommand>(args);");
+        sb.AppendLine($"result = ParseArgs<TRootCommand>(args);");
         sb.Return("result.IsValid");
         sb.CloseMethod();
     }

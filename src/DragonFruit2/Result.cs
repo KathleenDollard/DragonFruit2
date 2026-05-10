@@ -68,18 +68,15 @@ public class Result<TRootCommand> : Result
 
     public DataProvider<TRootCommand> ActiveDataProvider { get; internal set; }
 
-    public override IEnumerable<Diagnostic> Diagnostics
-    // This is in the TRootCommand specific version because it accesses DataValues
-    {
-        get
+    public override IEnumerable<Diagnostic> Diagnostics 
+        => DataValues switch
         {
-            // TODO: Check if we need the null check in the following LINQ.
-            var memberDiagnostics = DataValues
-                                        .Where(d => d.Diagnostics is not null && d.Diagnostics.Any())
-                                        .SelectMany(d => d.Diagnostics);
-            return CommandDiagnostics.Concat(memberDiagnostics);
-        }
-    }
+            null => CommandDiagnostics,
+            _ => CommandDiagnostics
+                    .Concat(DataValues
+                        .Where(d => d.Diagnostics is not null && d.Diagnostics.Any())
+                        .SelectMany(d => d.Diagnostics))
+        };
 
 
     public void Cleanup()

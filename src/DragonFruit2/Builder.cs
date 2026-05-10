@@ -70,6 +70,7 @@ public class Builder<TRootCommand>
         }
         catch (Exception e)
         {
+            // TODO: Create special diagnostic that includes all exception info
             result.AddDiagnostic(new Diagnostic(DiagnosticId.UnexpectedException.ToValidationIdString(), DiagnosticSeverity.Error,
                 Message: $"""
                 Unexpected exception: 

@@ -19,7 +19,7 @@ public class Cli
     /// avoid confusion.
     /// </remarks>
     /// <typeparam name="TRootCommand">The type containing the CLI definition</typeparam>
-    /// <returns>A Result instance containing the hydrated args or error messages.</returns>
+    /// <returns>A Result instance containing the hydrated CommandClass or error messages.</returns>
     public static Builder<TRootCommand>? CreateBuilder<TRootCommand>()
     {
         if (typeof(TRootCommand) == typeof(MyCommand))
@@ -30,20 +30,20 @@ public class Cli
                 : throw new InvalidOperationException("Type mismatch creating builder.");
         }
         return null;
-        // Add the other root args types here as else if blocks
+        // Add the other root CommandClass types here as else if blocks
     }
 
     /// <summary>
-    /// Parses CLI arguments to fill the specified args type. 
+    /// Parses CLI arguments to fill the specified CommandClass. 
     /// </summary>
     /// <remarks>
-    /// The args class specified as the type argument must be public.
+    /// The CommandClass specified as the type argument must be public.
     /// <br/>
     /// You may need to build after editing this line.
     /// </remarks>
     /// <typeparam name="TRootCommand">The type containing the CLI definition</typeparam>
     /// <param name="args">Optionaly pass the commandline args, if it is not passed, it will be retrieved from System.Environment.</param>
-    /// <returns>A Result instance containing the hydrated args or error messages.</returns>
+    /// <returns>A Result instance containing the hydrated CommandClass or error messages.</returns>
     public static Result<TRootCommand> ParseArgs<TRootCommand>(string[]? args = null)
     {
         var builder = CreateBuilder<TRootCommand>();
@@ -57,10 +57,10 @@ public class Cli
     }
 
     /// <summary>
-    /// Attempts to parses CLI arguments and fill the specified args type.
+    /// Attempts to parses CLI arguments and fill the specified CommandClass.
     /// </summary>
     /// <remarks>
-    /// The args class specified as the type argument must be public.
+    /// The CommandClass specified as the type argument must be public.
     /// <br/>
     /// You may need to build after editing this line.
     /// </remarks>

@@ -4,16 +4,16 @@ internal class Program
 {
     private static int Main(string[] args)
     {
-        var subcommandCommandDataValues = Cli.ParseArgs<SubCommandArgs>(args);
+        var subcommandCommandDataValues = Cli.ParseArgs<SubCommandCommand>(args);
         Console.WriteLine("Welcome to the SubCommand sample app");
 
         if (subcommandCommandDataValues.IsValid)
         {
             return subcommandCommandDataValues.Command switch
             {
-                MorningCommand morningArgs => MorningGreeting(morningArgs),
+                MorningCommand morningCommand => MorningGreeting(morningCommand),
 
-                EveningCommand eveningArgs => EveningGreeting(eveningArgs),
+                EveningCommand eveningCommand => EveningGreeting(eveningCommand),
 
                 _ => UnknownGreeting()
             };
@@ -26,14 +26,14 @@ internal class Program
 
         static int UnknownGreeting()
         {
-            Console.WriteLine("What the heck?");
+            Console.WriteLine("What the heck? The command was not found, perhaps you forgot the CommandClass attribute?");
             return 1;
         }
 
-        static int MorningGreeting(MorningCommand morningArgs)
+        static int MorningGreeting(MorningCommand morningCommand)
         {
             var breakfast = ", would you like some Cheerios with chocolate milk?.";
-            Console.WriteLine($"{morningArgs.Greeting} {morningArgs.Name}{breakfast}");
+            Console.WriteLine($"{morningCommand.Greeting} {morningCommand.Name}{breakfast}");
             return 0;
         }
 

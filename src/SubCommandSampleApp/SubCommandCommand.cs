@@ -7,7 +7,7 @@ namespace SampleConsoleApp;
 /// This is a test command
 /// </summary>
 [CommandClass]
-public partial class SubCommandArgs
+public partial class SubCommandCommand
 {
     /// <summary>
     /// "Your name"
@@ -16,11 +16,13 @@ public partial class SubCommandArgs
     public string Greeting { get; set; } = "Hello";
 }
 
-public partial class MorningCommand : SubCommandArgs
+[CommandClass]
+public partial class MorningCommand : SubCommandCommand
 {
 }
 
-public partial class EveningCommand : SubCommandArgs
+[CommandClass]
+public partial class EveningCommand : SubCommandCommand
 {
 
     /// <summary>
@@ -30,4 +32,5 @@ public partial class EveningCommand : SubCommandArgs
     public int Age { get; init; } = 1;
 }
 
+[CommandClass]
 public partial class Bar : EveningCommand { }

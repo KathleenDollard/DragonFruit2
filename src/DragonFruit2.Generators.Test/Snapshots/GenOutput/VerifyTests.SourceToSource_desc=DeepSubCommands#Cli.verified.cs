@@ -7,7 +7,7 @@ using DragonFruit2.Validators;
 using MyNamespace;
 
 /// <summary>
-/// Auto-generated partial class that supplies the root ArgsBuilder type.
+/// Auto-generated partial class that supplies the root CommandBuilder type.
 /// </summary>
 public class Cli
 {

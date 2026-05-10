@@ -4,7 +4,7 @@ namespace DragonFruit2.Generators.CodeOutput;
 
 // The Cli uses a trick base on C# overload resolution behavior. Items in the current namespace have precedence over those in imported namespaces.
 // When the user initially creates the app, importing DragonFruit2 supplies a CLI class for IntelliSense. When generation occurs, this call
-// is replaced with the generated CLI. This design allows access to the RootArgsBuilder without complicating user code. In modern .NET, this 
+// is replaced with the generated CLI. This design allows access to the RootCommandBuilder without complicating user code. In modern .NET, this 
 // could also be done with a static interface method. However, old .NET Framework...
 public class OutputCli
 {
@@ -51,7 +51,7 @@ public class OutputCli
     {
         sb.AppendLines([
                 "/// <summary>",
-                $"""/// Auto-generated partial class that supplies the root ArgsBuilder type.""",
+                $"""/// Auto-generated partial class that supplies the root CommandBuilder type.""",
                 "/// </summary>",
                 $"public class Cli"]);
         sb.OpenCurly();

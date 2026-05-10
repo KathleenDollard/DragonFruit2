@@ -142,9 +142,9 @@ public static class TestHelpers
         }
     }
 
-    internal static IEnumerable<CommandNode> GetCommandNodeInfos(string argsSource, string consoleSource)
+    internal static IEnumerable<CommandNode> GetCommandNodeInfos(string commandSource, string consoleSource)
     {
-        var commandInfos = GetCommandInfos(argsSource, consoleSource);
+        var commandInfos = GetCommandInfos(commandSource, consoleSource);
         return CommandBuilder.BuildCommandNodes(commandInfos!, new System.Threading.CancellationToken());
     }
 

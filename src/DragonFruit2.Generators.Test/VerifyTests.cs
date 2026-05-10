@@ -29,9 +29,9 @@ public class VerifyTests
 
     [Theory]
     [ClassData(typeof(CommandInfoTheoryData))]
-    public Task VerifyCommandInfo(string desc, string argsSource, string consoleSource)
+    public Task VerifyCommandInfo(string desc, string commandSource, string consoleSource)
     {
-        var commandInfos = TestHelpers.GetCommandInfos(argsSource, consoleSource);
+        var commandInfos = TestHelpers.GetCommandInfos(commandSource, consoleSource);
 
         return Verify(commandInfos, VerifySettings("CommandInfo")).UseParameters(desc);
     }
@@ -39,9 +39,9 @@ public class VerifyTests
 
     [Theory]
     [ClassData(typeof(CommandInfoTheoryData))]
-    public Task VerifyCommandNode(string desc, string argsSource, string consoleSource)
+    public Task VerifyCommandNode(string desc, string commandSource, string consoleSource)
     {
-        var commandNodes = TestHelpers.GetCommandNodeInfos(argsSource, consoleSource);
+        var commandNodes = TestHelpers.GetCommandNodeInfos(commandSource, consoleSource);
 
         return Verify(commandNodes, VerifySettings("CommandNode")).UseParameters(desc);
     }
@@ -71,14 +71,14 @@ public class VerifyTests
     /// <summary>
     /// </summary>
     /// <param name="desc">Used as part of file name, so keep it short</param>
-    /// <param name="argsSource">The source code for the command classes</param>
+    /// <param name="commandSource">The source code for the command classes</param>
     /// <param name="consoleSource">The source code for the console application with the CLI entry point call</param>
     /// <returns></returns>
     [Theory]
     [ClassData(typeof(CommandInfoTheoryData))]
-    public Task SourceToSource(string desc, string argsSource, string consoleSource)
+    public Task SourceToSource(string desc, string commandSource, string consoleSource)
     {
-        var compilation = TestHelpers.GetCompilation(argsSource, consoleSource);
+        var compilation = TestHelpers.GetCompilation(commandSource, consoleSource);
         var driver = VerifyHelpers.GetGeneratorDriver<DragonFruit2Generator>(compilation);
 
         var verifySettings = new VerifySettings();
@@ -89,14 +89,14 @@ public class VerifyTests
     /// <summary>
     /// </summary>
     /// <param name="desc">Used as part of file name, so keep it short</param>
-    /// <param name="argsSource">The source code for the command classes</param>
+    /// <param name="commandSource">The source code for the command classes</param>
     /// <param name="consoleSource">The source code for the console application with the CLI entry point call</param>
     /// <returns></returns>
     [Theory]
     [ClassData(typeof(CommandInfoTheoryData))]
-    public void ConfirmCaching(string desc, string argsSource, string consoleSource)
+    public void ConfirmCaching(string desc, string commandSource, string consoleSource)
     {
-        var compilation = TestHelpers.GetCompilation(argsSource, consoleSource);
+        var compilation = TestHelpers.GetCompilation(commandSource, consoleSource);
         var clonedCompilation = compilation.Clone();
        
         var firstRunResult = VerifyHelpers.GetGeneratorDriver<DragonFruit2Generator>(compilation).GetRunResult();

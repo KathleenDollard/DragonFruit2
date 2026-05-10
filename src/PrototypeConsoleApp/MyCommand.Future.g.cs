@@ -108,11 +108,11 @@ partial class MyCommand
         public MyCommandDataValues(MyCommandDataDefinition commandDefinition)
             : base(commandDefinition)
         {
-            Name = DataValue<string>.Create(nameof(Name), argsType, this, commandDefinition.Name);
+            Name = DataValue<string>.Create(nameof(Name), commandType, this, commandDefinition.Name);
             Add(Name);
-            Age = DataValue<int>.Create(nameof(Age), argsType, this, commandDefinition.Age);
+            Age = DataValue<int>.Create(nameof(Age), commandType, this, commandDefinition.Age);
             Add(Age);
-            Greeting = DataValue<string>.Create(nameof(Greeting), argsType, this, commandDefinition.Greeting);
+            Greeting = DataValue<string>.Create(nameof(Greeting), commandType, this, commandDefinition.Greeting);
             Add(Greeting);
         }
 
@@ -133,7 +133,7 @@ partial class MyCommand
             }
         }
 
-        private Type argsType = typeof(MyCommand);
+        private Type commandType = typeof(MyCommand);
 
         public DataValue<string> Name { get; }
         public DataValue<int> Age { get; }

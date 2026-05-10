@@ -7,7 +7,7 @@ namespace SampleConsoleApp;
 /// This is a test command
 /// </summary>
 [CommandClass]
-public partial class SubCommandCommand
+public partial class SubCommandCommand : CommandClass
 {
     /// <summary>
     /// "Your name"

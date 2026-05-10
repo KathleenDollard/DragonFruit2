@@ -208,5 +208,6 @@ public class StringBuilderWrapper
         };
     }
 
-
+    internal string NullStringIfNull(string? value)
+        => value ?? "null";
 }

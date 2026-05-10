@@ -270,7 +270,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass]  
-        public partial class MyCommand
+        public partial class MyCommand : CommandClass
         { 
             public string Name { get; set; } = 42
         }
@@ -291,7 +291,7 @@ public class PropInfoBuildingTests
         using DragonFruit2;
 
         [CommandClass] 
-        public partial class MyCommand
+        public partial class MyCommand : CommandClass
         { 
             [DragonFruit2.Description("R2D2")]
             public string Name { get; set; } = 42
@@ -314,7 +314,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public string Name { get; set; }
                 public int Age { get; set; }
@@ -344,7 +344,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public string Name { get; set; }
             }
@@ -373,7 +373,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public int Age { get; set; }
             }
@@ -398,7 +398,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public string Greeting { get; set; } = "Hello";
             }
@@ -425,7 +425,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public required string Name { get; set; }
             }
@@ -452,7 +452,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 [Argument(Position = 0)]
                 public string Name { get; set; }
@@ -481,7 +481,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 [Argument(5)]
                 public string Name { get; set; }
@@ -509,7 +509,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 [Description("User's full name")]
                 public string Name { get; set; }
@@ -537,7 +537,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public string? Name { get; set; }
             }
@@ -562,7 +562,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public string Name { get; set; }
             }
@@ -588,7 +588,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public string Name { get; set; }
             }
@@ -614,7 +614,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public string Name { get; set; }
             }
@@ -639,7 +639,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public int Count { get; set; } = 42;
             }
@@ -668,7 +668,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public string Name { get; set; }
             }
@@ -694,7 +694,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public string Path { get; set; } = "C:\\Users\\Test";
             }
@@ -720,7 +720,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public object Data { get; set; }
             }
@@ -747,7 +747,7 @@ public class PropInfoBuildingTests
             using DragonFruit2;
 
             [CommandClass] 
-            public class MyCommand
+            public class MyCommand : CommandClass
             {
                 public int? OptionalAge { get; set; }
             }

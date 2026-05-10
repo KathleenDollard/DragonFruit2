@@ -15,7 +15,6 @@ public sealed partial class DragonFruit2Generator : IIncrementalGenerator
             .CreateSyntaxProvider(
                 predicate: DragonFruit2Builder.InitialEntryPointFilter,
                 transform: DragonFruit2Builder.TransformEntryPoint)
-            .WithTrackingName("ParseArgsInvocations")
             .Where(static s => s is not null)
             .Select(static (s, _) => s!) // Quiet nullability warning
             .WithTrackingName(TrackingNames.ExtractEntryPoint);

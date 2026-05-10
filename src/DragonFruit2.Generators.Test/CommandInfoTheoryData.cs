@@ -19,7 +19,7 @@ public class CommandInfoTheoryData : TheoryData<string, string, string>
                     namespace MyNamespace
                     {
                         [CommandClass]
-                        public partial class MyCommand 
+                        public partial class MyCommand : CommandClass
                         {
                             public required string Name { get; set; }
                         }

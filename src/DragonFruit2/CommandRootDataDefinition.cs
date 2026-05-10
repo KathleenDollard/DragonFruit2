@@ -6,10 +6,7 @@ namespace DragonFruit2;
 
 public abstract class CommandRootDataDefinition<TRootCommand> : CommandDataDefinition<TRootCommand, TRootCommand>
 {
-
-    private readonly List<CommandDataDefinition> _subcommands = [];
-    private readonly List<DefaultDefinition> _defaultDefinitions = [];
-    private readonly Dictionary<string, Validator> _validators = [];
+    private Dictionary<CommandClass, CommandDataDefinition> commandDefinitionLookup = [];
 
     public CommandRootDataDefinition(Type command,
                                  CommandDataDefinition? parentDataDefinition,

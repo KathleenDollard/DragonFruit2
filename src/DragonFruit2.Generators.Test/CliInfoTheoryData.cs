@@ -23,8 +23,8 @@ public class CliInfoTheoryData
                     var myCommandDataValues = Cli.ParseArgs<MyCommand>(args);
                     var myCommandDataValues2 = Cli.ParseArgs<MyCommand2>(args);
 
-                    [CommandClass] class MyCommand{} 
-                    [CommandClass] class MyCommand2{}
+                    [CommandClass] class MyCommand{} : CommandClass
+                    [CommandClass] class MyCommand2{} : CommandClass
                     """,
 
                     """
@@ -32,7 +32,7 @@ public class CliInfoTheoryData
 
                     namespace MyCommandNamespace;
 
-                    [CommandClass] public class MyCommand3 
+                    [CommandClass] public class MyCommand3 : CommandClass
                     {}
                     """,
 
@@ -41,7 +41,7 @@ public class CliInfoTheoryData
 
                     namespace MyCommandNamespace2;
 
-                    [CommandClass] public class MyCommand4
+                    [CommandClass] public class MyCommand4 : CommandClass
                     {}
                     """,
 

@@ -4,6 +4,7 @@
 using DragonFruit2;
 using DragonFruit2.Validators;
 using System.CommandLine;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Cache;
 using System.Net.Http.Headers;
@@ -47,11 +48,13 @@ partial class MyCommand
     // Generation Note: MyCommand in the class declaration is TCommand.
     public partial class MyCommandDataDefinition : CommandDataDefinition<MyCommand, MyCommand>
     {
+        public static MyCommandDataDefinition Instance = new(null, null);
+
         // Generation Note: MyCommand in the following constructor is TCommand.
         public MyCommandDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
             : base(parentDataDefinition, rootDataDefinition)
         {
-            GetDataValues = () => new MyCommandDataValues(this);
+            GetDataValues = () => new MyCommandDataValues();
 
             Name = new OptionDataDefinition<string>(this, nameof(Name))
             {
@@ -105,14 +108,17 @@ partial class MyCommand
     // Generation Note: MyCommand in the following class is TRootCommand, except for the private srgsType.
     public class MyCommandDataValues : DataValues<MyCommand>
     {
-        public MyCommandDataValues(MyCommandDataDefinition commandDefinition)
-            : base(commandDefinition)
+        public static MyCommandDataDefinition CommandDataDefinition = MyCommandDataDefinition.Instance;
+        private Type commandClassType = typeof(MyCommand);
+
+        public MyCommandDataValues()
+            : base()
         {
-            Name = DataValue<string>.Create(nameof(Name), commandType, this, commandDefinition.Name);
+            Name = DataValue<string>.Create(nameof(Name), commandType, this, CommandDataDefinition.Name);
             Add(Name);
-            Age = DataValue<int>.Create(nameof(Age), commandType, this, commandDefinition.Age);
+            Age = DataValue<int>.Create(nameof(Age), commandType, this, CommandDataDefinition.Age);
             Add(Age);
-            Greeting = DataValue<string>.Create(nameof(Greeting), commandType, this, commandDefinition.Greeting);
+            Greeting = DataValue<string>.Create(nameof(Greeting), commandType, this, CommandDataDefinition.Greeting);
             Add(Greeting);
         }
 

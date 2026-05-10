@@ -26,13 +26,14 @@ namespace MyNamespace
         /// <summary>
         ///  The data definition is available to data providers and are used for initialization.
         /// </summary>
-        public partial class MorningGreetingCommandDataDefinition : CommandDataDefinition<MyNamespace.MyCommand>
+        public partial class MorningGreetingCommandDataDefinition : CommandDataDefinition<MyNamespace.MorningGreetingCommand, MyNamespace.MyCommand>
         {
+            public static MyNamespace.MorningGreetingCommand.MorningGreetingCommandDataDefinition Instance = new(MyNamespace.MyCommand.MyCommandDataDefinition.Instance, MyNamespace.MyCommand.MyCommandDataDefinition.Instance);
 
             public MorningGreetingCommandDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
                 : base(parentDataDefinition, rootDataDefinition)
             {
-                GetDataValues = () => new MorningGreetingCommandDataValues(this);
+                GetDataValues = () => new MorningGreetingCommandDataValues();
                 RegisterCustomizations();
             }
 
@@ -51,15 +52,17 @@ namespace MyNamespace
 
         }
 
-        public class MorningGreetingCommandDataValues : DataValues<MyNamespace.MyCommand>
+        public class MorningGreetingCommandDataValues : MyNamespace.MyCommand.MyCommandDataValues
         {
+            public static MyNamespace.MorningGreetingCommand.MorningGreetingCommandDataDefinition CommandDataDefinition = new(MyNamespace.MyCommand.MyCommandDataDefinition.Instance, MyNamespace.MyCommand.MyCommandDataDefinition.Instance);
+            private Type commandClassType = typeof(MorningGreetingCommand);
 
-            public MorningGreetingCommandDataValues(MorningGreetingCommandDataDefinition commandDefinition)
-                : base(commandDefinition)
+            public MorningGreetingCommandDataValues()
+                : base()
             {
             }
 
-             public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyCommand, TReturn> operationContainer)
+            public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyCommand, TReturn> operationContainer)
             {
                 try
                 {
@@ -74,7 +77,6 @@ namespace MyNamespace
                 }
             }
 
-            private Type commandClassType = typeof(MorningGreetingCommand);
             public DataValue<string> Name { get; }
 
             protected override MorningGreetingCommand CreateInstance()

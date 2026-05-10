@@ -26,13 +26,14 @@ namespace MyNamespace
         /// <summary>
         ///  The data definition is available to data providers and are used for initialization.
         /// </summary>
-        public partial class BarDataDefinition : CommandDataDefinition<MyNamespace.MyCommand>
+        public partial class BarDataDefinition : CommandDataDefinition<MyNamespace.Bar, MyNamespace.MyCommand>
         {
+            public static MyNamespace.Bar.BarDataDefinition Instance = new(MyNamespace.EveningGreetingCommand.EveningGreetingCommandDataDefinition.Instance, MyNamespace.MyCommand.MyCommandDataDefinition.Instance);
 
             public BarDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
                 : base(parentDataDefinition, rootDataDefinition)
             {
-                GetDataValues = () => new BarDataValues(this);
+                GetDataValues = () => new BarDataValues();
                 RegisterCustomizations();
             }
 
@@ -51,15 +52,17 @@ namespace MyNamespace
 
         }
 
-        public class BarDataValues : DataValues<MyNamespace.MyCommand>
+        public class BarDataValues : MyNamespace.EveningGreetingCommand.EveningGreetingCommandDataValues
         {
+            public static MyNamespace.Bar.BarDataDefinition CommandDataDefinition = new(MyNamespace.EveningGreetingCommand.EveningGreetingCommandDataDefinition.Instance, MyNamespace.MyCommand.MyCommandDataDefinition.Instance);
+            private Type commandClassType = typeof(Bar);
 
-            public BarDataValues(BarDataDefinition commandDefinition)
-                : base(commandDefinition)
+            public BarDataValues()
+                : base()
             {
             }
 
-             public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyCommand, TReturn> operationContainer)
+            public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyCommand, TReturn> operationContainer)
             {
                 try
                 {
@@ -75,7 +78,6 @@ namespace MyNamespace
                 }
             }
 
-            private Type commandClassType = typeof(Bar);
             public DataValue<int> Age { get; }
             public DataValue<string> Name { get; }
 

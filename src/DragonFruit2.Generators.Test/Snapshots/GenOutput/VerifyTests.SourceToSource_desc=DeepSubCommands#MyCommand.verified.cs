@@ -12,7 +12,7 @@ namespace MyNamespace
     /// <summary>
     /// Auto-generated partial class for building CLI commands for <see cref="MyCommand"/>" and creating a new MyCommand instance from a <see cref="System.CommandLine.ParseResult" />.
     /// </summary>
-    partial class MyCommand : Object
+    partial class MyCommand : CommandClass
     {
 
         public MyCommand()
@@ -42,13 +42,14 @@ namespace MyNamespace
         /// <summary>
         ///  The data definition is available to data providers and are used for initialization.
         /// </summary>
-        public partial class MyCommandDataDefinition : CommandDataDefinition<MyNamespace.MyCommand>
+        public partial class MyCommandDataDefinition : CommandDataDefinition<MyNamespace.MyCommand, MyNamespace.MyCommand>
         {
+            public static MyNamespace.MyCommand.MyCommandDataDefinition Instance = new(null, MyNamespace.MyCommand.MyCommandDataDefinition.Instance);
 
             public MyCommandDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
                 : base(parentDataDefinition, rootDataDefinition)
             {
-                GetDataValues = () => new MyCommandDataValues(this);
+                GetDataValues = () => new MyCommandDataValues();
                 Name = new OptionDataDefinition<string>(this, nameof(Name))
                 {
                     DataType = typeof(string), 
@@ -86,15 +87,17 @@ namespace MyNamespace
 
         public class MyCommandDataValues : DataValues<MyNamespace.MyCommand>
         {
+            public static MyNamespace.MyCommand.MyCommandDataDefinition CommandDataDefinition = new(null, MyNamespace.MyCommand.MyCommandDataDefinition.Instance);
+            private Type commandClassType = typeof(MyCommand);
 
-            public MyCommandDataValues(MyCommandDataDefinition commandDefinition)
-                : base(commandDefinition)
+            public MyCommandDataValues()
+                : base()
             {
-                Name = DataValue<string>.Create(nameof(Name), commandClassType, this, commandDefinition.Name);
+                Name = DataValue<string>.Create(nameof(Name), commandClassType, this, CommandDataDefinition.Name);
                 Add(Name);
             }
 
-             public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyCommand, TReturn> operationContainer)
+            public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyCommand, TReturn> operationContainer)
             {
                 try
                 {
@@ -109,7 +112,6 @@ namespace MyNamespace
                 }
             }
 
-            private Type commandClassType = typeof(MyCommand);
             public DataValue<string> Name { get; }
 
             protected override MyCommand CreateInstance()

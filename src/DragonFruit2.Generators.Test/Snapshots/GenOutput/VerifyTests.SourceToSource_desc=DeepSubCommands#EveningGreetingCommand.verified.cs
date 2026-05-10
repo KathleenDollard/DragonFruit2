@@ -42,13 +42,14 @@ namespace MyNamespace
         /// <summary>
         ///  The data definition is available to data providers and are used for initialization.
         /// </summary>
-        public partial class EveningGreetingCommandDataDefinition : CommandDataDefinition<MyNamespace.MyCommand>
+        public partial class EveningGreetingCommandDataDefinition : CommandDataDefinition<MyNamespace.EveningGreetingCommand, MyNamespace.MyCommand>
         {
+            public static MyNamespace.EveningGreetingCommand.EveningGreetingCommandDataDefinition Instance = new(MyNamespace.MyCommand.MyCommandDataDefinition.Instance, MyNamespace.MyCommand.MyCommandDataDefinition.Instance);
 
             public EveningGreetingCommandDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
                 : base(parentDataDefinition, rootDataDefinition)
             {
-                GetDataValues = () => new EveningGreetingCommandDataValues(this);
+                GetDataValues = () => new EveningGreetingCommandDataValues();
                 Age = new OptionDataDefinition<int>(this, nameof(Age))
                 {
                     DataType = typeof(int), 
@@ -80,17 +81,19 @@ namespace MyNamespace
 
         }
 
-        public class EveningGreetingCommandDataValues : DataValues<MyNamespace.MyCommand>
+        public class EveningGreetingCommandDataValues : MyNamespace.MyCommand.MyCommandDataValues
         {
+            public static MyNamespace.EveningGreetingCommand.EveningGreetingCommandDataDefinition CommandDataDefinition = new(MyNamespace.MyCommand.MyCommandDataDefinition.Instance, MyNamespace.MyCommand.MyCommandDataDefinition.Instance);
+            private Type commandClassType = typeof(EveningGreetingCommand);
 
-            public EveningGreetingCommandDataValues(EveningGreetingCommandDataDefinition commandDefinition)
-                : base(commandDefinition)
+            public EveningGreetingCommandDataValues()
+                : base()
             {
-                Age = DataValue<int>.Create(nameof(Age), commandClassType, this, commandDefinition.Age);
+                Age = DataValue<int>.Create(nameof(Age), commandClassType, this, CommandDataDefinition.Age);
                 Add(Age);
             }
 
-             public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyCommand, TReturn> operationContainer)
+            public override bool Operate<TReturn>(IOperateOnDataValue<MyNamespace.MyCommand, TReturn> operationContainer)
             {
                 try
                 {
@@ -106,7 +109,6 @@ namespace MyNamespace
                 }
             }
 
-            private Type commandClassType = typeof(EveningGreetingCommand);
             public DataValue<int> Age { get; }
             public DataValue<string> Name { get; }
 

@@ -3,10 +3,9 @@
     Name: MyCommand,
     NamespaceName: MyNamespace,
     Accessibility: public,
-    BaseTypeName: Object,
-    BaseTypeNamespace: System,
-    BaseTypeFullName: System.Object,
-    SimpleName: my,
+    BaseTypeName: CommandClass,
+    BaseTypeNamespace: DragonFruit2,
+    BaseTypeFullName: DragonFruit2.CommandClass,
     Arguments: [],
     Options: [
       {
@@ -32,7 +31,6 @@
     BaseTypeName: MyCommand,
     BaseTypeNamespace: MyNamespace,
     BaseTypeFullName: MyNamespace.MyCommand,
-    SimpleName: morning-greeting,
     Arguments: [],
     Options: []
   },
@@ -43,7 +41,6 @@
     BaseTypeName: MyCommand,
     BaseTypeNamespace: MyNamespace,
     BaseTypeFullName: MyNamespace.MyCommand,
-    SimpleName: evening-greeting,
     Arguments: [],
     Options: [
       {
@@ -71,7 +68,6 @@
     BaseTypeName: EveningGreetingCommand,
     BaseTypeNamespace: MyNamespace,
     BaseTypeFullName: MyNamespace.EveningGreetingCommand,
-    SimpleName: bar,
     Arguments: [],
     Options: []
   }

@@ -21,7 +21,7 @@ public class OutputDataDefinition
     private static void Fields(StringBuilderWrapper sb, CommandNode commandNode)
     {
         sb.AppendLine($"public static {commandNode.NestedName("DataDefinition")} Instance = new({sb.NullStringIfNull(commandNode.ParentCommandNode?.NestedName("DataDefinition.Instance"))}, {sb.NullStringIfNull(commandNode.RootCommandNode?.NestedName("DataDefinition.Instance"))});");
-    }   
+    }
 
     internal static void OpenClass(StringBuilderWrapper sb, CommandNode commandNode)
     {
@@ -37,25 +37,21 @@ public class OutputDataDefinition
 
         sb.AppendLine($"GetDataValues = () => new {commandNode.CommandInfo.Name}DataValues();");
 
-        foreach (var optionInfo in commandNode.CommandInfo.Options)
+        foreach (var propInfo in commandNode.GetSelfAndAncestorPropInfos())
         {
-            sb.AppendLine($"{optionInfo.Name} = new OptionDataDefinition<{optionInfo.TypeName}>(this, nameof({optionInfo.Name}))");
+            if (propInfo.IsArgument)
+            {
+                sb.AppendLine($"{propInfo.Name} = new ArgumentDataDefinition<{propInfo.TypeName}>(this, nameof({propInfo.Name}))");
+            }
+            else
+            {
+                sb.AppendLine($"{propInfo.Name} = new OptionDataDefinition<{propInfo.TypeName}>(this, nameof({propInfo.Name}))");
+            }
             sb.OpenCurly();
-            AddMemberInfo(sb, optionInfo);
+            AddMemberInfo(sb, propInfo);
             sb.CloseCurly(endStatement: true);
-            AddValidation(sb, optionInfo);
-            AddDefaults(sb, optionInfo);
-            sb.AppendLine();
-        }
-
-        foreach (var argumentInfo in commandNode.CommandInfo.Arguments)
-        {
-            sb.AppendLine($"{argumentInfo.Name} = new ArgumentDataDefinition<{argumentInfo.TypeName}>(this, nameof({argumentInfo.Name}))");
-            sb.OpenCurly();
-            AddMemberInfo(sb, argumentInfo);
-            sb.CloseCurly(endStatement: true);
-            AddValidation(sb, argumentInfo);
-            AddDefaults(sb, argumentInfo);
+            AddValidation(sb, propInfo);
+            AddDefaults(sb, propInfo);
             sb.AppendLine();
         }
 
@@ -102,14 +98,18 @@ public class OutputDataDefinition
 
     }
 
-
-
     private static void Properties(StringBuilderWrapper sb, CommandNode commandNode)
     {
-        foreach (var propInfo in commandNode.CommandInfo.GetOptionsAndArguments())
+        foreach (var propInfo in commandNode.GetSelfAndAncestorPropInfos())
         {
-            sb.AppendLine($"public OptionDataDefinition<{propInfo.TypeName}> {propInfo.Name} {{ get; }}");
-
+            if (propInfo.IsArgument)
+            {
+                sb.AppendLine($"public ArgumentDataDefinition<{propInfo.TypeName}> {propInfo.Name} {{ get; }}");
+            }
+            else
+            {
+                sb.AppendLine($"public OptionDataDefinition<{propInfo.TypeName}> {propInfo.Name} {{ get; }}");
+            }
         }
     }
 
@@ -119,7 +119,7 @@ public class OutputDataDefinition
 
         sb.AppendLine("return memberName switch");
         sb.OpenCurly();
-        foreach (var propInfo in commandNode.CommandInfo.GetOptionsAndArguments())
+        foreach (var propInfo in commandNode.GetSelfAndAncestorPropInfos())
         {
             sb.AppendLine($"nameof({propInfo.Name}) => {propInfo.Name},");
         }
@@ -132,10 +132,10 @@ public class OutputDataDefinition
     private static void Operate(StringBuilderWrapper sb, CommandNode commandNode)
     {
         sb.OpenMethod("public override IEnumerable<TReturn> Operate<TReturn> (IOperationOnMemberDefinition<TReturn> operationContainer)");
-        sb.AppendLine($"var retValues = new TReturn[{commandNode.CommandInfo.GetOptionsAndArguments().Count()}];");
+        sb.AppendLine($"var retValues = new TReturn[{commandNode.GetSelfAndAncestorPropInfos().Count()}];");
 
         var i = 0;
-        foreach (var propInfo in commandNode.CommandInfo.GetOptionsAndArguments())
+        foreach (var propInfo in commandNode.GetSelfAndAncestorPropInfos())
         {
             sb.AppendLine($"retValues[{i}] = operationContainer.Operate({propInfo.Name});");
             i++;

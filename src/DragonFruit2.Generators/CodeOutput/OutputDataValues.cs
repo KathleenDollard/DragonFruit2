@@ -43,7 +43,7 @@ internal class OutputDataValues
     {
         sb.OpenConstructor($"public {commandNode.CommandInfo.Name}DataValues()",
             "base()");
-        foreach (var propInfo in commandNode.CommandInfo.GetOptionsAndArguments())
+        foreach (var propInfo in commandNode.GetSelfAndAncestorPropInfos())
         {
             sb.AppendLine($"{propInfo.Name} = DataValue<{propInfo.TypeName}>.Create(nameof({propInfo.Name}), commandClassType, this, CommandDataDefinition.{propInfo.Name});");
             sb.AppendLine($"Add({propInfo.Name});");

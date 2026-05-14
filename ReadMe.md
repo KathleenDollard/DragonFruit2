@@ -1,11 +1,16 @@
-
 ## NEWSFLASH!!!!
 
-### Generation redesign
+[Shortcut to the examples](#scenarios)
 
-The long delay between PRs here is partially because of "life" and also because this is a major redesign that aligns with my "Staying sane with Roslyn source generators" talk that I will be giving at Techorama in May. Watch for future documentation in this repo on a th arc of the generation process.
+### Techorama
 
-The impact on the design is that `CommandClass` types must have a `CommandClass` attribute. This improves generation performance, and indicates that they are special DTO classes with extra behavior, and in non-trivial cases, should probably be isolated to the CLI layer. It is also a breaking change in the prototype.
+Thanks to all that came to my Techorama talk! The `techorama-be-2026-05-13` branch is the state of the project during the talk, plus changes to this `ReadMe.md`. I am planning some reorganization to clarify which projects are delivered and which support development and other changes which will not preserve the layout you saw in the talk.
+
+### Recent breaking changes
+
+Command classes must have both a `CommandClassAttribute` and a `CommandClass` base class.
+
+All use of "Args" in naming has been replaced with "Command" or "CommandClass". 
 
 
 ### .NET Rocks
@@ -70,11 +75,11 @@ Issues and PRs are welcome to keep docs current, and all other docs can be consi
 ```csharp
 using DragonFruit2;
 
-if (Cli.TryParse<Args>(out var result))
+if (Cli.TryParse<MyCommand>(out var result))
 {
-   var args = result.Args
+   var command = result.Command;
    // Do work here. The following line is an example
-   Console.WriteLine($"{args.Greeting}, {args.Name}")
+   Console.WriteLine($"{command.Greeting}, {command.Name}");
 }
 else
 {
@@ -84,27 +89,28 @@ else
 
 `TryParse` and `TryExecute` are planned.
 
-You may use any name in place of `Args` as the type parameter to `TryParse`. It will be squiggled at this point in your process.
+You may use any name in place of `MyCommand` as the type parameter to `TryParse`. It will be squiggled at this point in your process.
 
-Positioning your cursor on the `Args` type parameter, hold Ctl and hit the period. You should get a menu that includes "Generate type `Args`", and "Generate a class in a new file".
+Positioning your cursor on the `MyCommand` type parameter, hold Ctl and hit the period. You should get a menu that includes "Generate type `MyCommand`", and "Generate a class in a new file".
 
 Hit F12 to navigate to this new class and add `partial` and the `CommandClass` attribute to the class declaration:
 
 ```csharp
 [CommandClass]
-public partial class Args
+public partial class MyCommand
 ```
 
 The `CommandClass` attribute indicates that the DragonFruit2 generator will generate the code for the System.CommandLine interface and other DragonFruit2 features. The `partial` keyword indicates that the DragonFruit2 generator will add code to the class.
 
-_Eventually, there should be a fixer that appears for the DragonFruit2 entry points and offers to create the `Args` class with the appropriate name and `partial`._
+_Eventually, there should be a fixer that appears for the DragonFruit2 entry points and offers to create the CommandClass with the appropriate name and `partial`._
 
-Add properties to the `Args` class. By default properties are created as options. Use Pascal case for property names (the normal C# standard). DragonFruit2 will convert these to appropriate names for your CLI based on the POSIX standard. If you would like a property to appear as an argument, use the `Argument` attribute and specify the position in which the argument will appear. Argument positions should be unique. Here is an example:
+Add properties to the CommandClass. By default properties are created as options. Use Pascal case for property names (the normal C# standard). DragonFruit2 will convert these to appropriate names for your CLI based on the POSIX standard. If you would like a property to appear as an argument, use the `Argument` attribute and specify the position in which the argument will appear. Argument positions should be unique. Here is an example:
 
 _We should create an analyzer that checks for unique positions._
 
 ```csharp
-public partial class Args
+[CommandClass]
+public partial class MyCommand : CommandClass
 {
   /// <summary>
   /// "Your name"
@@ -134,17 +140,20 @@ Many CLIs consist of a single level. Some CLIs, such as the .NET CLI have subcom
 Subcommands in DragonFruit2are handled via derived classes. While this may be surprising, it allows a very natural handling of things like common options and how the returned result specifies which command was selected. A simple example is:
 
 ```csharp
-public partial class SubCommandArgs
+[CommandClass]
+public partial class SubCommand : CommandClass
 {
     public required string Name { get; set; }
     public virtual string Greeting { get; set; } = "Hello";
 }
 
-public partial class MorningArgs : SubCommandArgs
+[CommandClass]
+public partial class Morning : SubCommand
 {
 }
 
-public partial class EveningArgs : SubCommandArgs
+[CommandClass]
+public partial class Evening : SubCommand
 {
     public override string Greeting { get; set; } = "Good evening";
 }
@@ -161,7 +170,7 @@ The pragmatic considerations for using derived classes for subcommandsare:
 - It reduces the number of attributes or special knowledge needed to build a CLI
 - Only leaf nodes are ever invoked/created as a parse result and making non-invokable classes abstract is natural
 - Any options or arguments that apply to parent commands apply to the leaf and this makes their values naturally available
-- `recursive`, which has sometimes challenged folks, is strictly an aspect of System.CommandLine and based on an attribute. It's unrelated to the Args data.
+- `recursive`, which has sometimes challenged folks, is strictly an aspect of System.CommandLine and based on an attribute. It's unrelated to the CommandClass data.
 - When working with a result it can be typed to the parent and a `switch` used to determine which subcommand was executed.
 
 ### Validation
@@ -173,7 +182,8 @@ Declaring a property as `required` results in `Required` validation.
 Defining validation via an attribute:
 
 ```csharp
-internal partial class MyCommand : ArgsRootBase<MyCommand>
+[CommandClass]
+public partial class MyCommand : CommandClass
 {
     public required string Name { get; init; }
     [GreaterThan(0)]
@@ -185,7 +195,8 @@ internal partial class MyCommand : ArgsRootBase<MyCommand>
 Defining validation via registration:
 
 ```csharp
-internal partial class MyCommand : ArgsRootBase<MyCommand>
+[CommandClass]
+public partial class MyCommand : CommandClass
 {
     public required string Name { get; init; }
     [GreaterThan(0)]
@@ -211,7 +222,8 @@ Default values work almost like validation, in that both attribute and registrat
 Adding a default value to the previous example via an attribute:
 
 ```csharp
-internal partial class MyCommand : ArgsRootBase<MyCommand>
+[CommandClass]
+public partial class MyCommand : CommandClass
 {
     public required string Name { get; init; }
     [GreaterThan(0)]
@@ -224,7 +236,8 @@ internal partial class MyCommand : ArgsRootBase<MyCommand>
 Adding a default value to the previous example via registration:
 
 ```csharp
-internal partial class MyCommand : ArgsRootBase<MyCommand>
+[CommandClass]
+internal partial class MyCommand : CommandClass
 {
     public required string Name { get; init; }
     [GreaterThan(0)]
@@ -266,7 +279,7 @@ There are several ways to indicate that an option or argument is required.
 
 ### Execution
 
-A `TryExecute` method that runs an `Execute` method on the `Args` class is planned.
+A `TryExecute` method that runs an `Execute` method on the CommandClass is planned.
  
 ## Naming
 
@@ -274,7 +287,7 @@ It is generally suggested that your arg class use normal naming without suffixes
 
 - The name of the class is the name of the command
   - If it is the root command, the name is not used
-  - If the name ends in `Command` or `Args` it is removed unless the `UseExactName` _(not yet implemented)_ attribute is used
+  - If the name ends in `Command` it is removed unless the `UseExactName` _(not yet implemented)_ attribute is used
 - The name of the property is the name of the option or argument
   - By default, properties are options, because arguments need position information
   - Arguments use the `Argument` attribute, which must include `Position`

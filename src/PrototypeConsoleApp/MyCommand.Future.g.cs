@@ -50,7 +50,6 @@ partial class MyCommand
     {
         public static MyCommandDataDefinition Instance = new(null, null);
 
-        // Generation Note: MyCommand in the following constructor is TCommand.
         public MyCommandDataDefinition(CommandDataDefinition? parentDataDefinition, CommandDataDefinition? rootDataDefinition)
             : base(parentDataDefinition, rootDataDefinition)
         {
